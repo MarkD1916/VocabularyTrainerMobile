@@ -1,5 +1,8 @@
 package com.example.vocabularytrainer.presentation.welcome.components
 
+import android.annotation.SuppressLint
+import androidx.compose.animation.Crossfade
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
@@ -19,12 +22,15 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.vocabularytrainer.R
 
+@SuppressLint("UnusedCrossfadeTargetStateParameter")
 @Composable
 fun ImageWithSmallText(
     modifier: Modifier = Modifier,
-    imageId: Int,
+    imageIdFirstState: Int,
+    imageIdSecondState: Int = R.drawable.ic_baseline_web_24,
     text: String,
     onClick: () -> Unit,
+    imageState: Boolean = false,
     textColor: Color = Color(0xFFFFFFFF),
     xOffset: Float = 0f,
     yOffset: Float = 0f
@@ -33,14 +39,22 @@ fun ImageWithSmallText(
         .absoluteOffset(xOffset.dp, yOffset.dp)
         .width(70.dp)
         .clickable {
-        onClick()
-    }){
-        Image(
-            painterResource(imageId),
-            contentDescription = "",
-            contentScale = ContentScale.Fit,
-            modifier = Modifier.size(20.dp).align(Alignment.CenterVertically)
-        )
+            onClick()
+        }) {
+        Crossfade(
+            imageState,
+            animationSpec = tween(500),
+            modifier = Modifier
+                .size(20.dp)
+                .align(Alignment.CenterVertically)
+        ) {
+            Image(
+                painterResource(if (!it) imageIdFirstState else imageIdSecondState),
+                contentDescription = "",
+                contentScale = ContentScale.Fit,
+
+            )
+        }
         Spacer(modifier = Modifier.width(3.dp))
         Text(
             modifier = Modifier.align(Alignment.Top),

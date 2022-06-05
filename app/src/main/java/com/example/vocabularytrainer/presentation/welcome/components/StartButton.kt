@@ -76,7 +76,7 @@ fun StartButton(
             }
             .border(
                 width = 1.dp,
-                color = Color(0xFFF44336),
+                color = MaterialTheme.colors.secondary,
                 shape = RoundedCornerShape(12.dp)
             )
     ) {

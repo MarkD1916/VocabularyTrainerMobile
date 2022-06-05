@@ -5,8 +5,13 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.gestures.LocalOverScrollConfiguration
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Email
+import androidx.compose.material.icons.filled.Lock
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.geometry.Size
@@ -15,6 +20,7 @@ import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.toSize
 import com.example.vocabularytrainer.R
+import com.example.vocabularytrainer.presentation.auth.components.AuthTextField
 import com.example.vocabularytrainer.presentation.auth.components.PagerIndicator
 import com.example.vocabularytrainer.presentation.auth.components.PagerIndicatorSetup
 import com.example.vocabularytrainer.presentation.welcome.components.ImageWithSmallText
@@ -37,6 +43,11 @@ fun RegisterScreen() {
         pageCount = pagerState.pageCount,
         indicatorPadding = 60
     ).listOfPositions
+
+
+    val loginImageState = remember {
+        mutableStateOf(false)
+    }
     Column {
         Column(
             modifier = Modifier
@@ -83,7 +94,9 @@ fun RegisterScreen() {
             ) {
                 val scope by mutableStateOf(rememberCoroutineScope())
                 ImageWithSmallText(
-                    imageId = R.drawable.ic_baseline_lock_open_24,
+                    imageIdFirstState = R.drawable.ic_baseline_lock_open_24,
+                    imageIdSecondState = R.drawable.ic_baseline_lock_24,
+                    imageState = loginImageState.value,
                     text = "Login\nand\npassword",
                     onClick = {
                         scope.launch {
@@ -92,7 +105,7 @@ fun RegisterScreen() {
                     }
                 )
                 ImageWithSmallText(
-                    imageId = R.drawable.ic_baseline_add_avatar,
+                    imageIdFirstState = R.drawable.ic_baseline_add_avatar,
                     text = "Language\nand\navatar",
                     onClick = {
                         scope.launch {
@@ -102,7 +115,7 @@ fun RegisterScreen() {
                 )
 
                 ImageWithSmallText(
-                    imageId = R.drawable.ic_baseline_3p_24,
+                    imageIdFirstState = R.drawable.ic_baseline_3p_24,
                     text = "\nPreview\n",
                     onClick = {
                         scope.launch {
@@ -114,7 +127,9 @@ fun RegisterScreen() {
 
         }
 
-        PagerContent(pagerState = pagerState)
+        PagerContent(pagerState = pagerState) {
+            loginImageState.value = it
+        }
 
     }
 }
@@ -122,7 +137,10 @@ fun RegisterScreen() {
 
 @OptIn(ExperimentalPagerApi::class, androidx.compose.foundation.ExperimentalFoundationApi::class)
 @Composable
-private fun PagerContent(pagerState: PagerState) {
+private fun PagerContent(
+    pagerState: PagerState,
+    updateImage: (Boolean) -> Unit
+) {
     CompositionLocalProvider(
         LocalOverScrollConfiguration provides null
     ) {
@@ -134,7 +152,7 @@ private fun PagerContent(pagerState: PagerState) {
 
             when (pager) {
                 0 -> {
-                    EmailPasswordSubView()
+                    EmailPasswordSubView(updateImage)
                 }
                 1 -> {
                     AvatarNativeLanguageSubView()
@@ -149,15 +167,48 @@ private fun PagerContent(pagerState: PagerState) {
 }
 
 @Composable
-private fun EmailPasswordSubView() {
-    Column(
-        Modifier
-            .fillMaxSize()
-            .background(Color.Red)
-    ) {
+private fun EmailPasswordSubView(updateImage: (Boolean) -> Unit) {
+
+        Row(Modifier
+            .fillMaxSize()){
+            Column(
+                verticalArrangement = Arrangement.spacedBy(10.dp),
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 30.dp, vertical = 50.dp)
+            ) {
+                AuthTextField(
+                    modifier = Modifier.align(Alignment.CenterHorizontally),
+                    labelText = "Email address",
+                    placeHolderText = "Enter your e-mail",
+                    icon = Icons.Default.Email
+                )
+
+                AuthTextField(
+                    modifier = Modifier.align(Alignment.CenterHorizontally),
+                    labelText = "Password",
+                    placeHolderText = "Enter your password",
+                    Icons.Default.Lock
+                )
+
+                AuthTextField(
+                    modifier = Modifier.align(Alignment.CenterHorizontally),
+                    labelText = "Confirm Password",
+                    placeHolderText = "Confirm your password",
+                    Icons.Default.Lock
+                )
+            }
+        }
+
+//        Button(modifier = Modifier,
+//            onClick = {
+//                updateImage(true)
+//            }
+//        ) {
+//
+//        }
 
 
-    }
 }
 
 @Composable

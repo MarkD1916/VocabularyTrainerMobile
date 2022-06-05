@@ -84,7 +84,7 @@ fun WelcomeScreen(
                     Uri.parse(Constants.WEB_BLOG_LINK)
                 val uriHandler = LocalUriHandler.current
                 ImageWithSmallText(
-                    imageId = R.drawable.github_logo_white,
+                    imageIdFirstState = R.drawable.github_logo_white,
                     text = "My GitHub",
                     onClick = {
                         uriHandler.openUri(uriGitHub.toString())
@@ -92,7 +92,7 @@ fun WelcomeScreen(
                 )
 
                 ImageWithSmallText(
-                    imageId = R.drawable.ic_baseline_web_24,
+                    imageIdFirstState = R.drawable.ic_baseline_web_24,
                     text = "Web version",
                     onClick = {
                         uriHandler.openUri(uriWebBlog.toString())
