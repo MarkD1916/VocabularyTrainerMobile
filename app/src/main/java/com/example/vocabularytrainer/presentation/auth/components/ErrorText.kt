@@ -22,7 +22,7 @@ fun ErrorText(
     modifier: Modifier
 ) {
     Row(
-        modifier = modifier.fillMaxWidth()
+        modifier = modifier
     ) {
         Icon(
             modifier = Modifier
@@ -32,7 +32,7 @@ fun ErrorText(
             contentDescription = "error",
             tint = Color.Red
         )
-        Spacer(modifier = Modifier.width(10.dp))
+        Spacer(modifier = Modifier.width(5.dp))
         Text(
             modifier = Modifier.align(Alignment.CenterVertically),
             text = errorMessage,

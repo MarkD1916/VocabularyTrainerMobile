@@ -1,8 +1,8 @@
 package com.example.vocabularytrainer.domain.repository
 
-import com.example.vocabularytrainer.presentation.auth.registration.ValidationEvent
+import com.example.vocabularytrainer.presentation.auth.registration.RegistrationEvent
 
 
 interface AuthRepository {
-    suspend fun register(): ValidationEvent
+    suspend fun register(): RegistrationEvent
 }

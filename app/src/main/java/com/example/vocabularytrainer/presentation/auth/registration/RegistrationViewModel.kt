@@ -16,7 +16,6 @@ import javax.inject.Inject
 sealed class ValidationEvent() {
     object Success : ValidationEvent()
     data class Error(val message:String): ValidationEvent()
-    object Loading: ValidationEvent()
 }
 
 
@@ -48,6 +47,15 @@ class RegistrationViewModel @Inject constructor(
             is RegistrationEvent.Submit -> {
                 submitData()
             }
+            is RegistrationEvent.Loading -> {
+                state = state.copy(authResponseResult = AuthResponseResult.Loading)
+            }
+            is RegistrationEvent.Success -> {
+                state = state.copy(authResponseResult = AuthResponseResult.Success)
+            }
+            is RegistrationEvent.Error -> {
+                state = state.copy(authResponseResult = AuthResponseResult.Error(event.message))
+            }
         }
     }
 
@@ -75,8 +83,7 @@ class RegistrationViewModel @Inject constructor(
             state = state.copy(
                 emailError = null,
                 passwordError = null,
-                confirmPasswordError = null,
-                isLoading = true
+                confirmPasswordError = null
             )
         }
 //        viewModelScope.launch {
@@ -89,15 +96,13 @@ class RegistrationViewModel @Inject constructor(
     fun getDataFromServer() {
         viewModelScope.launch {
 
-            validationEventChannel.send(ValidationEvent.Loading)
-//
+//            validationEventChannel.send(ValidationEvent.Loading)
+            onEvent(RegistrationEvent.Loading)
             delay(5000L)
 //
 //            validationEventChannel.send(ValidationEvent.Success)
-            validationEventChannel.send(authUseCases.registerUser.execute("", ""))
-            state = state.copy(
-                isLoading = false
-            )
+            onEvent(authUseCases.registerUser.execute("", ""))
+
         }
     }
 

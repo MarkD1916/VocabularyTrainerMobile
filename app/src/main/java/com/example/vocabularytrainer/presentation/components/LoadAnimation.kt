@@ -1,11 +1,14 @@
 package com.example.vocabularytrainer.presentation.components
 
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.core.*
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.Canvas
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.Text
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
@@ -18,7 +21,7 @@ import androidx.compose.ui.unit.dp
 
 
 @Composable
-fun LoadAnimation(){
+fun LoadAnimation() {
     val infiniteTransition = rememberInfiniteTransition()
 
     val animationScale = infiniteTransition.animateFloat(
@@ -34,7 +37,7 @@ fun LoadAnimation(){
         )
     )
 
-    val animationAlpha= infiniteTransition.animateFloat(
+    val animationAlpha = infiniteTransition.animateFloat(
         initialValue = 1.0f,
         targetValue = 1.0f,
         animationSpec = infiniteRepeatable(
@@ -47,7 +50,8 @@ fun LoadAnimation(){
         )
     )
 
-    Column{
+    Column {
+
         Canvas(
             modifier = Modifier
                 .height(20.dp)
@@ -63,7 +67,11 @@ fun LoadAnimation(){
 
         }
         Spacer(modifier = Modifier.height(4.dp))
-        Text(modifier = Modifier.align(Alignment.CenterHorizontally),text ="Loading...", color = Color.White)
+        Text(
+            modifier = Modifier.align(Alignment.CenterHorizontally),
+            text = "Loading...",
+            color = Color.White
+        )
     }
 
 

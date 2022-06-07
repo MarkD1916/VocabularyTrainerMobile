@@ -1,17 +1,18 @@
 package com.example.vocabularytrainer.data.repository
 
 import com.example.vocabularytrainer.domain.repository.AuthRepository
+import com.example.vocabularytrainer.presentation.auth.registration.RegistrationEvent
 import com.example.vocabularytrainer.presentation.auth.registration.ValidationEvent
 import java.lang.Exception
 
 
 class AuthRepositoryImpl: AuthRepository {
 
-    override suspend fun register(): ValidationEvent {
+    override suspend fun register(): RegistrationEvent {
         return try {
-            ValidationEvent.Success
+            RegistrationEvent.Success
         } catch (e: Exception) {
-            ValidationEvent.Error(e.message!!)
+            RegistrationEvent.Error(e.message!!)
         }
     }
 

@@ -14,4 +14,8 @@ sealed class RegistrationEvent {
     ) : RegistrationEvent()
 
     object Submit : RegistrationEvent()
+
+    object Loading: RegistrationEvent()
+    object Success: RegistrationEvent()
+    data class Error(val message:String): RegistrationEvent()
 }

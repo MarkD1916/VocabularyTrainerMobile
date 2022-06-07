@@ -1,7 +1,6 @@
 package com.example.vocabularytrainer.presentation.auth
 
 import android.annotation.SuppressLint
-import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.LocalOverScrollConfiguration
@@ -13,7 +12,7 @@ import androidx.compose.material.Icon
 import androidx.compose.material.MaterialTheme
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Close
+import androidx.compose.material.icons.filled.Check
 import androidx.compose.material.icons.filled.Email
 import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Lock
@@ -38,6 +37,7 @@ import com.example.vocabularytrainer.presentation.auth.components.AuthTextField
 import com.example.vocabularytrainer.presentation.auth.components.ErrorText
 import com.example.vocabularytrainer.presentation.auth.components.PagerIndicator
 import com.example.vocabularytrainer.presentation.auth.components.PagerIndicatorSetup
+import com.example.vocabularytrainer.presentation.auth.registration.AuthResponseResult
 import com.example.vocabularytrainer.presentation.auth.registration.RegistrationEvent
 import com.example.vocabularytrainer.presentation.auth.registration.RegistrationViewModel
 import com.example.vocabularytrainer.presentation.auth.registration.ValidationEvent
@@ -49,7 +49,6 @@ import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.pager.HorizontalPager
 import com.google.accompanist.pager.PagerState
 import com.google.accompanist.pager.rememberPagerState
-import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.launch
 
 @SuppressLint("UnrememberedMutableState")
@@ -208,20 +207,17 @@ private fun EmailPasswordSubView(
     val state = registrationViewModel.state
     val context = LocalContext.current
 
-    val isLoading = remember{ mutableStateOf(false)}
     LaunchedEffect(key1 = context) {
         registrationViewModel.validationEvents.collect { event ->
             when (event) {
                 is ValidationEvent.Success -> {
-                    isLoading.value = false
+
 
                 }
                 is ValidationEvent.Error -> {
-                    isLoading.value = true
+
                 }
-                is ValidationEvent.Loading -> {
-                    isLoading.value = true
-                }
+
             }
         }
     }
@@ -247,7 +243,7 @@ private fun EmailPasswordSubView(
                     registrationViewModel.onEvent(RegistrationEvent.OnEmailEnter(it))
                 },
                 isError = state.emailError != null,
-                readOnly = state.isLoading
+                readOnly = state.getReadOnlyValue()
             )
 
             state.emailError?.let {
@@ -269,7 +265,7 @@ private fun EmailPasswordSubView(
                     registrationViewModel.onEvent(RegistrationEvent.OnPasswordEnter(it))
                 },
                 isError = state.passwordError != null,
-                readOnly = state.isLoading
+                readOnly = state.getReadOnlyValue()
             )
 
             Row(
@@ -313,7 +309,7 @@ private fun EmailPasswordSubView(
                     registrationViewModel.onEvent(RegistrationEvent.OnConfirmPasswordEnter(it))
                 },
                 isError = state.confirmPasswordError != null,
-                readOnly = state.isLoading
+                readOnly = state.getReadOnlyValue()
             )
             state.confirmPasswordError?.let {
                 ErrorText(
@@ -323,33 +319,48 @@ private fun EmailPasswordSubView(
                 )
             }
 
+
             Button(
                 modifier = Modifier.align(Alignment.CenterHorizontally),
                 onClick = {
-                    if (!state.isLoading) {
+                    if (state.authResponseResult == null || state.authResponseResult is AuthResponseResult.Error) {
                         registrationViewModel.onEvent(RegistrationEvent.Submit)
                     }
                 }
             ) {
-                if (state.isLoading) {
+                if (state.authResponseResult == null) {
+                    Text(text = "Submit", color = Color.White)
+                }
+                if (state.authResponseResult is AuthResponseResult.Loading) {
                     LoadAnimation()
                 }
-                else{
-                    Text(text ="Submit", color = Color.White)
+                if (state.authResponseResult is AuthResponseResult.Error) {
+                    Text(text = "Try Again", color = Color.White)
                 }
+                if (state.authResponseResult is AuthResponseResult.Success) {
+                    updateImage(true)
+                    Icon(
+                        modifier = Modifier
+                            .align(Alignment.CenterVertically)
+                            .size(30.dp),
+                        imageVector = Icons.Default.Check,
+                        contentDescription = "error",
+                        tint = Color.White
+                    )
+                }
+
             }
+            if (state.authResponseResult is AuthResponseResult.Error) {
+                ErrorText(
+                    modifier = Modifier.align(Alignment.CenterHorizontally),
+                    errorMessage = state.authResponseResult.message,
+                    textColor = Color.Red
+                )
+            }
+
+
         }
     }
-
-//        Button(modifier = Modifier,
-//            onClick = {
-//                updateImage(true)
-//            }
-//        ) {
-//
-//        }
-
-
 }
 
 @Composable
