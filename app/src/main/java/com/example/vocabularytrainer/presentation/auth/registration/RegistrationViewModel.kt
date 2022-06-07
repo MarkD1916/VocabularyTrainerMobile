@@ -8,12 +8,15 @@ import androidx.lifecycle.viewModelScope
 import com.example.vocabularytrainer.domain.auth.use_case.AuthUseCases
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 sealed class ValidationEvent() {
     object Success : ValidationEvent()
+    data class Error(val message:String): ValidationEvent()
+    object Loading: ValidationEvent()
 }
 
 
@@ -26,6 +29,10 @@ class RegistrationViewModel @Inject constructor(
 
     private val validationEventChannel = Channel<ValidationEvent>()
     val validationEvents = validationEventChannel.receiveAsFlow()
+
+    private val responseEventChannel = Channel<ValidationEvent>()
+    val responseEvents = responseEventChannel.receiveAsFlow()
+
 
     fun onEvent(event: RegistrationEvent) {
         when (event) {
@@ -64,8 +71,33 @@ class RegistrationViewModel @Inject constructor(
             )
             return
         }
+        else {
+            state = state.copy(
+                emailError = null,
+                passwordError = null,
+                confirmPasswordError = null,
+                isLoading = true
+            )
+        }
+//        viewModelScope.launch {
+//            validationEventChannel.send(ValidationEvent.Success)
+//            getDataFromServer()
+//        }
+        getDataFromServer()
+    }
+
+    fun getDataFromServer() {
         viewModelScope.launch {
-            validationEventChannel.send(ValidationEvent.Success)
+
+            validationEventChannel.send(ValidationEvent.Loading)
+//
+            delay(5000L)
+//
+//            validationEventChannel.send(ValidationEvent.Success)
+            validationEventChannel.send(authUseCases.registerUser.execute("", ""))
+            state = state.copy(
+                isLoading = false
+            )
         }
     }
 

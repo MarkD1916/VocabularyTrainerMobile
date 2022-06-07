@@ -40,105 +40,109 @@ fun WelcomeScreen(
             viewModel.job?.cancel()
         }
     }
-    Box(modifier = Modifier
-        .fillMaxSize()
-    ) {
-
+    Box {
         Column(
             modifier = Modifier
-                .fillMaxWidth()
-                .clip(
-                    RoundedCornerShape(
-                        bottomEnd = 50.dp,
-                        bottomStart = 50.dp
-                    )
-                )
-                .background(MaterialTheme.colors.primary)
-                .padding(
-                    horizontal = 15.dp,
-                    vertical = 15.dp
-                )
+                .fillMaxSize()
         ) {
-            Row(
-                modifier = Modifier
-                    .align(Alignment.CenterHorizontally)
-            ) {
-                Text(
-                    text = "Welcome to Vocabulary Trainer APP",
-                    color = Color(0xFFFFFFFF)
-                )
-            }
-            Spacer(modifier = Modifier.height(15.dp))
-            Row(
-                horizontalArrangement = Arrangement.SpaceBetween,
+
+            Column(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .align(Alignment.Start)
+                    .clip(
+                        RoundedCornerShape(
+                            bottomEnd = 50.dp,
+                            bottomStart = 50.dp
+                        )
+                    )
+                    .background(MaterialTheme.colors.primary)
                     .padding(
-                        horizontal = 15.dp
+                        horizontal = 15.dp,
+                        vertical = 15.dp
                     )
             ) {
-                val uriGitHub: Uri =
-                    Uri.parse(Constants.GIT_HUB_LINK)
-                val uriWebBlog: Uri =
-                    Uri.parse(Constants.WEB_BLOG_LINK)
-                val uriHandler = LocalUriHandler.current
-                ImageWithSmallText(
-                    imageIdFirstState = R.drawable.github_logo_white,
-                    text = "My GitHub",
-                    onClick = {
-                        uriHandler.openUri(uriGitHub.toString())
-                    }
-                )
+                Row(
+                    modifier = Modifier
+                        .align(Alignment.CenterHorizontally)
+                ) {
+                    Text(
+                        text = "Welcome to Vocabulary Trainer APP",
+                        color = Color(0xFFFFFFFF)
+                    )
+                }
+                Spacer(modifier = Modifier.height(15.dp))
+                Row(
+                    horizontalArrangement = Arrangement.SpaceBetween,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .align(Alignment.Start)
+                        .padding(
+                            horizontal = 15.dp
+                        )
+                ) {
+                    val uriGitHub: Uri =
+                        Uri.parse(Constants.GIT_HUB_LINK)
+                    val uriWebBlog: Uri =
+                        Uri.parse(Constants.WEB_BLOG_LINK)
+                    val uriHandler = LocalUriHandler.current
+                    ImageWithSmallText(
+                        imageIdFirstState = R.drawable.github_logo_white,
+                        text = "My GitHub",
+                        onClick = {
+                            uriHandler.openUri(uriGitHub.toString())
+                        }
+                    )
 
-                ImageWithSmallText(
-                    imageIdFirstState = R.drawable.ic_baseline_web_24,
-                    text = "Web version",
-                    onClick = {
-                        uriHandler.openUri(uriWebBlog.toString())
-                    }
+                    ImageWithSmallText(
+                        imageIdFirstState = R.drawable.ic_baseline_web_24,
+                        text = "Web version",
+                        onClick = {
+                            uriHandler.openUri(uriWebBlog.toString())
+                        }
+                    )
+                }
+                Spacer(modifier = Modifier.height(10.dp))
+            }
+            Column(
+                modifier =
+                Modifier
+                    .padding(horizontal = 15.dp, vertical = 20.dp)
+                    .align(Alignment.CenterHorizontally)
+            ) {
+                val scope by mutableStateOf(rememberCoroutineScope())
+
+                StartButton(
+                    modifier = Modifier,
+                    text = "I already have an Account",
+                    imageId = R.drawable.ic_baseline_insert_emoticon_24,
+                    onNavigate = onNavigate,
+                    route = Route.LOGIN,
+                    scope = scope,
+                    viewModel = viewModel
+                )
+                Spacer(modifier = Modifier.height(15.dp))
+                StartButton(
+                    modifier = Modifier,
+                    text = "Create new one",
+                    imageId = R.drawable.ic_baseline_add_reaction_24,
+                    onNavigate = onNavigate,
+                    route = Route.REGISTER,
+                    scope = scope,
+                    viewModel = viewModel
+                )
+                Spacer(modifier = Modifier.height(15.dp))
+                StartButton(
+                    modifier = Modifier,
+                    text = "Only Local usage",
+                    imageId = R.drawable.db_local_icon_white,
+                    onNavigate = onNavigate,
+                    route = Route.REGISTER,
+                    scope = scope,
+                    viewModel = viewModel
                 )
             }
-            Spacer(modifier = Modifier.height(10.dp))
+
         }
-        Column(modifier =
-        Modifier
-            .padding(horizontal = 15.dp)
-            .align(Alignment.Center)) {
-            val scope by mutableStateOf(rememberCoroutineScope())
-
-            StartButton(
-                modifier = Modifier,
-                text = "I already have an Account",
-                imageId = R.drawable.ic_baseline_insert_emoticon_24,
-                onNavigate = onNavigate,
-                route = Route.LOGIN,
-                scope = scope,
-                viewModel = viewModel
-            )
-            Spacer(modifier = Modifier.height(15.dp))
-            StartButton(
-                modifier = Modifier,
-                text = "Create new one",
-                imageId = R.drawable.ic_baseline_add_reaction_24,
-                onNavigate = onNavigate,
-                route = Route.REGISTER,
-                scope = scope,
-                viewModel = viewModel
-            )
-            Spacer(modifier = Modifier.height(15.dp))
-            StartButton(
-                modifier = Modifier,
-                text = "Only Local usage",
-                imageId = R.drawable.db_local_icon_white,
-                onNavigate = onNavigate,
-                route = Route.REGISTER,
-                scope = scope,
-                viewModel = viewModel
-            )
-        }
-
-
         Column(
             modifier = Modifier
                 .fillMaxWidth()
@@ -155,7 +159,7 @@ fun WelcomeScreen(
                     horizontal = 15.dp,
                     vertical = 15.dp
                 )
-        ){
+        ) {
             Row(
                 modifier = Modifier
                     .align(Alignment.CenterHorizontally)

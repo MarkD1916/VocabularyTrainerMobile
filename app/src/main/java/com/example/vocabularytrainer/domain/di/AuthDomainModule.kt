@@ -1,9 +1,7 @@
 package com.example.vocabularytrainer.domain.di
 
-import com.example.vocabularytrainer.domain.auth.use_case.AuthUseCases
-import com.example.vocabularytrainer.domain.auth.use_case.ValidateConfirmPassword
-import com.example.vocabularytrainer.domain.auth.use_case.ValidateEmail
-import com.example.vocabularytrainer.domain.auth.use_case.ValidatePassword
+import com.example.vocabularytrainer.domain.auth.use_case.*
+import com.example.vocabularytrainer.domain.repository.AuthRepository
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -17,11 +15,13 @@ object AuthDomainModule {
     @ViewModelScoped
     @Provides
     fun provideTrackerUseCases(
+        repository: AuthRepository
     ): AuthUseCases {
         return AuthUseCases(
             validateConfirmPassword = ValidateConfirmPassword(),
             validateEmail = ValidateEmail(),
-            validatePassword = ValidatePassword()
+            validatePassword = ValidatePassword(),
+            registerUser = RegisterUser(repository)
         )
     }
 

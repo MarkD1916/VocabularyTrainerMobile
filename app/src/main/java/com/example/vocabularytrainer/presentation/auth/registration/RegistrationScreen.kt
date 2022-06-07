@@ -1,6 +1,7 @@
 package com.example.vocabularytrainer.presentation.auth
 
 import android.annotation.SuppressLint
+import android.util.Log
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.LocalOverScrollConfiguration
@@ -40,6 +41,7 @@ import com.example.vocabularytrainer.presentation.auth.components.PagerIndicator
 import com.example.vocabularytrainer.presentation.auth.registration.RegistrationEvent
 import com.example.vocabularytrainer.presentation.auth.registration.RegistrationViewModel
 import com.example.vocabularytrainer.presentation.auth.registration.ValidationEvent
+import com.example.vocabularytrainer.presentation.components.LoadAnimation
 import com.example.vocabularytrainer.presentation.welcome.components.ImageWithSmallText
 import com.example.vocabularytrainer.util.Constants.PASSWORD_REQUIRE
 import com.example.vocabularytrainer.util.pxToDp
@@ -206,11 +208,19 @@ private fun EmailPasswordSubView(
     val state = registrationViewModel.state
     val context = LocalContext.current
 
+    val isLoading = remember{ mutableStateOf(false)}
     LaunchedEffect(key1 = context) {
         registrationViewModel.validationEvents.collect { event ->
             when (event) {
                 is ValidationEvent.Success -> {
+                    isLoading.value = false
 
+                }
+                is ValidationEvent.Error -> {
+                    isLoading.value = true
+                }
+                is ValidationEvent.Loading -> {
+                    isLoading.value = true
                 }
             }
         }
@@ -236,7 +246,8 @@ private fun EmailPasswordSubView(
                 onValueChange = {
                     registrationViewModel.onEvent(RegistrationEvent.OnEmailEnter(it))
                 },
-                isError = state.emailError != null
+                isError = state.emailError != null,
+                readOnly = state.isLoading
             )
 
             state.emailError?.let {
@@ -257,7 +268,8 @@ private fun EmailPasswordSubView(
                 onValueChange = {
                     registrationViewModel.onEvent(RegistrationEvent.OnPasswordEnter(it))
                 },
-                isError = state.passwordError != null
+                isError = state.passwordError != null,
+                readOnly = state.isLoading
             )
 
             Row(
@@ -268,12 +280,14 @@ private fun EmailPasswordSubView(
                         .align(Alignment.CenterVertically)
                         .size(10.dp),
                     imageVector = Icons.Default.Info,
-                    contentDescription = "error"
+                    contentDescription = "error",
+                    tint = Color.Black
                 )
                 Spacer(modifier = Modifier.width(10.dp))
                 Text(
                     modifier = Modifier.align(Alignment.CenterVertically),
                     text = PASSWORD_REQUIRE,
+                    color = Color.Black,
                     style = TextStyle(
                         fontFamily = FontFamily.Default,
                         fontWeight = FontWeight.Normal,
@@ -298,7 +312,8 @@ private fun EmailPasswordSubView(
                 onValueChange = {
                     registrationViewModel.onEvent(RegistrationEvent.OnConfirmPasswordEnter(it))
                 },
-                isError = state.confirmPasswordError != null
+                isError = state.confirmPasswordError != null,
+                readOnly = state.isLoading
             )
             state.confirmPasswordError?.let {
                 ErrorText(
@@ -311,10 +326,17 @@ private fun EmailPasswordSubView(
             Button(
                 modifier = Modifier.align(Alignment.CenterHorizontally),
                 onClick = {
-                    registrationViewModel.onEvent(RegistrationEvent.Submit)
+                    if (!state.isLoading) {
+                        registrationViewModel.onEvent(RegistrationEvent.Submit)
+                    }
                 }
             ) {
-
+                if (state.isLoading) {
+                    LoadAnimation()
+                }
+                else{
+                    Text(text ="Submit", color = Color.White)
+                }
             }
         }
     }
