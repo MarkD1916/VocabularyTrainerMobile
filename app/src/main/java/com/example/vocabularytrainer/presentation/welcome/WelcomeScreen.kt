@@ -126,6 +126,16 @@ fun WelcomeScreen(
                 scope = scope,
                 viewModel = viewModel
             )
+            Spacer(modifier = Modifier.height(15.dp))
+            StartButton(
+                modifier = Modifier,
+                text = "Only Local usage",
+                imageId = R.drawable.db_local_icon_white,
+                onNavigate = onNavigate,
+                route = Route.REGISTER,
+                scope = scope,
+                viewModel = viewModel
+            )
         }
 
 

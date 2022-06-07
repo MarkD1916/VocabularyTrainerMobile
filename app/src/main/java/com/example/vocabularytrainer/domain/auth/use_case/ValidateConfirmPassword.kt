@@ -1,6 +1,5 @@
 package com.example.vocabularytrainer.domain.auth.use_case
 
-import com.example.vocabularytrainer.util.Constants.PASSWORD_LENGTH
 
 class ValidateConfirmPassword {
 

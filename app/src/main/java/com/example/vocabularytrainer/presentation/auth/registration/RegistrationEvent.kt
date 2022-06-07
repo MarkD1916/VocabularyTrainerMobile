@@ -3,13 +3,15 @@ package com.example.vocabularytrainer.presentation.auth.registration
 sealed class RegistrationEvent {
     data class OnEmailEnter(
         val email: String = ""
-    ): RegistrationEvent()
+    ) : RegistrationEvent()
 
     data class OnPasswordEnter(
         val password: String = ""
-    ): RegistrationEvent()
+    ) : RegistrationEvent()
 
     data class OnConfirmPasswordEnter(
         val confirmPassword: String = ""
-    ): RegistrationEvent()
+    ) : RegistrationEvent()
+
+    object Submit : RegistrationEvent()
 }
