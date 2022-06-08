@@ -2,6 +2,7 @@ package com.example.vocabularytrainer.presentation.auth.components
 
 import android.annotation.SuppressLint
 import androidx.compose.animation.core.animateDpAsState
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -46,7 +47,7 @@ data class PagerIndicatorSetup(
 @Composable
 fun PagerIndicator(
     pagerPosition: Int = 0,
-    targetPosition: Int = 1,
+    targetPosition: Int = 0,
     isScrollInProcess: Boolean = false,
     positionOfIndicator: ArrayList<Int> = arrayListOf(),
     indicatorImageId: Int,
@@ -54,7 +55,8 @@ fun PagerIndicator(
 ) {
 
     val offsetAnimation: Dp by animateDpAsState(
-        if (!isScrollInProcess) positionOfIndicator[pagerPosition].dp else positionOfIndicator[targetPosition].dp
+        if (!isScrollInProcess) positionOfIndicator[pagerPosition].dp else positionOfIndicator[targetPosition].dp,
+        tween(200)
     ) {
     }
     Column {

@@ -25,6 +25,7 @@ import com.example.vocabularytrainer.presentation.welcome.components.ImageWithSm
 import com.example.vocabularytrainer.presentation.welcome.components.StartButton
 import com.example.vocabularytrainer.util.Constants
 import com.vmakd1916gmail.com.core.util.UiEvent
+import kotlinx.coroutines.cancel
 
 
 @SuppressLint("UnrememberedMutableState")
@@ -33,11 +34,11 @@ fun WelcomeScreen(
     onNavigate: (UiEvent.Navigate) -> Unit,
     viewModel: WelcomeViewModel = hiltViewModel()
 ) {
-
+    val scope by mutableStateOf(rememberCoroutineScope())
     DisposableEffect(Unit) {
         viewModel.job = null
         onDispose {
-            viewModel.job?.cancel()
+            scope.cancel()
         }
     }
     Box {
@@ -109,7 +110,7 @@ fun WelcomeScreen(
                     .padding(horizontal = 15.dp, vertical = 20.dp)
                     .align(Alignment.CenterHorizontally)
             ) {
-                val scope by mutableStateOf(rememberCoroutineScope())
+
 
                 StartButton(
                     modifier = Modifier,

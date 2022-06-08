@@ -5,15 +5,17 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.vocabularytrainer.data.preferences.AuthPreference
 import com.example.vocabularytrainer.domain.auth.use_case.AuthUseCases
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.receiveAsFlow
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
-sealed class ValidationEvent() {
+sealed class ValidationEvent {
     object Success : ValidationEvent()
     data class Error(val message:String): ValidationEvent()
 }
@@ -21,17 +23,27 @@ sealed class ValidationEvent() {
 
 @HiltViewModel
 class RegistrationViewModel @Inject constructor(
-    val authUseCases: AuthUseCases
+    private val authUseCases: AuthUseCases,
+    private val authPreference: AuthPreference
 ) : ViewModel() {
 
     var state by mutableStateOf(RegistrationState())
-
+    var job: Job? by mutableStateOf(null)
     private val validationEventChannel = Channel<ValidationEvent>()
     val validationEvents = validationEventChannel.receiveAsFlow()
 
-    private val responseEventChannel = Channel<ValidationEvent>()
-    val responseEvents = responseEventChannel.receiveAsFlow()
-
+    init {
+        if(authPreference.getStoredEmail().isNotBlank()
+            && authPreference.getStoredPassword().isNotBlank()
+        ){
+            state =  state.copy(
+                email = authPreference.getStoredEmail(),
+                password = authPreference.getStoredPassword(),
+                confirmPassword = authPreference.getStoredPassword(),
+                authResponseResult = AuthResponseResult.Success
+            )
+        }
+    }
 
     fun onEvent(event: RegistrationEvent) {
         when (event) {
@@ -52,6 +64,8 @@ class RegistrationViewModel @Inject constructor(
             }
             is RegistrationEvent.Success -> {
                 state = state.copy(authResponseResult = AuthResponseResult.Success)
+                authPreference.setStoredEmail(state.email)
+                authPreference.setStoredPassword(state.password)
             }
             is RegistrationEvent.Error -> {
                 state = state.copy(authResponseResult = AuthResponseResult.Error(event.message))
@@ -86,21 +100,13 @@ class RegistrationViewModel @Inject constructor(
                 confirmPasswordError = null
             )
         }
-//        viewModelScope.launch {
-//            validationEventChannel.send(ValidationEvent.Success)
-//            getDataFromServer()
-//        }
         getDataFromServer()
     }
 
-    fun getDataFromServer() {
+    private fun getDataFromServer() {
         viewModelScope.launch {
-
-//            validationEventChannel.send(ValidationEvent.Loading)
             onEvent(RegistrationEvent.Loading)
             delay(5000L)
-//
-//            validationEventChannel.send(ValidationEvent.Success)
             onEvent(authUseCases.registerUser.execute("", ""))
 
         }

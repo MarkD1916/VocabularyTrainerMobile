@@ -8,12 +8,12 @@ sealed class AuthResponseResult() {
 
 
 data class RegistrationState(
-    val email: String = "mark@gmail.com",
+    val email: String = "",
     val emailError: String? = null,
-    val password: String = "1234567890",
+    val password: String = "",
     val passwordError: String? = null,
     val passwordRequire: String? = "",
-    val confirmPassword: String = "1234567890",
+    val confirmPassword: String = "",
     val confirmPasswordError: String? = null,
     val confirmPasswordRequire: String? = "",
 

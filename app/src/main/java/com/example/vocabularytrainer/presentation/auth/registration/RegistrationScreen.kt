@@ -6,6 +6,7 @@ import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.LocalOverScrollConfiguration
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Button
 import androidx.compose.material.Icon
@@ -18,16 +19,22 @@ import androidx.compose.material.icons.filled.Info
 import androidx.compose.material.icons.filled.Lock
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.focus.FocusDirection
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
+import androidx.compose.ui.platform.LocalSoftwareKeyboardController
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.unit.toSize
@@ -49,13 +56,14 @@ import com.google.accompanist.pager.ExperimentalPagerApi
 import com.google.accompanist.pager.HorizontalPager
 import com.google.accompanist.pager.PagerState
 import com.google.accompanist.pager.rememberPagerState
+import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
 
 @SuppressLint("UnrememberedMutableState")
 @OptIn(ExperimentalPagerApi::class)
 @Composable
 fun RegisterScreen(
-
+    registrationViewModel: RegistrationViewModel = hiltViewModel()
 ) {
     val focusManager = LocalFocusManager.current
     val pagerState = rememberPagerState()
@@ -66,7 +74,12 @@ fun RegisterScreen(
         indicatorPadding = 60
     ).listOfPositions
 
-
+    val scope by mutableStateOf(rememberCoroutineScope())
+    DisposableEffect(Unit) {
+        onDispose {
+            scope.cancel()
+        }
+    }
     val loginImageState = remember {
         mutableStateOf(false)
     }
@@ -124,24 +137,31 @@ fun RegisterScreen(
                     .fillMaxWidth()
                     .background(MaterialTheme.colors.primary)
             ) {
-                val scope by mutableStateOf(rememberCoroutineScope())
+
+
                 ImageWithSmallText(
                     imageIdFirstState = R.drawable.ic_baseline_lock_open_24,
                     imageIdSecondState = R.drawable.ic_baseline_lock_24,
                     imageState = loginImageState.value,
                     text = "Login\nand\npassword",
                     onClick = {
-                        scope.launch {
-                            pagerState.animateScrollToPage(0)
+                        if (registrationViewModel.job?.isActive == false || registrationViewModel.job == null) {
+                            registrationViewModel.job = scope.launch {
+                                pagerState.animateScrollToPage(0)
+                            }
                         }
+
                     }
                 )
                 ImageWithSmallText(
                     imageIdFirstState = R.drawable.ic_baseline_add_avatar,
-                    text = "Language\nand\navatar",
+                    text = "Profile\nand\nLanguage",
                     onClick = {
-                        scope.launch {
-                            pagerState.animateScrollToPage(1)
+                        if (registrationViewModel.job?.isActive == false || registrationViewModel.job == null) {
+                            registrationViewModel.job = scope.launch {
+                                pagerState.animateScrollToPage(1)
+
+                            }
                         }
                     }
                 )
@@ -150,12 +170,16 @@ fun RegisterScreen(
                     imageIdFirstState = R.drawable.ic_baseline_3p_24,
                     text = "\nPreview\n",
                     onClick = {
-                        scope.launch {
-                            pagerState.animateScrollToPage(2)
+                        if (registrationViewModel.job?.isActive == false || registrationViewModel.job == null) {
+                            registrationViewModel.job = scope.launch {
+                                pagerState.animateScrollToPage(2)
+                            }
                         }
                     }
                 )
+
             }
+
             Spacer(modifier = Modifier.height(10.dp))
 
         }
@@ -199,6 +223,7 @@ private fun PagerContent(
     }
 }
 
+@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 private fun EmailPasswordSubView(
     updateImage: (Boolean) -> Unit,
@@ -206,6 +231,9 @@ private fun EmailPasswordSubView(
 ) {
     val state = registrationViewModel.state
     val context = LocalContext.current
+
+    val (focusRequester) = FocusRequester.createRefs()
+    val localFocusManager = LocalFocusManager.current
 
     LaunchedEffect(key1 = context) {
         registrationViewModel.validationEvents.collect { event ->
@@ -222,143 +250,167 @@ private fun EmailPasswordSubView(
         }
     }
 
-
-    Row(
-        Modifier
+    LazyColumn(
+        modifier = Modifier
             .fillMaxSize()
     ) {
-        Column(
-            verticalArrangement = Arrangement.spacedBy(10.dp),
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(horizontal = 30.dp, vertical = 50.dp)
-        ) {
-            AuthTextField(
-                modifier = Modifier.align(Alignment.CenterHorizontally),
-                labelText = "Email address",
-                placeHolderText = "Enter your e-mail",
-                icon = Icons.Default.Email,
-                text = state.email,
-                onValueChange = {
-                    registrationViewModel.onEvent(RegistrationEvent.OnEmailEnter(it))
-                },
-                isError = state.emailError != null,
-                readOnly = state.getReadOnlyValue()
-            )
-
-            state.emailError?.let {
-                ErrorText(
-                    modifier = Modifier.padding(horizontal = 30.dp),
-                    errorMessage = state.emailError ?: "",
-                    textColor = Color.Red
-                )
-            }
-
-
-            AuthTextField(
-                modifier = Modifier.align(Alignment.CenterHorizontally),
-                labelText = "Password",
-                placeHolderText = "Enter your password",
-                Icons.Default.Lock,
-                text = state.password,
-                onValueChange = {
-                    registrationViewModel.onEvent(RegistrationEvent.OnPasswordEnter(it))
-                },
-                isError = state.passwordError != null,
-                readOnly = state.getReadOnlyValue()
-            )
-
+        item {
             Row(
-                modifier = Modifier.padding(horizontal = 30.dp)
+                Modifier
+                    .fillMaxSize()
             ) {
-                Icon(
+                Column(
+                    verticalArrangement = Arrangement.spacedBy(10.dp),
                     modifier = Modifier
-                        .align(Alignment.CenterVertically)
-                        .size(10.dp),
-                    imageVector = Icons.Default.Info,
-                    contentDescription = "error",
-                    tint = Color.Black
-                )
-                Spacer(modifier = Modifier.width(10.dp))
-                Text(
-                    modifier = Modifier.align(Alignment.CenterVertically),
-                    text = PASSWORD_REQUIRE,
-                    color = Color.Black,
-                    style = TextStyle(
-                        fontFamily = FontFamily.Default,
-                        fontWeight = FontWeight.Normal,
-                        fontSize = 10.sp
+                        .fillMaxWidth()
+                        .padding(horizontal = 30.dp, vertical = 50.dp)
+                ) {
+                    AuthTextField(
+                        modifier = Modifier
+                            .align(Alignment.CenterHorizontally)
+                            .focusRequester(focusRequester),
+                        labelText = "Email address",
+                        placeHolderText = "Enter your e-mail",
+                        icon = Icons.Default.Email,
+                        text = state.email,
+                        onValueChange = {
+                            registrationViewModel.onEvent(RegistrationEvent.OnEmailEnter(it))
+                        },
+                        isError = state.emailError != null,
+                        readOnly = state.getReadOnlyValue(),
+                        localFocusManager,
+                        FocusDirection.Down,
+                        ImeAction.Next
                     )
-                )
-            }
 
-            state.passwordError?.let {
-                ErrorText(
-                    modifier = Modifier.padding(horizontal = 30.dp),
-                    errorMessage = it,
-                    textColor = Color.Red
-                )
-            }
-            AuthTextField(
-                modifier = Modifier.align(Alignment.CenterHorizontally),
-                labelText = "Confirm Password",
-                placeHolderText = "Confirm your password",
-                Icons.Default.Lock,
-                text = state.confirmPassword,
-                onValueChange = {
-                    registrationViewModel.onEvent(RegistrationEvent.OnConfirmPasswordEnter(it))
-                },
-                isError = state.confirmPasswordError != null,
-                readOnly = state.getReadOnlyValue()
-            )
-            state.confirmPasswordError?.let {
-                ErrorText(
-                    modifier = Modifier.padding(horizontal = 30.dp),
-                    errorMessage = it,
-                    textColor = Color.Red
-                )
-            }
+                    state.emailError?.let {
+                        ErrorText(
+                            modifier = Modifier.padding(horizontal = 30.dp),
+                            errorMessage = state.emailError ?: "",
+                            textColor = Color.Red
+                        )
+                    }
 
 
-            Button(
-                modifier = Modifier.align(Alignment.CenterHorizontally),
-                onClick = {
-                    if (state.authResponseResult == null || state.authResponseResult is AuthResponseResult.Error) {
-                        registrationViewModel.onEvent(RegistrationEvent.Submit)
+                    AuthTextField(
+                        modifier = Modifier
+                            .align(Alignment.CenterHorizontally)
+                            .focusRequester(focusRequester),
+                        labelText = "Password",
+                        placeHolderText = "Enter your password",
+                        Icons.Default.Lock,
+                        text = state.password,
+                        onValueChange = {
+                            registrationViewModel.onEvent(RegistrationEvent.OnPasswordEnter(it))
+                        },
+                        isError = state.passwordError != null,
+                        readOnly = state.getReadOnlyValue(),
+                        localFocusManager,
+                        FocusDirection.Down,
+                        ImeAction.Next
+                    )
+
+                    Row(
+                        modifier = Modifier.padding(horizontal = 30.dp)
+                    ) {
+                        Icon(
+                            modifier = Modifier
+                                .align(Alignment.CenterVertically)
+                                .size(10.dp),
+                            imageVector = Icons.Default.Info,
+                            contentDescription = "error",
+                            tint = Color.Black
+                        )
+                        Spacer(modifier = Modifier.width(10.dp))
+                        Text(
+                            modifier = Modifier.align(Alignment.CenterVertically),
+                            text = PASSWORD_REQUIRE,
+                            color = Color.Black,
+                            style = TextStyle(
+                                fontFamily = FontFamily.Default,
+                                fontWeight = FontWeight.Normal,
+                                fontSize = 10.sp
+                            )
+                        )
+                    }
+
+                    state.passwordError?.let {
+                        ErrorText(
+                            modifier = Modifier.padding(horizontal = 30.dp),
+                            errorMessage = it,
+                            textColor = Color.Red
+                        )
+                    }
+                    AuthTextField(
+                        modifier = Modifier
+                            .align(Alignment.CenterHorizontally)
+                            .focusRequester(focusRequester),
+                        labelText = "Confirm Password",
+                        placeHolderText = "Confirm your password",
+                        Icons.Default.Lock,
+                        text = state.confirmPassword,
+                        onValueChange = {
+                            registrationViewModel.onEvent(
+                                RegistrationEvent.OnConfirmPasswordEnter(
+                                    it
+                                )
+                            )
+                        },
+                        isError = state.confirmPasswordError != null,
+                        readOnly = state.getReadOnlyValue(),
+                        localFocusManager,
+                        FocusDirection.Up,
+                        ImeAction.Done
+                    )
+                    state.confirmPasswordError?.let {
+                        ErrorText(
+                            modifier = Modifier.padding(horizontal = 30.dp),
+                            errorMessage = it,
+                            textColor = Color.Red
+                        )
+                    }
+
+
+                    Button(
+                        modifier = Modifier.align(Alignment.CenterHorizontally),
+                        onClick = {
+                            if (state.authResponseResult == null || state.authResponseResult is AuthResponseResult.Error) {
+                                registrationViewModel.onEvent(RegistrationEvent.Submit)
+                            }
+                        }
+                    ) {
+                        when (state.authResponseResult) {
+                            null -> {
+                                Text(text = "Submit", color = Color.White)
+                            }
+                            is AuthResponseResult.Loading -> {
+                                LoadAnimation()
+                            }
+                            is AuthResponseResult.Error -> {
+                                Text(text = "Try Again", color = Color.White)
+                            }
+                            is AuthResponseResult.Success -> {
+                                updateImage(true)
+                                Icon(
+                                    modifier = Modifier
+                                        .align(Alignment.CenterVertically)
+                                        .size(30.dp),
+                                    imageVector = Icons.Default.Check,
+                                    contentDescription = "error",
+                                    tint = Color.White
+                                )
+                            }
+                        }
+                    }
+                    if (state.authResponseResult is AuthResponseResult.Error) {
+                        ErrorText(
+                            modifier = Modifier.align(Alignment.CenterHorizontally),
+                            errorMessage = state.authResponseResult.message,
+                            textColor = Color.Red
+                        )
                     }
                 }
-            ) {
-                if (state.authResponseResult == null) {
-                    Text(text = "Submit", color = Color.White)
-                }
-                if (state.authResponseResult is AuthResponseResult.Loading) {
-                    LoadAnimation()
-                }
-                if (state.authResponseResult is AuthResponseResult.Error) {
-                    Text(text = "Try Again", color = Color.White)
-                }
-                if (state.authResponseResult is AuthResponseResult.Success) {
-                    updateImage(true)
-                    Icon(
-                        modifier = Modifier
-                            .align(Alignment.CenterVertically)
-                            .size(30.dp),
-                        imageVector = Icons.Default.Check,
-                        contentDescription = "error",
-                        tint = Color.White
-                    )
-                }
-
             }
-            if (state.authResponseResult is AuthResponseResult.Error) {
-                ErrorText(
-                    modifier = Modifier.align(Alignment.CenterHorizontally),
-                    errorMessage = state.authResponseResult.message,
-                    textColor = Color.Red
-                )
-            }
-
-
         }
     }
 }

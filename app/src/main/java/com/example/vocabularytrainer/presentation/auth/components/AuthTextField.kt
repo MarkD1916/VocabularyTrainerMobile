@@ -1,5 +1,7 @@
 package com.example.vocabularytrainer.presentation.auth.components
 
+import androidx.compose.foundation.text.KeyboardActions
+import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.Icon
 import androidx.compose.material.OutlinedTextField
 import androidx.compose.material.Text
@@ -7,15 +9,21 @@ import androidx.compose.material.TextFieldDefaults
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Email
 import androidx.compose.runtime.*
+import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.focus.FocusDirection
+import androidx.compose.ui.focus.FocusManager
+import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.text.input.TextFieldValue
 import androidx.compose.ui.unit.sp
 
+@OptIn(ExperimentalComposeUiApi::class)
 @Composable
 fun AuthTextField(
     modifier: Modifier,
@@ -25,7 +33,10 @@ fun AuthTextField(
     text: String = "",
     onValueChange: (String)-> Unit,
     isError: Boolean,
-    readOnly: Boolean
+    readOnly: Boolean,
+    focusManager: FocusManager,
+    focusDirection: FocusDirection,
+    imeAction: ImeAction
 ) {
 //    var text by remember { mutableStateOf(TextFieldValue("")) }
     OutlinedTextField(
@@ -45,6 +56,11 @@ fun AuthTextField(
            fontFamily = FontFamily.Default,
            fontWeight = FontWeight.Normal,
            fontSize = 15.sp
-       )
+       ),
+        keyboardOptions = KeyboardOptions(imeAction = imeAction),
+        keyboardActions = KeyboardActions(
+            onNext = { focusManager.moveFocus(focusDirection) },
+            onDone = {focusManager.clearFocus()}
+        )
     )
 }
