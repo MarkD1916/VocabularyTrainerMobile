@@ -1,4 +1,4 @@
-package com.example.vocabularytrainer.core.di
+package com.example.vocabularytrainer.data.di
 
 import android.app.Application
 import android.content.Context
@@ -19,7 +19,7 @@ import javax.inject.Singleton
 object AppModule {
     @Provides
     @Singleton
-    fun provideSharedPreference(app: Application,@ApplicationContext context: Context) : SharedPreferences {
+    fun provideSharedPreference(@ApplicationContext context: Context) : SharedPreferences {
         val masterKey = MasterKey.Builder(context)
             .setKeyScheme(MasterKey.KeyScheme.AES256_GCM)
             .build()

@@ -8,4 +8,8 @@ interface Preferences {
     fun getStoredPassword(): String
 
     fun setStoredPassword(password: String)
+
+    fun getStoredToken(): String
+
+    fun setStoredToken(token: String)
 }
