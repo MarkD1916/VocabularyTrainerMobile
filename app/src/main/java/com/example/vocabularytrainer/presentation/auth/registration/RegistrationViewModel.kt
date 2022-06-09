@@ -106,8 +106,7 @@ class RegistrationViewModel @Inject constructor(
     private fun getDataFromServer() {
         viewModelScope.launch {
             onEvent(RegistrationEvent.Loading)
-            delay(5000L)
-            onEvent(authUseCases.registerUser.execute("", ""))
+            onEvent(authUseCases.registerUser.execute(state.password, state.email))
 
         }
     }

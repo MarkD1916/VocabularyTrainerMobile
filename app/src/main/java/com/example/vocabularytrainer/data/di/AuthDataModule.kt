@@ -2,6 +2,7 @@ package com.example.vocabularytrainer.data.di
 
 import com.androiddevs.ktornoteapp.data.remote.interceptors.TokenInterceptor
 import com.example.vocabularytrainer.data.preferences.AuthPreference
+import com.example.vocabularytrainer.data.remote.auth.api.AuthApi
 import com.example.vocabularytrainer.data.repository.AuthRepositoryImpl
 import com.example.vocabularytrainer.domain.repository.AuthRepository
 import dagger.Module
@@ -32,7 +33,7 @@ object AuthDataModule {
 
 
     @Provides
-    fun providesBaseUrl(): String = "http://10.0.2.2:8001"
+    fun providesBaseUrl(): String = "https://vmakd1916vocabularytrainer.herokuapp.com"
 
     @Provides
     @Singleton
@@ -42,9 +43,16 @@ object AuthDataModule {
         .client(client)
         .build()
 
+
     @Provides
     @Singleton
-    fun provideAuthRepository(): AuthRepository {
-        return AuthRepositoryImpl()
+    fun provideAuthApi(retrofit: Retrofit): AuthApi {
+        return retrofit.create(AuthApi::class.java)
+    }
+
+    @Provides
+    @Singleton
+    fun provideAuthRepository(authApi: AuthApi): AuthRepository {
+        return AuthRepositoryImpl(authApi)
     }
 }

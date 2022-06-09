@@ -7,6 +7,6 @@ class RegisterUser(
     private val repository: AuthRepository
 ) {
     suspend fun execute(password: String, email: String): RegistrationEvent {
-        return repository.register()
+        return repository.register(email, password)
     }
 }

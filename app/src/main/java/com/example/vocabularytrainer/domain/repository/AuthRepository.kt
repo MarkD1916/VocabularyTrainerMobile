@@ -4,5 +4,6 @@ import com.example.vocabularytrainer.presentation.auth.registration.Registration
 
 
 interface AuthRepository {
-    suspend fun register(): RegistrationEvent
+    suspend fun register(email: String,
+                         password: String): RegistrationEvent
 }
