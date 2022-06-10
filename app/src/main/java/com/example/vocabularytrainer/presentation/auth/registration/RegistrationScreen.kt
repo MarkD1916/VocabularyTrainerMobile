@@ -541,28 +541,29 @@ private fun ProfileSubView(
 
 
 
-        if (showImage.value) {
+
             CompositionLocalProvider(LocalImageLoader provides imageLoader) {
-
-                Row(horizontalArrangement = Arrangement.SpaceBetween,
-                    modifier = Modifier
-                        .padding(horizontal = 30.dp)
-                        .fillMaxWidth()
+                val painter = rememberImagePainter(imageUrl.value)
+                AnimatedVisibility(
+                    modifier = Modifier,
+                    visible = when (painter.state) {
+                        is ImagePainter.State.Empty,
+                        is ImagePainter.State.Success,
+                        -> true
+                        is ImagePainter.State.Loading,
+                        is ImagePainter.State.Error,
+                        -> showImage.value
+                    }
                 ) {
-                    val painter = rememberImagePainter(imageUrl.value)
-
-
-                    AnimatedVisibility(
-                        modifier = Modifier,
-                        visible = when (painter.state) {
-                            is ImagePainter.State.Empty,
-                            is ImagePainter.State.Success,
-                            -> true
-                            is ImagePainter.State.Loading,
-                            is ImagePainter.State.Error,
-                            -> false
-                        }
+                    showImage.value=false
+                    Row(
+                        horizontalArrangement = Arrangement.SpaceBetween,
+                        modifier = Modifier
+                            .padding(horizontal = 30.dp)
+                            .fillMaxWidth()
                     ) {
+
+
                         Image(
                             painter = painter,
                             contentDescription = "SVG Image",
@@ -571,28 +572,8 @@ private fun ProfileSubView(
                                 .align(Alignment.CenterVertically)
                                 .size(150.dp)
                         )
-                    }
-                    AnimatedVisibility(
-                        modifier = Modifier.align(Alignment.CenterVertically),
-                        visible = when (painter.state) {
-                            is ImagePainter.State.Empty,
-                            is ImagePainter.State.Success,
-                            -> false
-                            is ImagePainter.State.Loading,
-                            is ImagePainter.State.Error,
-                            -> true
-                        }
-                    ) {
-                        LoadAnimation(
-                            Modifier.padding(horizontal = 30.dp)
-                                .align(Alignment.CenterVertically)
-                                .size(150.dp)
-                        )
-                    }
-                    AnimatedVisibility(
-                        modifier = Modifier.align(Alignment.CenterVertically),
-                        visible = showImage.value
-                    ) {
+
+
                         Button(
                             modifier = Modifier.align(Alignment.CenterVertically),
                             onClick = {
@@ -601,11 +582,12 @@ private fun ProfileSubView(
                         ) {
                             Text(text = "Change")
                         }
+
                     }
                 }
             }
 
-        }
+
 
 
     }
