@@ -544,29 +544,13 @@ private fun ProfileSubView(
         if (showImage.value) {
             CompositionLocalProvider(LocalImageLoader provides imageLoader) {
 
-                Row(
+                Row(horizontalArrangement = Arrangement.SpaceBetween,
                     modifier = Modifier
                         .padding(horizontal = 30.dp)
                         .fillMaxWidth()
                 ) {
                     val painter = rememberImagePainter(imageUrl.value)
-                    AnimatedVisibility(
-                        modifier = Modifier.align(Alignment.CenterVertically),
-                        visible = when (painter.state) {
-                            is ImagePainter.State.Empty,
-                            is ImagePainter.State.Success,
-                            -> false
-                            is ImagePainter.State.Loading,
-                            is ImagePainter.State.Error,
-                            -> true
-                        }
-                    ) {
-                        LoadAnimation(
-                            Modifier
-                                .align(Alignment.CenterVertically)
-                                .size(150.dp)
-                        )
-                    }
+
 
                     AnimatedVisibility(
                         modifier = Modifier,
@@ -590,11 +574,27 @@ private fun ProfileSubView(
                     }
                     AnimatedVisibility(
                         modifier = Modifier.align(Alignment.CenterVertically),
+                        visible = when (painter.state) {
+                            is ImagePainter.State.Empty,
+                            is ImagePainter.State.Success,
+                            -> false
+                            is ImagePainter.State.Loading,
+                            is ImagePainter.State.Error,
+                            -> true
+                        }
+                    ) {
+                        LoadAnimation(
+                            Modifier.padding(horizontal = 30.dp)
+                                .align(Alignment.CenterVertically)
+                                .size(150.dp)
+                        )
+                    }
+                    AnimatedVisibility(
+                        modifier = Modifier.align(Alignment.CenterVertically),
                         visible = showImage.value
                     ) {
                         Button(
-                            modifier = Modifier.align(Alignment.CenterVertically)
-                                .padding(start = 90.dp),
+                            modifier = Modifier.align(Alignment.CenterVertically),
                             onClick = {
                                 scope.launch { bottomSheetState.show() }
                             }
