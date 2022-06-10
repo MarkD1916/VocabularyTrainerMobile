@@ -4,6 +4,8 @@ import android.annotation.SuppressLint
 import android.os.Build
 import android.util.Log
 import androidx.annotation.RequiresApi
+import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.LocalOverScrollConfiguration
@@ -11,6 +13,7 @@ import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
@@ -25,6 +28,7 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
@@ -36,6 +40,11 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.unit.toSize
 import androidx.hilt.navigation.compose.hiltViewModel
+import coil.ImageLoader
+import coil.compose.ImagePainter
+import coil.compose.LocalImageLoader
+import coil.compose.rememberImagePainter
+import coil.decode.SvgDecoder
 import com.example.vocabularytrainer.R
 import com.example.vocabularytrainer.presentation.auth.components.*
 import com.example.vocabularytrainer.presentation.auth.registration.AuthResponseResult
@@ -423,7 +432,10 @@ private fun EmailPasswordSubView(
 }
 
 @RequiresApi(Build.VERSION_CODES.O)
-@OptIn(ExperimentalComposeUiApi::class, ExperimentalMaterialApi::class)
+@OptIn(
+    ExperimentalComposeUiApi::class, ExperimentalMaterialApi::class,
+    coil.annotation.ExperimentalCoilApi::class
+)
 @Composable
 private fun ProfileSubView(
     registrationViewModel: RegistrationViewModel = hiltViewModel()
@@ -433,7 +445,14 @@ private fun ProfileSubView(
     val (focusRequester) = FocusRequester.createRefs()
     val localFocusManager = LocalFocusManager.current
 
-
+    val imageLoader = ImageLoader.Builder(LocalContext.current)
+        .crossfade(true)
+        .componentRegistry {
+            add(SvgDecoder(LocalContext.current))
+        }
+        .build()
+    val showImage = remember { mutableStateOf(false) }
+    val imageUrl = remember { mutableStateOf("") }
     val languageDialogVisible = remember { mutableStateOf(false) }
     Column(
         Modifier
@@ -506,28 +525,102 @@ private fun ProfileSubView(
         )
 
         val scope = rememberCoroutineScope()
-        Button(
+        AnimatedVisibility(
             modifier = Modifier.align(Alignment.CenterHorizontally),
-            onClick = {
-                 scope.launch { bottomSheetState.show() }
-            }
+            visible = !showImage.value
         ) {
-            Text(text = "Choose your Country")
+            Button(
+                modifier = Modifier.align(Alignment.CenterHorizontally),
+                onClick = {
+                    scope.launch { bottomSheetState.show() }
+                }
+            ) {
+                Text(text = "Choose your Country")
+            }
         }
+
+
+
+        if (showImage.value) {
+            CompositionLocalProvider(LocalImageLoader provides imageLoader) {
+
+                Row(
+                    modifier = Modifier
+                        .padding(horizontal = 30.dp)
+                        .fillMaxWidth()
+                ) {
+                    val painter = rememberImagePainter(imageUrl.value)
+                    AnimatedVisibility(
+                        modifier = Modifier.align(Alignment.CenterVertically),
+                        visible = when (painter.state) {
+                            is ImagePainter.State.Empty,
+                            is ImagePainter.State.Success,
+                            -> false
+                            is ImagePainter.State.Loading,
+                            is ImagePainter.State.Error,
+                            -> true
+                        }
+                    ) {
+                        LoadAnimation(
+                            Modifier
+                                .align(Alignment.CenterVertically)
+                                .size(150.dp)
+                        )
+                    }
+
+                    AnimatedVisibility(
+                        modifier = Modifier,
+                        visible = when (painter.state) {
+                            is ImagePainter.State.Empty,
+                            is ImagePainter.State.Success,
+                            -> true
+                            is ImagePainter.State.Loading,
+                            is ImagePainter.State.Error,
+                            -> false
+                        }
+                    ) {
+                        Image(
+                            painter = painter,
+                            contentDescription = "SVG Image",
+                            contentScale = ContentScale.Fit,
+                            modifier = Modifier
+                                .align(Alignment.CenterVertically)
+                                .size(150.dp)
+                        )
+                    }
+                    AnimatedVisibility(
+                        modifier = Modifier.align(Alignment.CenterVertically),
+                        visible = showImage.value
+                    ) {
+                        Button(
+                            modifier = Modifier.align(Alignment.CenterVertically)
+                                .padding(start = 90.dp),
+                            onClick = {
+                                scope.launch { bottomSheetState.show() }
+                            }
+                        ) {
+                            Text(text = "Change")
+                        }
+                    }
+                }
+            }
+
+        }
+
+
     }
     Box {
         ModalBottomSheetLayout(
             sheetState = bottomSheetState,
             sheetContent = {
-                Log.d("LOL", "ProfileSubView: ${bottomSheetState.currentValue}")
-
                 Icon(
                     modifier = Modifier
                         .align(Alignment.CenterHorizontally)
                         .size(30.dp),
-                    imageVector = if(bottomSheetState.currentValue == ModalBottomSheetValue.Expanded)Icons.Default.KeyboardArrowDown else Icons.Default.KeyboardArrowUp,
+                    imageVector = if (bottomSheetState.currentValue == ModalBottomSheetValue.Expanded) Icons.Default.KeyboardArrowDown else Icons.Default.KeyboardArrowUp,
                     contentDescription = "error"
                 )
+
                 Column(modifier = Modifier.heightIn(max = 500.dp)) {
                     SearchTextField(
                         text = "",
@@ -536,13 +629,17 @@ private fun ProfileSubView(
                         onFocusChange = {}
                     )
                     LazyColumn(modifier = Modifier.fillMaxWidth()) {
-                        items( test()) {
-                            CountryItem(it, Modifier
-                                .fillMaxWidth()
-                                .align(Alignment.CenterHorizontally)
-                                .padding(vertical = 10.dp)
-                                .background(Color.Green)
-                            )
+                        items(test()) {
+                            CountryItem(
+                                it, Modifier
+                                    .fillMaxWidth()
+                                    .align(Alignment.CenterHorizontally)
+                                    .padding(vertical = 10.dp)
+                                    .background(Color.Green)
+                            ) {
+                                showImage.value = true
+                                imageUrl.value = "https://countryflagsapi.com/svg/$it"
+                            }
                         }
                     }
 
@@ -553,12 +650,18 @@ private fun ProfileSubView(
     }
 }
 
-val locales = Locale.getISOCountries();
-fun test(): List<String> {
-    val list = arrayListOf<String>()
+val locales = Locale.getISOCountries()
+
+data class Country(
+    val name: String,
+    val code: String
+)
+
+fun test(): List<Country> {
+    val list = arrayListOf<Country>()
     for (countryCode in locales) {
         val obj = Locale("", countryCode)
-        list.add(obj.displayCountry)
+        list.add(Country(name = obj.displayCountry, code = obj.isO3Country))
     }
     return list
 }

@@ -40,7 +40,7 @@ object AuthDataModule {
 
     @Provides
     @Named("CountryUrl")
-    fun providesBaseUrlCountry(): String = "https://restcountries.com/v3.1"
+    fun providesBaseUrlCountry(): String = "https://countryflagsapi.com/"
 
     @Provides
     @Singleton
@@ -77,7 +77,7 @@ object AuthDataModule {
 
     @Provides
     @Singleton
-    fun provideAuthRepository(authApi: AuthApi): AuthRepository {
-        return AuthRepositoryImpl(authApi)
+    fun provideAuthRepository(authApi: AuthApi, countryApi: CountryApi): AuthRepository {
+        return AuthRepositoryImpl(authApi,countryApi)
     }
 }

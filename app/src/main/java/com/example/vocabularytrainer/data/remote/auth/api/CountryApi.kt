@@ -5,6 +5,6 @@ import retrofit2.Response
 import retrofit2.http.GET
 
 interface CountryApi {
-    @GET("/all")
-    suspend fun getAllCountry(): Response<AuthResponse>
+    @GET("/svg/")
+    suspend fun getAllCountry(code: String): Response<AuthResponse>
 }

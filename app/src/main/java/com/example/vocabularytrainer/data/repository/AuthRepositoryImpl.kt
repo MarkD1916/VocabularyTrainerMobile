@@ -1,6 +1,7 @@
 package com.example.vocabularytrainer.data.repository
 
 import com.example.vocabularytrainer.data.remote.auth.api.AuthApi
+import com.example.vocabularytrainer.data.remote.auth.api.CountryApi
 import com.example.vocabularytrainer.data.remote.auth.request.AccountRequest
 import com.example.vocabularytrainer.domain.repository.AuthRepository
 import com.example.vocabularytrainer.presentation.auth.registration.RegistrationEvent
@@ -9,7 +10,8 @@ import javax.inject.Inject
 
 
 class AuthRepositoryImpl @Inject constructor(
-    private val authApi: AuthApi
+    private val authApi: AuthApi,
+    private val countryApi: CountryApi
 ) : AuthRepository {
 
     override suspend fun register(
@@ -22,6 +24,10 @@ class AuthRepositoryImpl @Inject constructor(
         } catch (e: Exception) {
             RegistrationEvent.Error(e.message!!)
         }
+    }
+
+    override suspend fun getCountryFlag(email: String, password: String): RegistrationEvent {
+        TODO("Not yet implemented")
     }
 
 

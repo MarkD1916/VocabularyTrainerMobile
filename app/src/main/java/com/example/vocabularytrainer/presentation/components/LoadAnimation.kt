@@ -21,7 +21,7 @@ import androidx.compose.ui.unit.dp
 
 
 @Composable
-fun LoadAnimation() {
+fun LoadAnimation(modifier: Modifier = Modifier) {
     val infiniteTransition = rememberInfiniteTransition()
 
     val animationScale = infiniteTransition.animateFloat(
@@ -50,10 +50,10 @@ fun LoadAnimation() {
         )
     )
 
-    Column {
+    Column( modifier = modifier) {
 
         Canvas(
-            modifier = Modifier
+            modifier = modifier
                 .height(20.dp)
                 .align(Alignment.CenterHorizontally)
                 .scale(animationScale.value)
