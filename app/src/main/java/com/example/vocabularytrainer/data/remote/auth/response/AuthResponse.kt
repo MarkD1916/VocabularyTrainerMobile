@@ -1,6 +1,8 @@
 package com.example.vocabularytrainer.data.remote.auth.response
 
+import com.google.gson.annotations.SerializedName
+
 data class AuthResponse(
-    val username: String,
-    val message: String? = null
+    @SerializedName("username") val email: String,
+    val password: String
 )

@@ -1,22 +1,20 @@
 package com.example.vocabularytrainer.presentation.auth
 
 import android.annotation.SuppressLint
+import android.os.Build
+import android.util.Log
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.gestures.LocalOverScrollConfiguration
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.Button
-import androidx.compose.material.Icon
-import androidx.compose.material.MaterialTheme
-import androidx.compose.material.Text
+import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Check
-import androidx.compose.material.icons.filled.Email
-import androidx.compose.material.icons.filled.Info
-import androidx.compose.material.icons.filled.Lock
+import androidx.compose.material.icons.filled.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
@@ -39,10 +37,7 @@ import androidx.compose.ui.unit.sp
 import androidx.compose.ui.unit.toSize
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.vocabularytrainer.R
-import com.example.vocabularytrainer.presentation.auth.components.AuthTextField
-import com.example.vocabularytrainer.presentation.auth.components.ErrorText
-import com.example.vocabularytrainer.presentation.auth.components.PagerIndicator
-import com.example.vocabularytrainer.presentation.auth.components.PagerIndicatorSetup
+import com.example.vocabularytrainer.presentation.auth.components.*
 import com.example.vocabularytrainer.presentation.auth.registration.AuthResponseResult
 import com.example.vocabularytrainer.presentation.auth.registration.RegistrationEvent
 import com.example.vocabularytrainer.presentation.auth.registration.RegistrationViewModel
@@ -57,7 +52,9 @@ import com.google.accompanist.pager.PagerState
 import com.google.accompanist.pager.rememberPagerState
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
+import java.util.*
 
+@RequiresApi(Build.VERSION_CODES.O)
 @SuppressLint("UnrememberedMutableState")
 @OptIn(ExperimentalPagerApi::class)
 @Composable
@@ -191,6 +188,7 @@ fun RegisterScreen(
 }
 
 
+@RequiresApi(Build.VERSION_CODES.O)
 @OptIn(ExperimentalPagerApi::class, androidx.compose.foundation.ExperimentalFoundationApi::class)
 @Composable
 private fun PagerContent(
@@ -211,7 +209,7 @@ private fun PagerContent(
                     EmailPasswordSubView(updateImage)
                 }
                 1 -> {
-                    AvatarNativeLanguageSubView()
+                    ProfileSubView()
                 }
                 2 -> {
                     CongratSubView()
@@ -228,6 +226,8 @@ private fun EmailPasswordSubView(
     updateImage: (Boolean) -> Unit,
     registrationViewModel: RegistrationViewModel = hiltViewModel()
 ) {
+
+
     val state = registrationViewModel.state
     val context = LocalContext.current
 
@@ -408,21 +408,159 @@ private fun EmailPasswordSubView(
                             textColor = Color.Red
                         )
                     }
+                    if (state.authResponseResult is AuthResponseResult.Success) {
+                        Text(
+                            modifier = Modifier
+                                .padding(horizontal = 30.dp)
+                                .align(Alignment.CenterHorizontally),
+                            text = "Great! Now you can optionally setup your public information!"
+                        )
+                    }
                 }
             }
         }
     }
 }
 
+@RequiresApi(Build.VERSION_CODES.O)
+@OptIn(ExperimentalComposeUiApi::class, ExperimentalMaterialApi::class)
 @Composable
-private fun AvatarNativeLanguageSubView() {
+private fun ProfileSubView(
+    registrationViewModel: RegistrationViewModel = hiltViewModel()
+) {
+    val state = registrationViewModel.state
+    val bottomSheetState = rememberModalBottomSheetState(ModalBottomSheetValue.Hidden)
+    val (focusRequester) = FocusRequester.createRefs()
+    val localFocusManager = LocalFocusManager.current
+
+
+    val languageDialogVisible = remember { mutableStateOf(false) }
     Column(
         Modifier
             .fillMaxSize()
-            .background(Color.Green)
     ) {
+        AuthTextField(
+            modifier = Modifier
+                .align(Alignment.CenterHorizontally)
+                .focusRequester(focusRequester),
+            labelText = "First Name",
+            placeHolderText = "Enter your First Name",
+            Icons.Default.AccountBox,
+            text = "",
+            onValueChange = {
+//                registrationViewModel.onEvent(
+//                    RegistrationEvent.OnConfirmPasswordEnter(
+//                        it
+//                    )
+//                )
+            },
+            isError = false,
+            readOnly = true,
+            localFocusManager,
+            FocusDirection.Up,
+            ImeAction.Done
+        )
 
+        AuthTextField(
+            modifier = Modifier
+                .align(Alignment.CenterHorizontally)
+                .focusRequester(focusRequester),
+            labelText = "Last Name",
+            placeHolderText = "Enter your Last Name",
+            Icons.Default.AccountBox,
+            text = "",
+            onValueChange = {
+//                registrationViewModel.onEvent(
+//                    RegistrationEvent.OnConfirmPasswordEnter(
+//                        it
+//                    )
+//                )
+            },
+            isError = false,
+            readOnly = true,
+            localFocusManager,
+            FocusDirection.Up,
+            ImeAction.Done
+        )
+
+        AuthTextField(
+            modifier = Modifier
+                .align(Alignment.CenterHorizontally)
+                .focusRequester(focusRequester),
+            labelText = "Bio",
+            placeHolderText = "Enter your Bio",
+            Icons.Default.AccountBox,
+            text = "",
+            onValueChange = {
+//                registrationViewModel.onEvent(
+//                    RegistrationEvent.OnConfirmPasswordEnter(
+//                        it
+//                    )
+//                )
+            },
+            isError = false,
+            readOnly = true,
+            localFocusManager,
+            FocusDirection.Up,
+            ImeAction.Done
+        )
+
+        val scope = rememberCoroutineScope()
+        Button(
+            modifier = Modifier.align(Alignment.CenterHorizontally),
+            onClick = {
+                 scope.launch { bottomSheetState.show() }
+            }
+        ) {
+            Text(text = "Choose your Country")
+        }
     }
+    Box {
+        ModalBottomSheetLayout(
+            sheetState = bottomSheetState,
+            sheetContent = {
+                Log.d("LOL", "ProfileSubView: ${bottomSheetState.currentValue}")
+
+                Icon(
+                    modifier = Modifier
+                        .align(Alignment.CenterHorizontally)
+                        .size(30.dp),
+                    imageVector = if(bottomSheetState.currentValue == ModalBottomSheetValue.Expanded)Icons.Default.KeyboardArrowDown else Icons.Default.KeyboardArrowUp,
+                    contentDescription = "error"
+                )
+                Column(modifier = Modifier.heightIn(max = 500.dp)) {
+                    SearchTextField(
+                        text = "",
+                        onValueChange = {},
+                        onSearch = { /*TODO*/ },
+                        onFocusChange = {}
+                    )
+                    LazyColumn(modifier = Modifier.fillMaxWidth()) {
+                        items( test()) {
+                            CountryItem(it, Modifier
+                                .fillMaxWidth()
+                                .align(Alignment.CenterHorizontally)
+                                .padding(vertical = 10.dp)
+                                .background(Color.Green)
+                            )
+                        }
+                    }
+
+                }
+
+            }
+        ) {}
+    }
+}
+
+val locales = Locale.getISOCountries();
+fun test(): List<String> {
+    val list = arrayListOf<String>()
+    for (countryCode in locales) {
+        val obj = Locale("", countryCode)
+        list.add(obj.displayCountry)
+    }
+    return list
 }
 
 @Composable
