@@ -527,7 +527,7 @@ private fun ProfileSubView(
         val scope = rememberCoroutineScope()
         AnimatedVisibility(
             modifier = Modifier.align(Alignment.CenterHorizontally),
-            visible = !showImage.value
+            visible = imageUrl.value==""
         ) {
             Button(
                 modifier = Modifier.align(Alignment.CenterHorizontally),
@@ -617,7 +617,6 @@ private fun ProfileSubView(
                                     .fillMaxWidth()
                                     .align(Alignment.CenterHorizontally)
                                     .padding(vertical = 10.dp)
-                                    .background(Color.Green)
                             ) {
                                 showImage.value = true
                                 imageUrl.value = "https://countryflagsapi.com/svg/$it"
