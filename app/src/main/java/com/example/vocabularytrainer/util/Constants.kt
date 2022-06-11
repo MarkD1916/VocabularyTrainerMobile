@@ -20,5 +20,6 @@ object Constants {
     const val TOKEN_HEADER_NAME = "Authorization"
 
     fun getTokenValue(token: String) = "Token $token"
+    fun getCountryFlagUrl(countryShortName: String) = "https://countryflagsapi.com/svg/$countryShortName"
 
 }

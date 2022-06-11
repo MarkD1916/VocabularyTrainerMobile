@@ -2,7 +2,6 @@ package com.example.vocabularytrainer.presentation.auth
 
 import android.annotation.SuppressLint
 import android.os.Build
-import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.foundation.Image
@@ -13,7 +12,6 @@ import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
@@ -23,7 +21,9 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.ExperimentalComposeUiApi
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.focus.FocusDirection
+import androidx.compose.ui.focus.FocusManager
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.geometry.Size
@@ -54,11 +54,9 @@ import com.example.vocabularytrainer.presentation.auth.registration.ValidationEv
 import com.example.vocabularytrainer.presentation.components.LoadAnimation
 import com.example.vocabularytrainer.presentation.welcome.components.ImageWithSmallText
 import com.example.vocabularytrainer.util.Constants.PASSWORD_REQUIRE
+import com.example.vocabularytrainer.util.Constants.getCountryFlagUrl
 import com.example.vocabularytrainer.util.pxToDp
-import com.google.accompanist.pager.ExperimentalPagerApi
-import com.google.accompanist.pager.HorizontalPager
-import com.google.accompanist.pager.PagerState
-import com.google.accompanist.pager.rememberPagerState
+import com.google.accompanist.pager.*
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
 import java.util.*
@@ -198,7 +196,10 @@ fun RegisterScreen(
 
 
 @RequiresApi(Build.VERSION_CODES.O)
-@OptIn(ExperimentalPagerApi::class, androidx.compose.foundation.ExperimentalFoundationApi::class)
+@OptIn(
+    ExperimentalPagerApi::class, androidx.compose.foundation.ExperimentalFoundationApi::class,
+    dev.chrisbanes.snapper.ExperimentalSnapperApi::class
+)
 @Composable
 private fun PagerContent(
     pagerState: PagerState,
@@ -210,7 +211,8 @@ private fun PagerContent(
         HorizontalPager(
             modifier = Modifier.fillMaxSize(),
             count = 3,
-            state = pagerState
+            state = pagerState,
+//            flingBehavior = ,
         ) { pager ->
 
             when (pager) {
@@ -221,7 +223,7 @@ private fun PagerContent(
                     ProfileSubView()
                 }
                 2 -> {
-                    CongratSubView()
+                    PreviewSubView()
                 }
             }
 
@@ -382,6 +384,7 @@ private fun EmailPasswordSubView(
                     Button(
                         modifier = Modifier.align(Alignment.CenterHorizontally),
                         onClick = {
+                            localFocusManager.clearFocus()
                             if (state.authResponseResult == null || state.authResponseResult is AuthResponseResult.Error) {
                                 registrationViewModel.onEvent(RegistrationEvent.Submit)
                             }
@@ -452,146 +455,171 @@ private fun ProfileSubView(
         }
         .build()
     val showImage = remember { mutableStateOf(false) }
-    val imageUrl = remember { mutableStateOf("") }
-    val languageDialogVisible = remember { mutableStateOf(false) }
-    Column(
-        Modifier
+    LazyColumn(
+        modifier = Modifier
             .fillMaxSize()
     ) {
-        AuthTextField(
-            modifier = Modifier
-                .align(Alignment.CenterHorizontally)
-                .focusRequester(focusRequester),
-            labelText = "First Name",
-            placeHolderText = "Enter your First Name",
-            Icons.Default.AccountBox,
-            text = "",
-            onValueChange = {
-//                registrationViewModel.onEvent(
-//                    RegistrationEvent.OnConfirmPasswordEnter(
-//                        it
-//                    )
-//                )
-            },
-            isError = false,
-            readOnly = true,
-            localFocusManager,
-            FocusDirection.Up,
-            ImeAction.Done
-        )
-
-        AuthTextField(
-            modifier = Modifier
-                .align(Alignment.CenterHorizontally)
-                .focusRequester(focusRequester),
-            labelText = "Last Name",
-            placeHolderText = "Enter your Last Name",
-            Icons.Default.AccountBox,
-            text = "",
-            onValueChange = {
-//                registrationViewModel.onEvent(
-//                    RegistrationEvent.OnConfirmPasswordEnter(
-//                        it
-//                    )
-//                )
-            },
-            isError = false,
-            readOnly = true,
-            localFocusManager,
-            FocusDirection.Up,
-            ImeAction.Done
-        )
-
-        AuthTextField(
-            modifier = Modifier
-                .align(Alignment.CenterHorizontally)
-                .focusRequester(focusRequester),
-            labelText = "Bio",
-            placeHolderText = "Enter your Bio",
-            Icons.Default.AccountBox,
-            text = "",
-            onValueChange = {
-//                registrationViewModel.onEvent(
-//                    RegistrationEvent.OnConfirmPasswordEnter(
-//                        it
-//                    )
-//                )
-            },
-            isError = false,
-            readOnly = true,
-            localFocusManager,
-            FocusDirection.Up,
-            ImeAction.Done
-        )
-
-        val scope = rememberCoroutineScope()
-        AnimatedVisibility(
-            modifier = Modifier.align(Alignment.CenterHorizontally),
-            visible = imageUrl.value==""
-        ) {
-            Button(
-                modifier = Modifier.align(Alignment.CenterHorizontally),
-                onClick = {
-                    scope.launch { bottomSheetState.show() }
-                }
+        item {
+            Column(
+                verticalArrangement = Arrangement.spacedBy(10.dp),
+                modifier = Modifier
+                    .fillMaxSize()
+                    .padding(horizontal = 30.dp, vertical = 50.dp)
             ) {
-                Text(text = "Choose your Country")
-            }
-        }
-
-
-
-
-            CompositionLocalProvider(LocalImageLoader provides imageLoader) {
-                val painter = rememberImagePainter(imageUrl.value)
-                AnimatedVisibility(
-                    modifier = Modifier,
-                    visible = when (painter.state) {
-                        is ImagePainter.State.Empty,
-                        is ImagePainter.State.Success,
-                        -> true
-                        is ImagePainter.State.Loading,
-                        is ImagePainter.State.Error,
-                        -> showImage.value
-                    }
-                ) {
-                    showImage.value=false
-                    Row(
-                        horizontalArrangement = Arrangement.SpaceBetween,
-                        modifier = Modifier
-                            .padding(horizontal = 30.dp)
-                            .fillMaxWidth()
-                    ) {
-
-
-                        Image(
-                            painter = painter,
-                            contentDescription = "SVG Image",
-                            contentScale = ContentScale.Fit,
-                            modifier = Modifier
-                                .align(Alignment.CenterVertically)
-                                .size(150.dp)
+                AuthTextField(
+                    modifier = Modifier
+                        .align(Alignment.CenterHorizontally)
+                        .focusRequester(focusRequester),
+                    labelText = "First Name",
+                    placeHolderText = "Enter your First Name",
+                    Icons.Default.AccountBox,
+                    text = state.firstName,
+                    onValueChange = {
+                        registrationViewModel.onEvent(
+                            RegistrationEvent.OnFirstNameEnter(
+                                it
+                            )
                         )
+                    },
+                    isError = false,
+                    readOnly = false,
+                    localFocusManager,
+                    FocusDirection.Up,
+                    ImeAction.Done
+                )
+
+                AuthTextField(
+                    modifier = Modifier
+                        .align(Alignment.CenterHorizontally)
+                        .focusRequester(focusRequester),
+                    labelText = "Last Name",
+                    placeHolderText = "Enter your Last Name",
+                    Icons.Default.AccountBox,
+                    text = state.lastName,
+                    onValueChange = {
+                        registrationViewModel.onEvent(
+                            RegistrationEvent.OnLastNameEnter(
+                                it
+                            )
+                        )
+                    },
+                    isError = false,
+                    readOnly = false,
+                    localFocusManager,
+                    FocusDirection.Up,
+                    ImeAction.Done
+                )
+
+                AuthTextField(
+                    modifier = Modifier
+                        .align(Alignment.CenterHorizontally)
+                        .heightIn(min = 200.dp)
+                        .focusRequester(focusRequester),
+                    labelText = "Bio",
+                    placeHolderText = "Enter your Bio",
+                    Icons.Default.List,
+                    text = state.bio,
+                    onValueChange = {
+                        registrationViewModel.onEvent(
+                            RegistrationEvent.OnBioEnter(
+                                it
+                            )
+                        )
+                    },
+                    isError = false,
+                    readOnly = false,
+                    localFocusManager,
+                    FocusDirection.Up,
+                    ImeAction.Done
+                )
+
+                val scope = rememberCoroutineScope()
+                AnimatedVisibility(
+                    modifier = Modifier.align(Alignment.CenterHorizontally),
+                    visible = state.countryUrl == ""
+                ) {
+                    Button(
+                        modifier = Modifier.align(Alignment.CenterHorizontally),
+                        onClick = {
+                            localFocusManager.clearFocus()
+                            scope.launch { bottomSheetState.show() }
+                        }
+                    ) {
+                        Text(text = "Choose your Country")
+                    }
+                }
 
 
-                        Button(
-                            modifier = Modifier.align(Alignment.CenterVertically),
-                            onClick = {
-                                scope.launch { bottomSheetState.show() }
+
+
+                CompositionLocalProvider(LocalImageLoader provides imageLoader) {
+                    val painter = rememberImagePainter(state.countryUrl)
+                    AnimatedVisibility(
+                        modifier = Modifier,
+                        visible = if (showImage.value) {
+                            when (painter.state) {
+                                is ImagePainter.State.Empty,
+                                is ImagePainter.State.Success,
+                                -> true
+                                is ImagePainter.State.Loading,
+                                is ImagePainter.State.Error,
+                                -> false
                             }
-                        ) {
-                            Text(text = "Change")
+                        } else {
+                            state.countryUrl.isNotBlank()
                         }
 
+                    ) {
+
+                        Row(
+                            horizontalArrangement = Arrangement.SpaceBetween,
+                            modifier = Modifier
+                                .padding(vertical = 10.dp)
+                                .clip(RoundedCornerShape(5.dp))
+                                .padding(2.dp)
+                                .shadow(
+                                    elevation = 2.dp,
+                                    shape = RoundedCornerShape(5.dp)
+                                )
+                                .background(MaterialTheme.colors.surface)
+                                .fillMaxWidth()
+                        ) {
+
+
+                            Image(
+                                painter = painter,
+                                contentDescription = "SVG Image",
+                                contentScale = ContentScale.Fit,
+                                modifier = Modifier
+                                    .padding(start = 10.dp)
+                                    .align(Alignment.CenterVertically)
+                                    .size(150.dp)
+                            )
+
+
+                            Button(
+                                modifier = Modifier
+                                    .align(Alignment.CenterVertically)
+                                    .padding(end = 10.dp),
+                                onClick = {
+                                    localFocusManager.clearFocus()
+                                    scope.launch { bottomSheetState.show() }
+                                }
+                            ) {
+                                Text(text = "Change")
+                            }
+
+                        }
                     }
                 }
+
+
             }
-
-
-
-
+        }
     }
     Box {
+
+        val scope = rememberCoroutineScope()
         ModalBottomSheetLayout(
             sheetState = bottomSheetState,
             sheetContent = {
@@ -605,21 +633,35 @@ private fun ProfileSubView(
 
                 Column(modifier = Modifier.heightIn(max = 500.dp)) {
                     SearchTextField(
-                        text = "",
-                        onValueChange = {},
-                        onSearch = { /*TODO*/ },
-                        onFocusChange = {}
+                        text = registrationViewModel.searchRequest.value,
+                        shouldHint = false,
+                        onValueChange = {
+                            registrationViewModel.searchRequest.value = it
+                            registrationViewModel.collectCountry()
+                        },
+                        onSearch = {
+
+                        },
+                        focusManager = localFocusManager
+
                     )
+
                     LazyColumn(modifier = Modifier.fillMaxWidth()) {
-                        items(test()) {
+                        items(registrationViewModel.searchResult.value.ifEmpty { registrationViewModel.countries }) {
                             CountryItem(
                                 it, Modifier
                                     .fillMaxWidth()
                                     .align(Alignment.CenterHorizontally)
                                     .padding(vertical = 10.dp)
                             ) {
+                                localFocusManager.clearFocus()
                                 showImage.value = true
-                                imageUrl.value = "https://countryflagsapi.com/svg/$it"
+                                registrationViewModel.onEvent(
+                                    RegistrationEvent.OnCountryFlagSelected(
+                                        getCountryFlagUrl(it)
+                                    )
+                                )
+                                scope.launch { bottomSheetState.animateTo(ModalBottomSheetValue.Hidden) }
                             }
                         }
                     }
@@ -631,14 +673,14 @@ private fun ProfileSubView(
     }
 }
 
-val locales = Locale.getISOCountries()
+val locales: Array<String> = Locale.getISOCountries()
 
 data class Country(
     val name: String,
     val code: String
 )
 
-fun test(): List<Country> {
+fun getCountryList(): List<Country> {
     val list = arrayListOf<Country>()
     for (countryCode in locales) {
         val obj = Locale("", countryCode)
@@ -648,23 +690,27 @@ fun test(): List<Country> {
 }
 
 @Composable
-private fun CongratSubView() {
+private fun PreviewSubView(
+    registrationViewModel: RegistrationViewModel = hiltViewModel()
+) {
+    val state = registrationViewModel.state
     Column(
         Modifier
             .fillMaxSize()
-            .background(Color.Blue)
+            .padding(horizontal = 30.dp, vertical = 50.dp)
     ) {
+        Text(text = "Your private data")
+
+        Text(text = "${state.email}")
+        Text(text = "${state.password}")
+
+        Text(text = "Your public data")
+
+        Text(text = "${state.firstName}")
+        Text(text = "${state.lastName}")
+        Text(text = "${state.bio}")
+        Text(text = "${state.countryUrl}")
 
     }
 }
 
-@Composable
-private fun TestView() {
-    Column(
-        Modifier
-            .fillMaxSize()
-            .background(Color.Blue)
-    ) {
-
-    }
-}

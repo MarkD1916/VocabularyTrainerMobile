@@ -1,17 +1,20 @@
 package com.example.vocabularytrainer.presentation.auth.registration
 
+import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.vocabularytrainer.data.preferences.AuthPreference
 import com.example.vocabularytrainer.domain.auth.use_case.AuthUseCases
+import com.example.vocabularytrainer.presentation.auth.Country
+import com.example.vocabularytrainer.presentation.auth.getCountryList
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.receiveAsFlow
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -45,6 +48,23 @@ class RegistrationViewModel @Inject constructor(
         }
     }
 
+    val countries = getCountryList()
+    var searchRequest = mutableStateOf("")
+    val searchResult = mutableStateOf(getCountryList())
+
+
+    fun collectCountry() {
+        viewModelScope.launch {
+            searchResult.value =countries.filter {country->
+                searchRequest.value.length>= 3
+            }.filter {
+                it.name.startsWith(searchRequest.value.replaceFirstChar { it.uppercase() })
+            }
+
+
+            }
+    }
+
     fun onEvent(event: RegistrationEvent) {
         when (event) {
             is RegistrationEvent.OnEmailEnter -> {
@@ -69,6 +89,19 @@ class RegistrationViewModel @Inject constructor(
             }
             is RegistrationEvent.Error -> {
                 state = state.copy(authResponseResult = AuthResponseResult.Error(event.message))
+            }
+
+            is RegistrationEvent.OnCountryFlagSelected -> {
+                state = state.copy(countryUrl = event.countryFlagUrl)
+            }
+            is RegistrationEvent.OnFirstNameEnter -> {
+                state = state.copy(firstName = event.firstName)
+            }
+            is RegistrationEvent.OnLastNameEnter -> {
+                state = state.copy(lastName = event.lastName)
+            }
+            is RegistrationEvent.OnBioEnter -> {
+                state = state.copy(bio = event.bio)
             }
         }
     }
@@ -107,7 +140,6 @@ class RegistrationViewModel @Inject constructor(
         viewModelScope.launch {
             onEvent(RegistrationEvent.Loading)
             onEvent(authUseCases.registerUser.execute(state.password, state.email))
-
         }
     }
 

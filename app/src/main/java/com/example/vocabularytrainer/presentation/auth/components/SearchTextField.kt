@@ -2,6 +2,7 @@ package com.example.vocabularytrainer.presentation.auth.components
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -19,12 +20,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
+import androidx.compose.ui.focus.FocusManager
 import androidx.compose.ui.focus.FocusState
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.input.ImeAction
 import androidx.compose.ui.unit.dp
+import com.example.vocabularytrainer.util.LocalSpacing
 
 @Composable
 fun SearchTextField(
@@ -34,11 +37,11 @@ fun SearchTextField(
     modifier: Modifier = Modifier,
     hint: String = "Search",
     shouldHint: Boolean = false,
-    onFocusChange: (FocusState) -> Unit
+    focusManager: FocusManager,
 ) {
-    val spacing = 10.dp
+    val spacing = LocalSpacing.current
     Box(
-        modifier = modifier.background(Color.Yellow)
+        modifier = modifier
     ) {
         BasicTextField(
             value = text,
@@ -46,7 +49,7 @@ fun SearchTextField(
             singleLine = true,
             keyboardActions = KeyboardActions(
                 onSearch = {
-                    onSearch()
+                    focusManager.clearFocus()
                     defaultKeyboardAction(imeAction = ImeAction.Search)
                 }
             ),
@@ -62,8 +65,9 @@ fun SearchTextField(
                 )
                 .background(MaterialTheme.colors.surface)
                 .fillMaxWidth()
-//                .padding(spacing.spaceMedium)
-//                .padding(end = spacing.spaceMedium)
+                .padding(spacing.spaceMedium)
+                .padding(end = spacing.spaceMedium)
+//                .onFocusChanged { onFocusChange(it) }
         )
         if (shouldHint) {
             Text(
@@ -73,7 +77,7 @@ fun SearchTextField(
                 color = Color.LightGray,
                 modifier = Modifier
                     .align(Alignment.CenterStart)
-//                    .padding(start = spacing.spaceMedium)
+                    .padding(start = spacing.spaceMedium)
             )
         }
         IconButton(
@@ -82,7 +86,7 @@ fun SearchTextField(
         ) {
             Icon(
                 imageVector = Icons.Default.Search,
-                contentDescription = ""
+                contentDescription = "search"
             )
         }
     }

@@ -26,7 +26,7 @@ fun CountryItem(country: Country, modifier: Modifier, updateImage: (String)-> Un
                 horizontalArrangement = Arrangement.SpaceBetween,
             ) {
                 Text(
-                    text = country.name, modifier = Modifier
+                    text = country.name, modifier = Modifier.widthIn(max=150.dp)
                         .align(Alignment.CenterVertically)
                 )
 
@@ -42,7 +42,7 @@ fun CountryItem(country: Country, modifier: Modifier, updateImage: (String)-> Un
                             .align(Alignment.CenterVertically)
                             .size(15.dp),
                         imageVector = Icons.Default.Check,
-                        contentDescription = "error",
+                        contentDescription = "choose",
                         tint = Color.White
                     )
 

@@ -5,7 +5,7 @@ import androidx.annotation.RequiresApi
 import java.time.LocalDate
 import java.util.*
 
-sealed class AuthResponseResult() {
+sealed class AuthResponseResult {
     object Loading: AuthResponseResult()
     object Success: AuthResponseResult()
     data class Error(val message:String): AuthResponseResult()
@@ -26,8 +26,8 @@ data class RegistrationState(
 
     val firstName: String = "",
     val lastName: String = "",
-    val country: String = "",
-    val bio: String = ""
+    val bio: String = "",
+    val countryUrl: String = "",
 ) {
     fun getReadOnlyValue():Boolean {
         return authResponseResult is AuthResponseResult.Loading || authResponseResult is AuthResponseResult.Success
