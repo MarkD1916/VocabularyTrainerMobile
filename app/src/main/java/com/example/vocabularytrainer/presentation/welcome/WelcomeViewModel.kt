@@ -21,11 +21,10 @@ import javax.inject.Inject
 
 @HiltViewModel
 class WelcomeViewModel@Inject constructor(): ViewModel() {
-    var job: Job? by mutableStateOf(null)
 
     private val _uiEvent = Channel<UiEvent>()
     var uiEvent: Flow<UiEvent>? = _uiEvent.receiveAsFlow()
-    val startNow = mutableStateOf(false)
+
     fun onEvent(event: WelcomeEvent) {
         when (event) {
             is WelcomeEvent.OnStartClick -> {

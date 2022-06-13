@@ -16,6 +16,8 @@ interface AuthApi {
     @POST("/mobile/token/login")
     suspend fun loginUser(@Body user: LoginRequest): Response<LoginResponse>
 
+//    suspend fun logout
+
 //    @POST("auth/token/logout/")
 //    suspend fun logoutUser(): Response<Any>
 }

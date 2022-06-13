@@ -3,7 +3,6 @@ package com.example.vocabularytrainer.data.di
 import com.androiddevs.ktornoteapp.data.remote.interceptors.TokenInterceptor
 import com.example.vocabularytrainer.data.preferences.AuthPreference
 import com.example.vocabularytrainer.data.remote.auth.api.AuthApi
-import com.example.vocabularytrainer.data.remote.auth.api.CountryApi
 import com.example.vocabularytrainer.data.repository.AuthRepositoryImpl
 import com.example.vocabularytrainer.domain.repository.AuthRepository
 import dagger.Module
@@ -38,9 +37,6 @@ object AuthDataModule {
     @Named("AuthUrl")
     fun providesBaseUrlAuth(): String = "https://vmakd1916vocabularytrainer.herokuapp.com"
 
-    @Provides
-    @Named("CountryUrl")
-    fun providesBaseUrlCountry(): String = "https://countryflagsapi.com/"
 
     @Provides
     @Singleton
@@ -52,32 +48,17 @@ object AuthDataModule {
         .build()
 
 
-
-
     @Provides
     @Singleton
     fun provideAuthApi(@Named("Auth")retrofit: Retrofit): AuthApi {
         return retrofit.create(AuthApi::class.java)
     }
 
-    @Provides
-    @Singleton
-    @Named("Country")
-    fun provideCountryRetrofit(@Named("CountryUrl")BASE_URL: String, client: OkHttpClient): Retrofit = Retrofit.Builder()
-        .addConverterFactory(GsonConverterFactory.create())
-        .baseUrl(BASE_URL)
-        .client(client)
-        .build()
+
 
     @Provides
     @Singleton
-    fun provideCountryApi(@Named("Country")retrofit: Retrofit): CountryApi {
-        return retrofit.create(CountryApi::class.java)
-    }
-
-    @Provides
-    @Singleton
-    fun provideAuthRepository(authApi: AuthApi, countryApi: CountryApi): AuthRepository {
-        return AuthRepositoryImpl(authApi,countryApi)
+    fun provideAuthRepository(authApi: AuthApi): AuthRepository {
+        return AuthRepositoryImpl(authApi)
     }
 }
