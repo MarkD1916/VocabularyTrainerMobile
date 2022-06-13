@@ -8,7 +8,7 @@ import java.nio.channels.AsynchronousFileChannel.open
 import javax.xml.parsers.DocumentBuilderFactory
 
 
-data class AccountRequest(
+data class RegisterRequest(
     @SerializedName("username") val email: String,
     val password: String
 )

@@ -1,8 +1,14 @@
 package com.example.vocabularytrainer.presentation.auth.registration
 
-import com.example.vocabularytrainer.data.remote.auth.response.AuthResponse
+import com.example.vocabularytrainer.data.remote.auth.response.RegisterResponse
 
-sealed class RegistrationEvent {
+interface GeneralEvent {
+    object Loading : GeneralEvent
+    object NoInternetConnection: GeneralEvent
+}
+
+
+sealed class RegistrationEvent: GeneralEvent {
     data class OnEmailEnter(
         val email: String = ""
     ) : RegistrationEvent()
@@ -17,10 +23,8 @@ sealed class RegistrationEvent {
 
     object Submit : RegistrationEvent()
 
-    object Loading : RegistrationEvent()
-
     data class Success(
-        val result: AuthResponse? = null
+        val result: RegisterResponse? = null
     ) : RegistrationEvent()
 
     data class Error(val message: String) : RegistrationEvent()

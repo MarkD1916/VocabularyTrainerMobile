@@ -22,15 +22,15 @@ data class RegistrationState(
     val confirmPasswordError: String? = null,
     val confirmPasswordRequire: String? = "",
 
-    val authResponseResult: AuthResponseResult? = null,
+    val registerResponseResult: AuthResponseResult? = null,
 
     val firstName: String = "",
     val lastName: String = "",
     val bio: String = "",
-    val countryUrl: String = "",
+    val countryUrl: String = ""
 ) {
     fun getReadOnlyValue():Boolean {
-        return authResponseResult is AuthResponseResult.Loading || authResponseResult is AuthResponseResult.Success
+        return registerResponseResult is AuthResponseResult.Loading || registerResponseResult is AuthResponseResult.Success
     }
 
     @RequiresApi(Build.VERSION_CODES.O)

@@ -54,15 +54,14 @@ fun LoadAnimation(modifier: Modifier = Modifier) {
 
         Canvas(
             modifier = modifier
-                .height(20.dp)
                 .align(Alignment.CenterHorizontally)
                 .scale(animationScale.value)
 
         ) {
             drawCircle(
                 brush = Brush.sweepGradient(listOf(Color.Yellow, Color.Red)),
-                style = Stroke(7f),
-                radius = 20f
+                style = Stroke(27f),
+                radius = 200f
             )
 
         }

@@ -21,7 +21,8 @@ object AuthDomainModule {
             validateConfirmPassword = ValidateConfirmPassword(),
             validateEmail = ValidateEmail(),
             validatePassword = ValidatePassword(),
-            registerUser = RegisterUser(repository)
+            registerUser = RegisterUser(repository),
+            loginUser = LoginUser(repository)
         )
     }
 

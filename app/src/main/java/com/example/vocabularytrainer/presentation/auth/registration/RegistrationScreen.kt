@@ -23,7 +23,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.focus.FocusDirection
-import androidx.compose.ui.focus.FocusManager
 import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.geometry.Size
@@ -46,6 +45,7 @@ import coil.compose.LocalImageLoader
 import coil.compose.rememberImagePainter
 import coil.decode.SvgDecoder
 import com.example.vocabularytrainer.R
+import com.example.vocabularytrainer.navigation.Route
 import com.example.vocabularytrainer.presentation.auth.components.*
 import com.example.vocabularytrainer.presentation.auth.registration.AuthResponseResult
 import com.example.vocabularytrainer.presentation.auth.registration.RegistrationEvent
@@ -57,6 +57,7 @@ import com.example.vocabularytrainer.util.Constants.PASSWORD_REQUIRE
 import com.example.vocabularytrainer.util.Constants.getCountryFlagUrl
 import com.example.vocabularytrainer.util.pxToDp
 import com.google.accompanist.pager.*
+import com.vmakd1916gmail.com.core.util.UiEvent
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
 import java.util.*
@@ -66,6 +67,7 @@ import java.util.*
 @OptIn(ExperimentalPagerApi::class)
 @Composable
 fun RegisterScreen(
+    onNavigate: (UiEvent.Navigate) -> Unit,
     registrationViewModel: RegistrationViewModel = hiltViewModel()
 ) {
     val focusManager = LocalFocusManager.current
@@ -187,7 +189,7 @@ fun RegisterScreen(
 
         }
 
-        PagerContent(pagerState = pagerState) {
+        PagerContent(pagerState = pagerState, onNavigate = onNavigate) {
             loginImageState.value = it
         }
 
@@ -202,6 +204,7 @@ fun RegisterScreen(
 )
 @Composable
 private fun PagerContent(
+    onNavigate: (UiEvent.Navigate) -> Unit,
     pagerState: PagerState,
     updateImage: (Boolean) -> Unit
 ) {
@@ -223,7 +226,7 @@ private fun PagerContent(
                     ProfileSubView()
                 }
                 2 -> {
-                    PreviewSubView()
+                    PreviewSubView(onNavigate)
                 }
             }
 
@@ -385,12 +388,12 @@ private fun EmailPasswordSubView(
                         modifier = Modifier.align(Alignment.CenterHorizontally),
                         onClick = {
                             localFocusManager.clearFocus()
-                            if (state.authResponseResult == null || state.authResponseResult is AuthResponseResult.Error) {
+                            if (state.registerResponseResult == null || state.registerResponseResult is AuthResponseResult.Error) {
                                 registrationViewModel.onEvent(RegistrationEvent.Submit)
                             }
                         }
                     ) {
-                        when (state.authResponseResult) {
+                        when (state.registerResponseResult) {
                             null -> {
                                 Text(text = "Submit", color = Color.White)
                             }
@@ -413,14 +416,14 @@ private fun EmailPasswordSubView(
                             }
                         }
                     }
-                    if (state.authResponseResult is AuthResponseResult.Error) {
+                    if (state.registerResponseResult is AuthResponseResult.Error) {
                         ErrorText(
                             modifier = Modifier.align(Alignment.CenterHorizontally),
-                            errorMessage = state.authResponseResult.message,
+                            errorMessage = state.registerResponseResult.message,
                             textColor = Color.Red
                         )
                     }
-                    if (state.authResponseResult is AuthResponseResult.Success) {
+                    if (state.registerResponseResult is AuthResponseResult.Success) {
                         Text(
                             modifier = Modifier
                                 .padding(horizontal = 30.dp)
@@ -691,11 +694,15 @@ fun getCountryList(): List<Country> {
 
 @Composable
 private fun PreviewSubView(
+    onNavigate: (UiEvent.Navigate) -> Unit,
     registrationViewModel: RegistrationViewModel = hiltViewModel()
 ) {
     val state = registrationViewModel.state
+    val openDialog = remember { mutableStateOf(false)  }
+
     Column(
-        Modifier
+        verticalArrangement = Arrangement.spacedBy(10.dp),
+        modifier = Modifier
             .fillMaxSize()
             .padding(horizontal = 30.dp, vertical = 50.dp)
     ) {
@@ -711,6 +718,54 @@ private fun PreviewSubView(
         Text(text = "${state.bio}")
         Text(text = "${state.countryUrl}")
 
+        Button(
+            modifier = Modifier
+                .align(Alignment.CenterHorizontally)
+                .padding(end = 10.dp),
+            onClick = {
+                if (state.registerResponseResult is AuthResponseResult.Success) {
+                    onNavigate(UiEvent.Navigate(Route.LOGIN))
+                }
+                else{
+                    openDialog.value = true
+                }
+            }
+        ) {
+            Text(text = "Login")
+        }
+
+    }
+    if (openDialog.value) {
+
+        AlertDialog(
+            onDismissRequest = {
+                openDialog.value = false
+            },
+            title = {
+                Text(text = "Ooooops...I can't find user's data")
+            },
+            text = {
+                Text("You can't LogIn without account")
+            },
+            confirmButton = {
+                Button(
+
+                    onClick = {
+                        onNavigate(UiEvent.Navigate(Route.LOGIN))
+                        openDialog.value = false
+                    }) {
+                    Text("SignIn")
+                }
+            },
+            dismissButton = {
+                Button(
+                    onClick = {
+                        openDialog.value = false
+                    }) {
+                    Text("Continue create new account")
+                }
+            }
+        )
     }
 }
 

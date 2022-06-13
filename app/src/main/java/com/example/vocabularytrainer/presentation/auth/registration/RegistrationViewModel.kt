@@ -1,19 +1,17 @@
 package com.example.vocabularytrainer.presentation.auth.registration
 
-import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.vocabularytrainer.data.preferences.AuthPreference
 import com.example.vocabularytrainer.domain.auth.use_case.AuthUseCases
-import com.example.vocabularytrainer.presentation.auth.Country
 import com.example.vocabularytrainer.presentation.auth.getCountryList
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -43,7 +41,7 @@ class RegistrationViewModel @Inject constructor(
                 email = authPreference.getStoredEmail(),
                 password = authPreference.getStoredPassword(),
                 confirmPassword = authPreference.getStoredPassword(),
-                authResponseResult = AuthResponseResult.Success
+                registerResponseResult = AuthResponseResult.Success
             )
         }
     }
@@ -65,8 +63,17 @@ class RegistrationViewModel @Inject constructor(
             }
     }
 
-    fun onEvent(event: RegistrationEvent) {
+    fun onEvent(event: GeneralEvent) {
         when (event) {
+            is GeneralEvent.Loading -> {
+                state = state.copy(registerResponseResult = AuthResponseResult.Loading)
+            }
+
+            is GeneralEvent.NoInternetConnection -> {
+
+            }
+
+
             is RegistrationEvent.OnEmailEnter -> {
                 state = state.copy(email = event.email)
             }
@@ -79,18 +86,15 @@ class RegistrationViewModel @Inject constructor(
             is RegistrationEvent.Submit -> {
                 submitData()
             }
-            is RegistrationEvent.Loading -> {
-                state = state.copy(authResponseResult = AuthResponseResult.Loading)
-            }
+
             is RegistrationEvent.Success -> {
-                state = state.copy(authResponseResult = AuthResponseResult.Success)
+                state = state.copy(registerResponseResult = AuthResponseResult.Success)
                 authPreference.setStoredEmail(state.email)
                 authPreference.setStoredPassword(state.password)
             }
             is RegistrationEvent.Error -> {
-                state = state.copy(authResponseResult = AuthResponseResult.Error(event.message))
+                state = state.copy(registerResponseResult = AuthResponseResult.Error(event.message))
             }
-
             is RegistrationEvent.OnCountryFlagSelected -> {
                 state = state.copy(countryUrl = event.countryFlagUrl)
             }
@@ -103,6 +107,7 @@ class RegistrationViewModel @Inject constructor(
             is RegistrationEvent.OnBioEnter -> {
                 state = state.copy(bio = event.bio)
             }
+
         }
     }
 
@@ -133,12 +138,12 @@ class RegistrationViewModel @Inject constructor(
                 confirmPasswordError = null
             )
         }
-        getDataFromServer()
+        registerUser()
     }
 
-    private fun getDataFromServer() {
+    private fun registerUser() {
         viewModelScope.launch {
-            onEvent(RegistrationEvent.Loading)
+            onEvent(GeneralEvent.Loading)
             onEvent(authUseCases.registerUser.execute(state.password, state.email))
         }
     }

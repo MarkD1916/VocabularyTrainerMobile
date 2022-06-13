@@ -1,10 +1,13 @@
 package com.example.vocabularytrainer.presentation.welcome.components
 
+import android.util.Log
 import android.view.MotionEvent
 import androidx.compose.animation.core.animateFloatAsState
+import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Card
@@ -23,6 +26,7 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import com.example.vocabularytrainer.R
 import com.example.vocabularytrainer.navigation.Route
+import com.example.vocabularytrainer.presentation.welcome.WelcomeEvent
 import com.example.vocabularytrainer.presentation.welcome.WelcomeViewModel
 import com.vmakd1916gmail.com.core.util.UiEvent
 import kotlinx.coroutines.CoroutineScope
@@ -42,8 +46,20 @@ fun StartButton(
     viewModel: WelcomeViewModel
 
 ) {
-    val selected = remember { mutableStateOf(false) }
-    val scale = animateFloatAsState(if (selected.value) 1.1f else 1f)
+    var selected by remember { mutableStateOf(false) }
+    var finished by remember { mutableStateOf(false) }
+    val flashFinished: (Float) -> Unit = {
+        finished = true
+        if (finished && !selected) {
+            viewModel.onEvent(WelcomeEvent.OnStartClick(route))
+        }
+    }
+    val scale = animateFloatAsState(
+        if (selected) 1.1f else 1f,
+        tween(durationMillis = 150),
+        finishedListener = flashFinished
+    )
+
 
     Card(
         shape = RoundedCornerShape(12.dp),
@@ -51,29 +67,27 @@ fun StartButton(
             .heightIn(max = 155.dp)
             .height(155.dp)
             .scale(scale.value)
-            .pointerInteropFilter {
-                when (it.action) {
-                    MotionEvent.ACTION_UP -> {
-                        selected.value = false
-                        if (viewModel.job == null) {
-                            viewModel.job = scope.launch {
-                                delay(150)
-                                onNavigate(UiEvent.Navigate(route))
-                            }
-                        }
 
-                        //TODO: content into AnimationButton
+            .pointerInteropFilter {
+
+                when (it.action) {
+
+                    MotionEvent.ACTION_UP -> {
+
+                        selected = false
 
                     }
                     MotionEvent.ACTION_DOWN -> {
-                        selected.value = true
+                        selected = true
                     }
                     else -> {
-                        selected.value = false
+
+
                     }
                 }
                 true
             }
+
             .border(
                 width = 1.dp,
                 color = MaterialTheme.colors.secondary,

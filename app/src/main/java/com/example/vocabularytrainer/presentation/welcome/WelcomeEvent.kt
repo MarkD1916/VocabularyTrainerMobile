@@ -1,6 +1,5 @@
 package com.example.vocabularytrainer.presentation.welcome
 
 sealed class WelcomeEvent {
-    object OnGitHubButtonClick: WelcomeEvent()
-    object OnWebButtonClick: WelcomeEvent()
+    data class OnStartClick(val route: String): WelcomeEvent()
 }
