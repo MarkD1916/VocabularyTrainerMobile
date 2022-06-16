@@ -4,6 +4,7 @@ import com.example.vocabularytrainer.data.remote.auth.api.AuthApi
 import com.example.vocabularytrainer.data.remote.auth.request.LoginRequest
 import com.example.vocabularytrainer.data.remote.auth.request.RegisterRequest
 import com.example.vocabularytrainer.domain.repository.AuthRepository
+import com.example.vocabularytrainer.presentation.auth.AuthEvent
 import com.example.vocabularytrainer.presentation.auth.login.LoginEvent
 import com.example.vocabularytrainer.presentation.auth.registration.RegistrationEvent
 import com.example.vocabularytrainer.util.getLoginResponseFromServer
@@ -37,7 +38,7 @@ class AuthRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun logout(): LoginEvent {
+    override suspend fun logout(): AuthEvent {
         return try {
             val response = authApi.logOutUser()
             getLogoutResponseFromServer(response)

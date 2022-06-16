@@ -1,10 +1,10 @@
 package com.example.vocabularytrainer.domain.auth.use_case
 
 import com.example.vocabularytrainer.domain.repository.AuthRepository
-import com.example.vocabularytrainer.presentation.auth.login.LoginEvent
+import com.example.vocabularytrainer.presentation.auth.AuthEvent
 
 class LogoutUser (private val repository: AuthRepository) {
-    suspend fun execute(): LoginEvent {
+    suspend fun execute(): AuthEvent {
         return repository.logout()
     }
 }
