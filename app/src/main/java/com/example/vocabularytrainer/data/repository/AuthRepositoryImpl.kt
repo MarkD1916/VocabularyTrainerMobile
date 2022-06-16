@@ -7,6 +7,7 @@ import com.example.vocabularytrainer.domain.repository.AuthRepository
 import com.example.vocabularytrainer.presentation.auth.login.LoginEvent
 import com.example.vocabularytrainer.presentation.auth.registration.RegistrationEvent
 import com.example.vocabularytrainer.util.getLoginResponseFromServer
+import com.example.vocabularytrainer.util.getLogoutResponseFromServer
 import com.example.vocabularytrainer.util.getRegisterResponseFromServer
 import javax.inject.Inject
 
@@ -29,14 +30,19 @@ class AuthRepositoryImpl @Inject constructor(
 
     override suspend fun login(email: String, password: String): LoginEvent {
         return try {
-            val response = authApi.loginUser(LoginRequest(email, password))
+            val response = authApi.logInUser(LoginRequest(email, password))
             getLoginResponseFromServer(response)
         } catch (e: Exception) {
             LoginEvent.Error(e.message!!)
         }
     }
 
-    override suspend fun logout(token: String): LoginEvent {
-        TODO("Not yet implemented")
+    override suspend fun logout(): LoginEvent {
+        return try {
+            val response = authApi.logOutUser()
+            getLogoutResponseFromServer(response)
+        } catch (e: Exception) {
+            LoginEvent.Error(e.message!!)
+        }
     }
 }

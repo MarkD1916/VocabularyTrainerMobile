@@ -23,10 +23,23 @@ fun getRegisterResponseFromServer(response: Response<RegisterResponse>): Registr
 fun getLoginResponseFromServer(response: Response<LoginResponse>): LoginEvent {
 
     return if (response.isSuccessful) {
-        LoginEvent.Success(response.body())
+        LoginEvent.SuccessLogin(response.body())
     } else {
         if(response.code()==400) {
-            LoginEvent.Error("A user with that username already exists.")
+            LoginEvent.Error(response.message())
+        } else{
+            LoginEvent.Error(response.message())
+        }
+    }
+}
+
+fun getLogoutResponseFromServer(response: Response<LoginResponse>): LoginEvent {
+
+    return if (response.isSuccessful) {
+        LoginEvent.SuccessLogout
+    } else {
+        if(response.code()==400) {
+            LoginEvent.Error(response.message())
         } else{
             LoginEvent.Error(response.message())
         }

@@ -7,11 +7,11 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.vocabularytrainer.data.preferences.AuthPreference
 import com.example.vocabularytrainer.domain.auth.use_case.AuthUseCases
+import com.example.vocabularytrainer.presentation.auth.AuthEvent
 import com.example.vocabularytrainer.presentation.auth.getCountryList
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.channels.Channel
-import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -63,21 +63,18 @@ class RegistrationViewModel @Inject constructor(
             }
     }
 
-    fun onEvent(event: GeneralEvent) {
+    fun onEvent(event: AuthEvent) {
         when (event) {
-            is GeneralEvent.Loading -> {
+            is AuthEvent.Loading -> {
                 state = state.copy(registerResponseResult = AuthResponseResult.Loading)
             }
 
-            is GeneralEvent.NoInternetConnection -> {
+            is AuthEvent.NoInternetConnection -> { }
 
-            }
-
-
-            is RegistrationEvent.OnEmailEnter -> {
+            is AuthEvent.OnEmailEnter -> {
                 state = state.copy(email = event.email)
             }
-            is RegistrationEvent.OnPasswordEnter -> {
+            is AuthEvent.OnPasswordEnter -> {
                 state = state.copy(password = event.password)
             }
             is RegistrationEvent.OnConfirmPasswordEnter -> {
@@ -143,7 +140,7 @@ class RegistrationViewModel @Inject constructor(
 
     private fun registerUser() {
         viewModelScope.launch {
-            onEvent(GeneralEvent.Loading)
+            onEvent(AuthEvent.Loading)
             onEvent(authUseCases.registerUser.execute(state.password, state.email))
         }
     }

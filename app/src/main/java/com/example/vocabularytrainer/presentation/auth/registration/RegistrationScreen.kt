@@ -27,7 +27,6 @@ import androidx.compose.ui.focus.FocusRequester
 import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.geometry.Size
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.layout.onGloballyPositioned
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalFocusManager
@@ -47,10 +46,7 @@ import coil.decode.SvgDecoder
 import com.example.vocabularytrainer.R
 import com.example.vocabularytrainer.navigation.Route
 import com.example.vocabularytrainer.presentation.auth.components.*
-import com.example.vocabularytrainer.presentation.auth.registration.AuthResponseResult
-import com.example.vocabularytrainer.presentation.auth.registration.RegistrationEvent
-import com.example.vocabularytrainer.presentation.auth.registration.RegistrationViewModel
-import com.example.vocabularytrainer.presentation.auth.registration.ValidationEvent
+import com.example.vocabularytrainer.presentation.auth.registration.*
 import com.example.vocabularytrainer.presentation.components.LoadAnimation
 import com.example.vocabularytrainer.presentation.welcome.components.ImageWithSmallText
 import com.example.vocabularytrainer.util.Constants.PASSWORD_REQUIRE
@@ -287,7 +283,7 @@ private fun EmailPasswordSubView(
                         icon = Icons.Default.Email,
                         text = state.email,
                         onValueChange = {
-                            registrationViewModel.onEvent(RegistrationEvent.OnEmailEnter(it))
+                            registrationViewModel.onEvent(AuthEvent.OnEmailEnter(it))
                         },
                         isError = state.emailError != null,
                         readOnly = state.getReadOnlyValue(),
@@ -314,7 +310,7 @@ private fun EmailPasswordSubView(
                         Icons.Default.Lock,
                         text = state.password,
                         onValueChange = {
-                            registrationViewModel.onEvent(RegistrationEvent.OnPasswordEnter(it))
+                            registrationViewModel.onEvent(AuthEvent.OnPasswordEnter(it))
                         },
                         isError = state.passwordError != null,
                         readOnly = state.getReadOnlyValue(),
@@ -581,10 +577,10 @@ private fun ProfileSubView(
                                 .clip(RoundedCornerShape(5.dp))
                                 .padding(2.dp)
                                 .shadow(
-                                    elevation = 2.dp,
-                                    shape = RoundedCornerShape(5.dp)
+                                    elevation = 1.dp,
+                                    shape = RoundedCornerShape(2.dp)
                                 )
-                                .background(MaterialTheme.colors.surface)
+                                .background(Color(0xA1F5F5F5))
                                 .fillMaxWidth()
                         ) {
 
@@ -592,11 +588,11 @@ private fun ProfileSubView(
                             Image(
                                 painter = painter,
                                 contentDescription = "SVG Image",
-                                contentScale = ContentScale.Fit,
                                 modifier = Modifier
                                     .padding(start = 10.dp)
                                     .align(Alignment.CenterVertically)
                                     .size(150.dp)
+
                             )
 
 

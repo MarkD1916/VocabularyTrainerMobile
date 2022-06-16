@@ -15,5 +15,5 @@ interface AuthRepository {
         password: String
     ): LoginEvent
 
-    suspend fun logout(token: String): LoginEvent
+    suspend fun logout(): LoginEvent
 }

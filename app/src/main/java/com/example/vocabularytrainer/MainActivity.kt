@@ -34,7 +34,10 @@ import com.example.vocabularytrainer.extantions.navigateEvent
 import com.example.vocabularytrainer.navigation.Route
 import com.example.vocabularytrainer.presentation.auth.AuthScreen
 import com.example.vocabularytrainer.presentation.auth.RegisterScreen
+import com.example.vocabularytrainer.presentation.auth.login.LoginEvent
+import com.example.vocabularytrainer.presentation.auth.login.LoginViewModel
 import com.example.vocabularytrainer.presentation.home.HomeScreen
+import com.example.vocabularytrainer.presentation.home.HomeViewModel
 import com.example.vocabularytrainer.presentation.home.components.AppBar
 import com.example.vocabularytrainer.presentation.home.components.DrawerBody
 import com.example.vocabularytrainer.presentation.home.components.DrawerHeader
@@ -52,7 +55,7 @@ import javax.inject.Inject
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
-    private val viewModel: WelcomeViewModel by viewModels()
+    private val viewModel: HomeViewModel by viewModels()
 
     @Inject
     lateinit var authPreference: AuthPreference
@@ -137,13 +140,14 @@ class MainActivity : ComponentActivity() {
                                                         scope.launch {
                                                             scaffoldState.drawerState.close()
                                                         }
-                                                        authPreference.setStoredToken("")
-                                                        authPreference.setStoredEmail("")
+                                                        Log.d("LOL", "HomeScreen: ${viewModel.hashCode()}")
+                                                        viewModel.onEvent(LoginEvent.LogOut)
                                                         navController.navigateEvent(
                                                             UiEvent.Navigate(
                                                                 Route.WELCOME
                                                             )
                                                         )
+
                                                     }
 
                                                 }
@@ -151,7 +155,7 @@ class MainActivity : ComponentActivity() {
                                         )
                                     }
                                 ) {
-                                    HomeScreen()
+                                    HomeScreen(onNavigate = navController::navigateEvent)
                                 }
 
 

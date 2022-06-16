@@ -6,10 +6,11 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.vocabularytrainer.data.preferences.AuthPreference
+import com.example.vocabularytrainer.data.remote.auth.response.LoginResponse
 import com.example.vocabularytrainer.domain.auth.use_case.AuthUseCases
 import com.example.vocabularytrainer.navigation.Route
+import com.example.vocabularytrainer.presentation.auth.AuthEvent
 import com.example.vocabularytrainer.presentation.auth.registration.AuthResponseResult
-import com.example.vocabularytrainer.presentation.auth.registration.GeneralEvent
 import com.vmakd1916gmail.com.core.util.UiEvent
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
@@ -35,7 +36,7 @@ class LoginViewModel @Inject constructor(
             val email = authPreference.getStoredEmail()
             val password = authPreference.getStoredPassword()
             viewModelScope.launch {
-                onEvent(GeneralEvent.Loading)
+                onEvent(AuthEvent.Loading)
                 onEvent(authUseCases.loginUser.execute(password, email))
                 if (state.loginResponseResult is AuthResponseResult.Success) {
 
@@ -44,8 +45,6 @@ class LoginViewModel @Inject constructor(
                             route = Route.HOME
                         )
                     )
-
-
                 }
             }
         }
@@ -60,19 +59,81 @@ class LoginViewModel @Inject constructor(
         }
     }
 
-    fun onEvent(event: GeneralEvent) {
+    fun onEvent(event: AuthEvent) {
         when (event) {
-            is GeneralEvent.Loading -> {
+            is AuthEvent.Loading -> {
                 state = state.copy(loginResponseResult = AuthResponseResult.Loading)
             }
-            is LoginEvent.Success -> {
-                state = state.copy(loginResponseResult = AuthResponseResult.Success)
+            is LoginEvent.SuccessLogin -> {
                 authPreference.setStoredToken(event.result?.token?:"")
+                viewModelScope.launch {
+                    _uiEvent.send(
+                        UiEvent.Navigate(
+                            route = Route.HOME
+                        )
+                    )
+                }
             }
-            is LoginEvent.LogOut -> {
-                authPreference.setStoredToken("")
 
+            is LoginEvent.Error -> {
+                state = state.copy(loginResponseResult = AuthResponseResult.Error(event.message))
             }
+
+            is LoginEvent.LogOut -> {
+                logOutUser()
+            }
+            is LoginEvent.Login -> {
+                submitData()
+            }
+            is AuthEvent.OnEmailEnter -> {
+                state = state.copy(email = event.email)
+            }
+            is AuthEvent.OnPasswordEnter -> {
+                state = state.copy(password = event.password)
+            }
+
         }
     }
+
+    private fun submitData() {
+        val emailResult = authUseCases.validateEmail.execute(state.email)
+        val passwordResult = authUseCases.validatePassword.execute(state.password)
+        val hasError = listOf(
+            emailResult,
+            passwordResult
+        ).any {
+            !it.success
+        }
+        if (hasError) {
+            state = state.copy(
+                emailError = emailResult.error,
+                passwordError = passwordResult.error
+            )
+            return
+        }
+        else {
+            state = state.copy(
+                emailError = null,
+                passwordError = null
+            )
+        }
+        loginUser()
+    }
+
+    private fun loginUser() {
+        viewModelScope.launch {
+            onEvent(AuthEvent.Loading)
+            onEvent(authUseCases.loginUser.execute(state.password, state.email))
+        }
+    }
+
+    private fun logOutUser() {
+        viewModelScope.launch {
+            onEvent(authUseCases.logoutUser.execute())
+            authPreference.setStoredToken("")
+            authPreference.setStoredEmail("")
+            authPreference.setStoredPassword("")
+        }
+    }
+
 }

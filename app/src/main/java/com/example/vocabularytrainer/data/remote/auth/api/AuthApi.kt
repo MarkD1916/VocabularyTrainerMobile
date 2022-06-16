@@ -12,12 +12,11 @@ interface AuthApi {
 
     @POST("/mobile/users/")
     suspend fun registerUser(@Body user: RegisterRequest): Response<RegisterResponse>
-//
+
     @POST("/mobile/token/login")
-    suspend fun loginUser(@Body user: LoginRequest): Response<LoginResponse>
+    suspend fun logInUser(@Body user: LoginRequest): Response<LoginResponse>
 
-//    suspend fun logout
+    @POST("/mobile/token/logout")
+    suspend fun logOutUser(): Response<LoginResponse>
 
-//    @POST("auth/token/logout/")
-//    suspend fun logoutUser(): Response<Any>
 }
