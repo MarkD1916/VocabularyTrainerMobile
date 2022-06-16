@@ -3,8 +3,11 @@ package com.example.vocabularytrainer.data.di
 import com.androiddevs.ktornoteapp.data.remote.interceptors.TokenInterceptor
 import com.example.vocabularytrainer.data.preferences.AuthPreference
 import com.example.vocabularytrainer.data.remote.auth.api.AuthApi
+import com.example.vocabularytrainer.data.remote.home.api.HomeApi
 import com.example.vocabularytrainer.data.repository.AuthRepositoryImpl
+import com.example.vocabularytrainer.data.repository.HomeRepositoryImpl
 import com.example.vocabularytrainer.domain.repository.AuthRepository
+import com.example.vocabularytrainer.domain.repository.HomeRepository
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -17,11 +20,11 @@ import javax.inject.Singleton
 
 @Module
 @InstallIn(SingletonComponent::class)
-object AuthDataModule {
+object DataModule {
 
     @Singleton
     @Provides
-    fun provideTokenAuthInterceptor(authSharedPreferences: AuthPreference): TokenInterceptor =
+    fun provideTokenInterceptor(authSharedPreferences: AuthPreference): TokenInterceptor =
         TokenInterceptor(authSharedPreferences)
 
     @Singleton
@@ -34,14 +37,14 @@ object AuthDataModule {
 
 
     @Provides
-    @Named("AuthUrl")
+    @Named("VocabularyUrl")
     fun providesBaseUrlAuth(): String = "https://vmakd1916vocabularytrainer.herokuapp.com"
 
 
     @Provides
     @Singleton
-    @Named("Auth")
-    fun provideAuthRetrofit(@Named("AuthUrl")BASE_URL: String, client: OkHttpClient): Retrofit = Retrofit.Builder()
+    @Named("Vocabulary")
+    fun provideVocabularyRetrofit(@Named("VocabularyUrl")BASE_URL: String, client: OkHttpClient): Retrofit = Retrofit.Builder()
         .addConverterFactory(GsonConverterFactory.create())
         .baseUrl(BASE_URL)
         .client(client)
@@ -50,10 +53,15 @@ object AuthDataModule {
 
     @Provides
     @Singleton
-    fun provideAuthApi(@Named("Auth")retrofit: Retrofit): AuthApi {
+    fun provideAuthApi(@Named("Vocabulary")retrofit: Retrofit): AuthApi {
         return retrofit.create(AuthApi::class.java)
     }
 
+    @Provides
+    @Singleton
+    fun provideHomeApi(@Named("Vocabulary")retrofit: Retrofit): HomeApi {
+        return retrofit.create(HomeApi::class.java)
+    }
 
 
     @Provides
@@ -61,4 +69,11 @@ object AuthDataModule {
     fun provideAuthRepository(authApi: AuthApi): AuthRepository {
         return AuthRepositoryImpl(authApi)
     }
+
+    @Provides
+    @Singleton
+    fun provideHomeRepository(homeApi: HomeApi): HomeRepository {
+        return HomeRepositoryImpl(homeApi)
+    }
+
 }

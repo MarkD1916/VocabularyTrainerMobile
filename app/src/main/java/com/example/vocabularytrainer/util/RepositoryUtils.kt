@@ -8,27 +8,27 @@ import com.example.vocabularytrainer.presentation.auth.registration.Registration
 import retrofit2.Response
 
 //ToDo нужно как-то унифицировать эти функции
-fun getRegisterResponseFromServer(response: Response<RegisterResponse>): RegistrationEvent {
+fun getRegisterResponseFromServer(response: Response<RegisterResponse>): AuthEvent {
 
     return if (response.isSuccessful) {
         RegistrationEvent.Success(response.body())
     } else {
-        if(response.code()==400) {
+        if (response.code() == 400) {
             RegistrationEvent.Error("A user with that username already exists.")
-        } else{
+        } else {
             RegistrationEvent.Error(response.message())
         }
     }
 }
 
-fun getLoginResponseFromServer(response: Response<LoginResponse>): LoginEvent {
+fun getLoginResponseFromServer(response: Response<LoginResponse>): AuthEvent {
 
     return if (response.isSuccessful) {
         LoginEvent.SuccessLogin(response.body())
     } else {
-        if(response.code()==400) {
+        if (response.code() == 400) {
             LoginEvent.Error(response.message())
-        } else{
+        } else {
             LoginEvent.Error(response.message())
         }
     }
@@ -39,9 +39,9 @@ fun getLogoutResponseFromServer(response: Response<LoginResponse>): AuthEvent {
     return if (response.isSuccessful) {
         AuthEvent.Success
     } else {
-        if(response.code()==400) {
+        if (response.code() == 400) {
             LoginEvent.Error(response.message())
-        } else{
+        } else {
             LoginEvent.Error(response.message())
         }
     }

@@ -9,12 +9,12 @@ interface AuthRepository {
     suspend fun register(
         email: String,
         password: String
-    ): RegistrationEvent
+    ): AuthEvent
 
     suspend fun login(
         email: String,
         password: String
-    ): LoginEvent
+    ): AuthEvent
 
     suspend fun logout(): AuthEvent
 }

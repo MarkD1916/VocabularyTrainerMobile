@@ -20,7 +20,7 @@ class AuthRepositoryImpl @Inject constructor(
     override suspend fun register(
         email: String,
         password: String
-    ): RegistrationEvent {
+    ): AuthEvent {
         return try {
             val response = authApi.registerUser(RegisterRequest(email, password))
             getRegisterResponseFromServer(response)
@@ -29,7 +29,7 @@ class AuthRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun login(email: String, password: String): LoginEvent {
+    override suspend fun login(email: String, password: String): AuthEvent {
         return try {
             val response = authApi.logInUser(LoginRequest(email, password))
             getLoginResponseFromServer(response)

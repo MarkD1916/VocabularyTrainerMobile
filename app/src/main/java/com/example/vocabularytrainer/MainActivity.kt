@@ -92,7 +92,6 @@ class MainActivity : ComponentActivity() {
                         }
                         composable(Route.HOME)
                         {
-
                                 Scaffold(
                                     scaffoldState = scaffoldState,
                                     topBar = {

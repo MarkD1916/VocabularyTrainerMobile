@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.vocabularytrainer.data.preferences.AuthPreference
 import com.example.vocabularytrainer.domain.auth.use_case.AuthUseCases
+import com.example.vocabularytrainer.domain.home.use_case.HomeUseCases
 import com.example.vocabularytrainer.presentation.auth.AuthEvent
 import com.example.vocabularytrainer.presentation.auth.login.LoginEvent
 import com.vmakd1916gmail.com.core.util.UiEvent
@@ -18,10 +19,15 @@ import javax.inject.Inject
 class HomeViewModel @Inject constructor(
     private val authPreference: AuthPreference,
     private val authUseCases: AuthUseCases,
+    private val homeUseCases: HomeUseCases
 ) : ViewModel() {
 
     private val _uiEvent = Channel<UiEvent>()
     var uiEvent: Flow<UiEvent>? = _uiEvent.receiveAsFlow()
+
+    init {
+
+    }
 
     fun onEvent(event: AuthEvent) {
         when (event) {
