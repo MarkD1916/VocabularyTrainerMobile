@@ -1,20 +1,14 @@
 package com.example.vocabularytrainer.presentation.home
 
+import com.example.vocabularytrainer.data.remote.home.local.Item
+import com.example.vocabularytrainer.data.remote.home.remote.response.GroupResponse
+import com.example.vocabularytrainer.domain.home.model.Group
+
 
 data class HomeState(
-    val actionResult_1: String = "1",
-    val actionResult_2: String = "2",
-    val actionState_1: Resource<String> = Resource.NoAction(),
-
-    val actionState_2: Resource<String> = Resource.NoAction(),
+    val actionResult_1: String = "",
+    var actionState_1: List<Item> = listOf(),
+    var group: Resource<List<GroupResponse>> = Resource.NoAction()
 ) {
-    fun getActionResult1(): String{
 
-        return actionState_1.data?:""
-    }
-
-    fun getActionResult2(): String{
-
-        return actionState_2.data?:""
-    }
 }

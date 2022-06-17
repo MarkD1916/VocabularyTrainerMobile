@@ -1,9 +1,12 @@
 package com.example.vocabularytrainer.data.di
 
+import android.app.Application
+import androidx.room.Room
 import com.androiddevs.ktornoteapp.data.remote.interceptors.TokenInterceptor
 import com.example.vocabularytrainer.data.preferences.AuthPreference
 import com.example.vocabularytrainer.data.remote.auth.api.AuthApi
-import com.example.vocabularytrainer.data.remote.home.api.HomeApi
+import com.example.vocabularytrainer.data.local.home.VocabularyDatabase
+import com.example.vocabularytrainer.data.remote.home.remote.api.HomeApi
 import com.example.vocabularytrainer.data.repository.AuthRepositoryImpl
 import com.example.vocabularytrainer.data.repository.HomeRepositoryImpl
 import com.example.vocabularytrainer.domain.repository.AuthRepository
@@ -61,6 +64,17 @@ object DataModule {
     @Singleton
     fun provideHomeApi(@Named("Vocabulary")retrofit: Retrofit): HomeApi {
         return retrofit.create(HomeApi::class.java)
+    }
+
+
+    @Provides
+    @Singleton
+    fun provideTrackerDatabase(app: Application): VocabularyDatabase {
+        return Room.databaseBuilder(
+            app,
+            VocabularyDatabase::class.java,
+            "vocabulary_db"
+        ).build()
     }
 
 

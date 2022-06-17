@@ -1,11 +1,14 @@
 package com.example.vocabularytrainer.presentation.home
 
+import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.vocabularytrainer.data.preferences.AuthPreference
+import com.example.vocabularytrainer.data.remote.home.local.Item
+import com.example.vocabularytrainer.data.remote.home.local.Test
 import com.example.vocabularytrainer.domain.auth.use_case.AuthUseCases
 import com.example.vocabularytrainer.domain.home.use_case.HomeUseCases
 import com.example.vocabularytrainer.presentation.auth.AuthEvent
@@ -32,6 +35,8 @@ class HomeViewModel @Inject constructor(
 
     init {
 
+       onHomeEvent(HomeEvent.GetAllGroup)
+
     }
 
     fun onEvent(event: AuthEvent) {
@@ -45,42 +50,50 @@ class HomeViewModel @Inject constructor(
     fun onHomeEvent(event: HomeEvent) {
         when (event) {
             is HomeEvent.GetAllGroup -> {
-                //state = state.copy(***=Loading)
-                getGroupFromServer()
+                state = state.copy(
+                    group = Resource.Loading()
+                )
+                viewModelScope.launch {
+                    state = state.copy(
+                        group = homeUseCases.getAllGroup.execute()
+                    )
+
+                }
             }
 
             is HomeEvent.Action1 -> {
-                state = state.copy(actionState_1 = Resource.Loading())
-                doAction1()
+
+                state = state.copy(
+                    actionState_1 = state.actionState_1.map {
+                        if (it.id == event.index) {
+                            it.copy(state = Resource.Loading())
+                        } else it
+                    }
+                )
+//                doAction1(event.index)
+
             }
 
-            is HomeEvent.Action2 -> {
-                state = state.copy(actionState_2 = Resource.Loading())
-                doAction2()
-            }
         }
     }
 
-    private fun doAction1() {
-        viewModelScope.launch {
-            delay(5000)
-            state = state.copy(actionState_1 = Resource.Success("1 Success"))
-        }
-    }
-
-    private fun doAction2() {
-        viewModelScope.launch {
-            delay(10000)
-            state = state.copy(actionState_2 = Resource.Success("2 Success"))
-        }
-    }
-
-
+//    private fun doAction1(index: Int) {
+//        viewModelScope.launch {
+//            delay(5000)
+//            state = state.copy(
+//                actionState_1 = state.actionState_1.map {
+//                    if (it.id == index) {
+//                        it.copy(state = Resource.Success("Success $index"))
+//                    } else it
+//                }
+//            )
+//        }
+//    }
 
 
     private fun getGroupFromServer() {
         viewModelScope.launch {
-            when(val result = homeUseCases.getAllGroup.execute()){
+            when (val result = homeUseCases.getAllGroup.execute()) {
                 is Resource.Success -> {
                     result.data//state = state.copy
                 }
@@ -100,9 +113,9 @@ class HomeViewModel @Inject constructor(
 
     private fun logOutUser() {
         viewModelScope.launch {
-            onEvent(authUseCases.logoutUser.execute())
             authPreference.setStoredToken("")
             authPreference.setStoredEmail("")
+            onEvent(authUseCases.logoutUser.execute())
             authPreference.setStoredPassword("")
         }
     }

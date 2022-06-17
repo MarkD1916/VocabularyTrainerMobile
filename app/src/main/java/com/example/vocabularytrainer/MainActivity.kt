@@ -139,7 +139,6 @@ class MainActivity : ComponentActivity() {
                                                         scope.launch {
                                                             scaffoldState.drawerState.close()
                                                         }
-                                                        Log.d("LOL", "HomeScreen: ${viewModel.hashCode()}")
                                                         viewModel.onEvent(LoginEvent.LogOut)
                                                         navController.navigateEvent(
                                                             UiEvent.Navigate(

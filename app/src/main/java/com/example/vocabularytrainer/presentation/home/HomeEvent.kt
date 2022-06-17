@@ -1,6 +1,6 @@
 package com.example.vocabularytrainer.presentation.home
 
-import com.example.vocabularytrainer.data.remote.home.response.GroupResponse
+import com.example.vocabularytrainer.data.remote.home.remote.response.GroupResponse
 
 
 sealed class Resource<T>(val data: T? = null, val message: String? = null) {
@@ -16,9 +16,9 @@ sealed class Resource<T>(val data: T? = null, val message: String? = null) {
 }
 
 sealed class HomeEvent {
-    data class GetAllGroup(val data: GroupResponse): HomeEvent()
+    object GetAllGroup: HomeEvent()
 
-    object Action1: HomeEvent()
+    data class Action1(val index: Int): HomeEvent()
     object Action2: HomeEvent()
 
 }
