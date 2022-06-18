@@ -8,18 +8,25 @@ import com.example.vocabularytrainer.presentation.auth.login.LoginEvent
 import com.example.vocabularytrainer.presentation.auth.registration.RegistrationEvent
 import com.example.vocabularytrainer.presentation.home.Resource
 import retrofit2.Response
+import java.io.IOException
+import java.util.concurrent.TimeoutException
+
 inline fun <T> safeCall(action: () -> Resource<T>): Resource<T> {
     return try {
         action()
     } catch (e: Exception) {
         if (!Variables.isNetworkConnected) {
-            Resource.Error("No Internet Connection")
+            Resource.Error("No Internet Connection", data = null)
+        }
+        else if (e.cause is TimeoutException) {
+            throw TimeoutException()
         }
         else {
             Resource.Error(e.message ?: "An unknown error occurred")
         }
     }
 }
+
 //ToDo нужно как-то унифицировать эти функции
 fun getRegisterResponseFromServer(response: Response<RegisterResponse>): AuthEvent {
 

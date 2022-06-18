@@ -17,9 +17,10 @@ import com.vmakd1916gmail.com.core.util.UiEvent
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.receiveAsFlow
+import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
+import java.io.IOException
+import java.util.concurrent.TimeoutException
 import javax.inject.Inject
 
 @HiltViewModel
@@ -54,10 +55,15 @@ class HomeViewModel @Inject constructor(
                     group = Resource.Loading()
                 )
                 viewModelScope.launch {
-                    state = state.copy(
-                        group = homeUseCases.getAllGroup.execute()
-                    )
-
+                    homeUseCases.getAllGroup.execute()
+                        .retry(retries = 3) { cause ->
+                            return@retry cause is TimeoutException
+                        }
+                        .collect {
+                        state = state.copy(
+                            group = it
+                        )
+                    }
                 }
             }
 
@@ -91,21 +97,7 @@ class HomeViewModel @Inject constructor(
 //    }
 
 
-    private fun getGroupFromServer() {
-        viewModelScope.launch {
-            when (val result = homeUseCases.getAllGroup.execute()) {
-                is Resource.Success -> {
-                    result.data//state = state.copy
-                }
-                is Resource.Loading -> {
 
-                }
-                is Resource.Error -> {
-                    result.message//state = state.copy
-                }
-            }
-        }
-    }
 
     fun onErrorEvent() {
 
