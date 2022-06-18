@@ -1,5 +1,6 @@
 package com.example.vocabularytrainer.data.repository
 
+import com.example.vocabularytrainer.data.local.home.dao.VocabularyDao
 import com.example.vocabularytrainer.data.remote.home.remote.api.HomeApi
 import com.example.vocabularytrainer.data.remote.home.remote.response.GroupResponse
 import com.example.vocabularytrainer.domain.home.model.Group
@@ -11,7 +12,8 @@ import kotlinx.coroutines.flow.flow
 import javax.inject.Inject
 
 class HomeRepositoryImpl @Inject constructor(
-    private val homeApi: HomeApi
+    private val homeApi: HomeApi,
+    private val dao: VocabularyDao
 ) : HomeRepository {
     override suspend fun getAllGroupFromServer(): Flow<Resource<List<GroupResponse>>> = flow {
         val result = try {

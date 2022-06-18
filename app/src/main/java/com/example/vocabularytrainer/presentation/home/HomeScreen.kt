@@ -11,6 +11,8 @@ import androidx.compose.material.Button
 import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
@@ -20,7 +22,10 @@ import com.example.vocabularytrainer.data.remote.home.local.Test
 import com.example.vocabularytrainer.presentation.auth.registration.AuthResponseResult
 import com.example.vocabularytrainer.presentation.components.LoadAnimation
 import com.example.vocabularytrainer.presentation.components.LoadingAnimationType
+import com.google.accompanist.swiperefresh.SwipeRefresh
+import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import com.vmakd1916gmail.com.core.util.UiEvent
+import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.collectIndexed
 import javax.inject.Qualifier
 
@@ -45,45 +50,84 @@ fun HomeScreen(
 
     }
 
-    when (state.group) {
-        is Resource.NoAction -> {
 
-        }
-        is Resource.Loading -> {
-            Box(modifier = Modifier.fillMaxSize()) {
-                LoadAnimation(
-                    modifier =
-                    Modifier
-                        .align(Alignment.Center)
-                        .size(300.dp),
-                    radius = 200f,
-                    stroke = 27f,
-                    animationType = LoadingAnimationType.Screen
-                )
+    val isRefreshing by viewModel.isRefreshing.collectAsState()
+
+    SwipeRefresh(
+        state = rememberSwipeRefreshState(isRefreshing),
+        onRefresh = {
+            viewModel.refresh()
+        },
+    ) {
+
+        when (state.group) {
+            is Resource.NoAction -> {
+
             }
-        }
-        is Resource.Success -> {
-            LazyColumn(
-                modifier = Modifier
-                    .fillMaxSize()
-            ) {
-                items(state.group.data!!) { item ->
-                    Text(text = item.name)
+            is Resource.Loading-> {
+                when(state.group) {
+                    is LoadingType.FullScreenLoading -> {
+                        Box(modifier = Modifier.fillMaxSize()) {
+                            LoadAnimation(
+                                modifier =
+                                Modifier
+                                    .align(Alignment.Center)
+                                    .size(300.dp),
+                                radius = 200f,
+                                stroke = 27f,
+                                animationType = LoadingAnimationType.Screen
+                            )
+                        }
+                    }
+
+                    is LoadingType.ElementLoading -> {
+                        LazyColumn(
+                            modifier = Modifier
+                                .fillMaxSize()
+                        ) {
+
+                        }
+                    }
+                }
+
+            }
+            is Resource.Success -> {
+                LazyColumn(
+                    modifier = Modifier
+                        .fillMaxSize()
+                ) {
+                    items(state.group.data!!) { item ->
+                        Text(text = item.name)
+                    }
+                }
+            }
+            is Resource.Error -> {
+                Text(text = state.group.message!!)
+                Button(onClick = {
+                    viewModel.onHomeEvent(
+                        HomeEvent
+                            .GetAllGroup
+                    )
+                }) {
+                    Text(text = "Try again")
                 }
             }
         }
-        is Resource.Error -> {
-            Text(text = state.group.message!!)
-            Button(onClick = {
-                viewModel.onHomeEvent(HomeEvent.GetAllGroup)
-            }) {
-                Text(text = "Try again")
-            }
-        }
-    }
 
+    }
 }
 
+//@Composable
+//fun successResult(){
+//    LazyColumn(
+//        modifier = Modifier
+//            .fillMaxSize()
+//    ) {
+//        items(state.group.data!!) { item ->
+//            Text(text = item.name)
+//        }
+//    }
+//}
 
 //    when (state.loginResponseResult) {
 //        is AuthResponseResult.Loading -> {

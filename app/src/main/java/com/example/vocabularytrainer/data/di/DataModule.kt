@@ -6,6 +6,7 @@ import com.androiddevs.ktornoteapp.data.remote.interceptors.TokenInterceptor
 import com.example.vocabularytrainer.data.preferences.AuthPreference
 import com.example.vocabularytrainer.data.remote.auth.api.AuthApi
 import com.example.vocabularytrainer.data.local.home.VocabularyDatabase
+import com.example.vocabularytrainer.data.local.home.dao.VocabularyDao
 import com.example.vocabularytrainer.data.remote.home.remote.api.HomeApi
 import com.example.vocabularytrainer.data.repository.AuthRepositoryImpl
 import com.example.vocabularytrainer.data.repository.HomeRepositoryImpl
@@ -77,6 +78,9 @@ object DataModule {
         ).build()
     }
 
+    @Singleton
+    @Provides
+    fun provideVocabularyDao(db: VocabularyDatabase) = db.dao
 
     @Provides
     @Singleton
@@ -86,8 +90,8 @@ object DataModule {
 
     @Provides
     @Singleton
-    fun provideHomeRepository(homeApi: HomeApi): HomeRepository {
-        return HomeRepositoryImpl(homeApi)
+    fun provideHomeRepository(homeApi: HomeApi, dao: VocabularyDao): HomeRepository {
+        return HomeRepositoryImpl(homeApi,dao)
     }
 
 }
