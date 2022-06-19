@@ -1,33 +1,24 @@
 package com.example.vocabularytrainer.presentation.home
 
 import androidx.activity.compose.BackHandler
-import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.Button
 import androidx.compose.material.Text
-import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.collectAsState
-import androidx.compose.runtime.getValue
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.example.vocabularytrainer.data.remote.home.local.Test
-import com.example.vocabularytrainer.presentation.auth.registration.AuthResponseResult
 import com.example.vocabularytrainer.presentation.components.LoadAnimation
 import com.example.vocabularytrainer.presentation.components.LoadingAnimationType
+import com.example.vocabularytrainer.presentation.home.components.GroupItem
 import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import com.vmakd1916gmail.com.core.util.UiEvent
-import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.collectIndexed
-import javax.inject.Qualifier
 
 @Composable
 fun HomeScreen(
@@ -50,7 +41,7 @@ fun HomeScreen(
 
     }
 
-
+    var visible by remember { mutableStateOf(false) }
     val isRefreshing by viewModel.isRefreshing.collectAsState()
 
     SwipeRefresh(
@@ -64,8 +55,9 @@ fun HomeScreen(
             is Resource.NoAction -> {
 
             }
-            is Resource.Loading-> {
-                when(state.group) {
+            is Resource.Loading -> {
+
+                when (state.group) {
                     is LoadingType.FullScreenLoading -> {
                         Box(modifier = Modifier.fillMaxSize()) {
                             LoadAnimation(
@@ -81,35 +73,78 @@ fun HomeScreen(
                     }
 
                     is LoadingType.ElementLoading -> {
-                        LazyColumn(
-                            modifier = Modifier
-                                .fillMaxSize()
-                        ) {
+                        visible = false
+                        Column(modifier = Modifier.fillMaxSize()) {
+                            LazyColumn(
+                                modifier = Modifier
+                            ) {
+                                items(state.group.data!!) { item ->
+                                    GroupItem(
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .padding(vertical = 10.dp),
+                                        groupName = item.name,
+                                        visible = visible
+                                    )
+                                }
+                            }
+                        }
+                    }
 
+                    is LoadingType.LoadingFromDB -> {
+                        visible = true
+                        Column(modifier = Modifier.fillMaxSize()) {
+                            LazyColumn(
+                                modifier = Modifier
+                            ) {
+                                items(state.group.data!!) { item ->
+                                    GroupItem(
+                                        modifier = Modifier
+                                            .fillMaxWidth()
+                                            .padding(vertical = 10.dp),
+                                        groupName = item.name,
+                                        visible = visible
+                                    )
+                                }
+                            }
                         }
                     }
                 }
 
             }
             is Resource.Success -> {
+                visible = true
                 LazyColumn(
                     modifier = Modifier
                         .fillMaxSize()
                 ) {
                     items(state.group.data!!) { item ->
-                        Text(text = item.name)
+                        GroupItem(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                                .padding(vertical = 10.dp),
+                            groupName = item.name,
+                            visible = visible
+                        )
                     }
                 }
             }
             is Resource.Error -> {
-                Text(text = state.group.message!!)
-                Button(onClick = {
-                    viewModel.onHomeEvent(
-                        HomeEvent
-                            .GetAllGroup
-                    )
-                }) {
-                    Text(text = "Try again")
+                Box(modifier = Modifier.fillMaxSize()) {
+                    Column(modifier = Modifier.align(Alignment.Center)) {
+                        Button(
+                            modifier = Modifier.align(Alignment.CenterHorizontally),
+                            onClick = {
+                                viewModel.onHomeEvent(
+                                    HomeEvent
+                                        .GetAllGroup
+                                )
+                            }) {
+                            Text(text = "Try again")
+                        }
+                        Text(text = state.group.message!!)
+                    }
+
                 }
             }
         }

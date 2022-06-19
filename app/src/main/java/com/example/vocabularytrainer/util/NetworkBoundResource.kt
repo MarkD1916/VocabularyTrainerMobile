@@ -14,11 +14,11 @@ inline fun <ResultType, RequestType> networkBoundResource(
     crossinline onFetchFailed: (Throwable) -> Unit = { Unit },
     crossinline shouldFetch: (ResultType) -> Boolean = { true }
 ) = flow<Resource<ResultType>> {
-    emit(Resource.Loading(null))
+//    emit(Resource.Loading(null))
     val data = query().first()
 
     val flow = if (shouldFetch(data)) {
-        emit(Resource.Loading(data))
+//        emit(Resource.Loading(data))
         try {
             val fetchedResult = fetch() // get data from server
             saveFetchResult(fetchedResult) // take fetch result and insert into db

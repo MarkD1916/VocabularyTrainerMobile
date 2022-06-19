@@ -1,10 +1,12 @@
 package com.example.vocabularytrainer.presentation.home
 
+import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.androiddevs.ktornoteapp.data.remote.interceptors.Variables
 import com.example.vocabularytrainer.data.preferences.AuthPreference
 import com.example.vocabularytrainer.domain.auth.use_case.AuthUseCases
 import com.example.vocabularytrainer.domain.home.use_case.HomeUseCases
@@ -54,14 +56,15 @@ class HomeViewModel @Inject constructor(
                 state = state.copy(
                     group = event.loadingType
                 )
+
                 viewModelScope.launch {
                     homeUseCases.getAllGroup.execute()
-                        .retry(retries = 3) { cause ->
+                        .retry(retries = 5) { cause ->
                             return@retry cause is TimeoutException
                         }
-                        .collect {
+                        .collectLatest { groupList ->
                             state = state.copy(
-                                group = it
+                                group = groupList
                             )
                         }
                 }
@@ -98,7 +101,12 @@ class HomeViewModel @Inject constructor(
 
 
     fun refresh() {
-        HomeEvent.GetAllGroup.loadingType = LoadingType.ElementLoading()
+        if(!Variables.isNetworkConnected){
+            HomeEvent.GetAllGroup.loadingType = LoadingType.LoadingFromDB(state.group.data)
+        }
+        else {
+            HomeEvent.GetAllGroup.loadingType = LoadingType.ElementLoading(state.group.data)
+        }
         onHomeEvent(HomeEvent.GetAllGroup)
     }
 

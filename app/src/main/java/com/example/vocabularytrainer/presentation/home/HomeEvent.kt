@@ -1,6 +1,8 @@
 package com.example.vocabularytrainer.presentation.home
 
+import com.example.vocabularytrainer.data.local.home.entity.GroupEntity
 import com.example.vocabularytrainer.data.remote.home.remote.response.GroupResponse
+import com.example.vocabularytrainer.domain.home.model.Group
 
 
 sealed class Resource<T>(open val data: T? = null, val message: String? = null) {
@@ -20,11 +22,13 @@ sealed class LoadingType<T>(override val data: T? = null): Resource.Loading<T>()
     class FullScreenLoading<T>(data: T? = null): LoadingType<T>(data)
 
     class ElementLoading<T>(data: T? = null): LoadingType<T>(data)
+
+    class LoadingFromDB<T>(data: T? = null): LoadingType<T>(data)
 }
 
 sealed class HomeEvent {
     object GetAllGroup : HomeEvent() {
-        var loadingType:LoadingType<List<GroupResponse>> = LoadingType.FullScreenLoading()
+        var loadingType:LoadingType<List<GroupEntity>> = LoadingType.FullScreenLoading()
     }
 
     data class Action1(val index: Int): HomeEvent()
