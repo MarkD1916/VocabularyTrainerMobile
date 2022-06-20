@@ -25,10 +25,10 @@ inline fun <ResultType, RequestType> networkBoundResource(
             query().map {
                 Resource.Success(it) // make query to db and map to Success obj
             }
-        } catch (t: Throwable) {
-            onFetchFailed(t)
+        } catch (e: Exception) {
+            onFetchFailed(e)
             query().map {
-                Resource.Error("Couldn't reach server. It might be down", it)
+                Resource.Error(e.message?:"Couldn't reach server. It might be down", it)
             }
         }
     } else {

@@ -1,16 +1,12 @@
 package com.example.vocabularytrainer.presentation.home.components
 
-import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.core.tween
-import androidx.compose.animation.fadeIn
-import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.layout.*
 import androidx.compose.material.Button
 import androidx.compose.material.Card
 import androidx.compose.material.Icon
 import androidx.compose.material.Text
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Check
+import androidx.compose.material.icons.filled.Delete
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -20,7 +16,11 @@ import com.example.vocabularytrainer.presentation.components.DotLoadingAnimation
 
 
 @Composable
-fun GroupItem(modifier: Modifier, groupName: String, visible:Boolean) {
+fun GroupItem(
+    modifier: Modifier,
+    groupName: String,
+    visible:Boolean,
+    onDelete: () -> Unit) {
     Card(elevation = 10.dp, modifier = modifier.padding(horizontal = 25.dp)) {
         Column(modifier = modifier) {
             Row(
@@ -44,7 +44,7 @@ fun GroupItem(modifier: Modifier, groupName: String, visible:Boolean) {
                 Button(
                     modifier = Modifier,
                     onClick = {
-
+                        onDelete()
                     }
                 ) {
 
@@ -52,7 +52,7 @@ fun GroupItem(modifier: Modifier, groupName: String, visible:Boolean) {
                         modifier = Modifier
                             .align(Alignment.CenterVertically)
                             .size(15.dp),
-                        imageVector = Icons.Default.Check,
+                        imageVector = Icons.Default.Delete,
                         contentDescription = "choose",
                         tint = Color.White
                     )

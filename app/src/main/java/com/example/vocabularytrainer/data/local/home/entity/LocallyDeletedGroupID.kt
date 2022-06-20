@@ -3,10 +3,8 @@ package com.example.vocabularytrainer.data.local.home.entity
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 
-@Entity(tableName = "GroupTable")
-data class GroupEntity(
+@Entity(tableName = "localy_deleted_group_ids")
+data class LocallyDeletedGroupID(
     @PrimaryKey(autoGenerate = false)
-    val id: String,
-    val name: String,
-    var isSync: Boolean
+    val deletedGroupId: String
 )

@@ -10,7 +10,7 @@ import kotlinx.coroutines.flow.Flow
 class GetAllGroup(
     private val repository: HomeRepository
 ) {
-    suspend fun execute(): Flow<Resource<List<GroupEntity>>> {
+    fun execute(): Flow<Resource<List<GroupEntity>>> {
         return repository.getAllGroupFromServer()
     }
 }

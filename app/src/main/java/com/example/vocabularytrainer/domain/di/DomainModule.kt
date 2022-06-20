@@ -1,6 +1,7 @@
 package com.example.vocabularytrainer.domain.di
 
 import com.example.vocabularytrainer.domain.auth.use_case.*
+import com.example.vocabularytrainer.domain.home.use_case.DeleteGroup
 import com.example.vocabularytrainer.domain.home.use_case.GetAllGroup
 import com.example.vocabularytrainer.domain.home.use_case.HomeUseCases
 import com.example.vocabularytrainer.domain.repository.AuthRepository
@@ -36,7 +37,8 @@ object DomainModule {
         repository: HomeRepository
     ): HomeUseCases {
         return HomeUseCases(
-            getAllGroup = GetAllGroup(repository)
+            getAllGroup = GetAllGroup(repository),
+            deleteGroup = DeleteGroup(repository)
         )
     }
 

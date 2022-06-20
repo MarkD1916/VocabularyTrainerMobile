@@ -7,13 +7,18 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.androiddevs.ktornoteapp.data.remote.interceptors.Variables
+import com.example.vocabularytrainer.data.local.home.entity.GroupEntity
+import com.example.vocabularytrainer.data.mapper.home.toGroup
+import com.example.vocabularytrainer.data.mapper.home.toGroupSuccess
 import com.example.vocabularytrainer.data.preferences.AuthPreference
 import com.example.vocabularytrainer.domain.auth.use_case.AuthUseCases
+import com.example.vocabularytrainer.domain.home.use_case.GetAllGroup
 import com.example.vocabularytrainer.domain.home.use_case.HomeUseCases
 import com.example.vocabularytrainer.presentation.auth.AuthEvent
 import com.example.vocabularytrainer.presentation.auth.login.LoginEvent
 import com.vmakd1916gmail.com.core.util.UiEvent
 import dagger.hilt.android.lifecycle.HiltViewModel
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
@@ -30,6 +35,9 @@ class HomeViewModel @Inject constructor(
     var state by mutableStateOf(HomeState())
     private val _uiEvent = Channel<UiEvent>()
     var uiEvent: Flow<UiEvent>? = _uiEvent.receiveAsFlow()
+
+
+    private var getAllGroup: Job? = null
 
     private val _isRefreshing = MutableStateFlow(false)
 
@@ -54,31 +62,38 @@ class HomeViewModel @Inject constructor(
         when (event) {
             is HomeEvent.GetAllGroup -> {
                 state = state.copy(
-                    group = event.loadingType
+                    group = state.group.map {
+                        it.copy(state = event.loadingType)
+                    },
+                    screenState = event.loadingType
                 )
+                getAllGroup?.cancel()
 
-                viewModelScope.launch {
-                    homeUseCases.getAllGroup.execute()
-                        .retry(retries = 5) { cause ->
-                            return@retry cause is TimeoutException
-                        }
-                        .collectLatest { groupList ->
+                getAllGroup = homeUseCases.getAllGroup.execute()
+                        .onEach { groupList ->
+                            val data = groupList.data
+                            val mapData = data?.map {
+                                it.toGroupSuccess()
+                            }
                             state = state.copy(
-                                group = groupList
+                                group = mapData?: listOf(),
+                                screenState = null
                             )
-                        }
-                }
+                }.launchIn(viewModelScope)
             }
 
-            is HomeEvent.Action1 -> {
-
+            is HomeEvent.DeleteGroup -> {
                 state = state.copy(
-                    actionState_1 = state.actionState_1.map {
-                        if (it.id == event.index) {
-                            it.copy(state = Resource.Loading())
+                    group = state.group.map {
+                        if (it.id == event.id) {
+                            it.copy(state = event.loadingType)
                         } else it
                     }
                 )
+                viewModelScope.launch {
+                    homeUseCases.deleteGroup.execute(event.id)
+                }
+
 //                doAction1(event.index)
 
             }
@@ -102,11 +117,14 @@ class HomeViewModel @Inject constructor(
 
     fun refresh() {
         if(!Variables.isNetworkConnected){
-            HomeEvent.GetAllGroup.loadingType = LoadingType.LoadingFromDB(state.group.data)
+            HomeEvent.GetAllGroup.loadingType = LoadingType.LoadingFromDB(state.group)
         }
         else {
-            HomeEvent.GetAllGroup.loadingType = LoadingType.ElementLoading(state.group.data)
+            HomeEvent.GetAllGroup.loadingType = LoadingType.ElementLoading(state.group)
         }
+//        viewModelScope.launch {
+//            _getAllGroupEvent.send(HomeEvent.GetAllGroup)
+//        }
         onHomeEvent(HomeEvent.GetAllGroup)
     }
 

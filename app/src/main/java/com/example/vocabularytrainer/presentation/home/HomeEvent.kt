@@ -28,9 +28,14 @@ sealed class LoadingType<T>(override val data: T? = null): Resource.Loading<T>()
 
 sealed class HomeEvent {
     object GetAllGroup : HomeEvent() {
-        var loadingType:LoadingType<List<GroupEntity>> = LoadingType.FullScreenLoading()
+        var loadingType:LoadingType<List<Group>> = LoadingType.FullScreenLoading()
     }
 
+    data class DeleteGroup(
+        val id: String
+    ): HomeEvent(){
+        var loadingType:LoadingType<Group> = LoadingType.ElementLoading()
+    }
     data class Action1(val index: Int): HomeEvent()
     object Action2: HomeEvent()
 

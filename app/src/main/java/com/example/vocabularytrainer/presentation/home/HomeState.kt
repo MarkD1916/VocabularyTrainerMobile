@@ -9,7 +9,8 @@ import com.example.vocabularytrainer.domain.home.model.Group
 data class HomeState(
     val actionResult_1: String = "",
     var actionState_1: List<Item> = listOf(),
-    var group: Resource<List<GroupEntity>> = Resource.NoAction()
+    var group: List<Group> = listOf(),
+    var screenState: Resource<*>? = null
 ) {
 
 }
