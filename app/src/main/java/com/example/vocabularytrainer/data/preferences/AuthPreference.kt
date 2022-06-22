@@ -5,6 +5,7 @@ import com.example.vocabularytrainer.domain.preferences.Preferences
 import com.example.vocabularytrainer.util.Constants.KEY_LOGGED_IN_EMAIL
 import com.example.vocabularytrainer.util.Constants.KEY_PASSWORD
 import com.example.vocabularytrainer.util.Constants.KEY_TOKEN
+import com.example.vocabularytrainer.util.Constants.KEY_USER_ID
 
 class AuthPreference(
     private val prefs: SharedPreferences
@@ -40,6 +41,17 @@ class AuthPreference(
         prefs
             .edit()
             .putString(KEY_TOKEN, token)
+            .apply()
+    }
+
+    override fun getUserId(): String {
+        return prefs.getString(KEY_USER_ID, "")!!
+    }
+
+    override fun setUserId(id: String) {
+        prefs
+            .edit()
+            .putString(KEY_USER_ID, id)
             .apply()
     }
 }

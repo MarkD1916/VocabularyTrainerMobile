@@ -4,8 +4,10 @@ import com.example.vocabularytrainer.data.remote.auth.request.LoginRequest
 import com.example.vocabularytrainer.data.remote.auth.request.RegisterRequest
 import com.example.vocabularytrainer.data.remote.auth.response.LoginResponse
 import com.example.vocabularytrainer.data.remote.auth.response.RegisterResponse
+import com.example.vocabularytrainer.data.remote.auth.response.UserResponse
 import retrofit2.Response
 import retrofit2.http.Body
+import retrofit2.http.GET
 import retrofit2.http.POST
 
 interface AuthApi {
@@ -19,4 +21,6 @@ interface AuthApi {
     @POST("/mobile/token/logout")
     suspend fun logOutUser(): Response<LoginResponse>
 
+    @GET("mobile/users/me")
+    suspend fun getCurrentUser(): Response<UserResponse>
 }

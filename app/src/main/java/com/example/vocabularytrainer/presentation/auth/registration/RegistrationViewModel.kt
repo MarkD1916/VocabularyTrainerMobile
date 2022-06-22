@@ -1,5 +1,6 @@
 package com.example.vocabularytrainer.presentation.auth.registration
 
+import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -10,10 +11,9 @@ import com.example.vocabularytrainer.domain.auth.use_case.AuthUseCases
 import com.example.vocabularytrainer.presentation.auth.AuthEvent
 import com.example.vocabularytrainer.presentation.auth.getCountryList
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.Job
+import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.*
-import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 sealed class ValidationEvent {
@@ -139,11 +139,17 @@ class RegistrationViewModel @Inject constructor(
     }
 
     private fun registerUser() {
+
+
         viewModelScope.launch {
             onEvent(AuthEvent.Loading)
             onEvent(authUseCases.registerUser.execute(state.password, state.email))
         }
     }
 
+    override fun onCleared() {
+        super.onCleared()
+        Log.d("LOL", "onCleared: ")
+    }
 
 }

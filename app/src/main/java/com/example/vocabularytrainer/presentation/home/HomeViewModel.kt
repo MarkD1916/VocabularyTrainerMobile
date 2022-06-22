@@ -18,10 +18,9 @@ import com.example.vocabularytrainer.presentation.auth.AuthEvent
 import com.example.vocabularytrainer.presentation.auth.login.LoginEvent
 import com.vmakd1916gmail.com.core.util.UiEvent
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.Job
+import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.*
-import kotlinx.coroutines.launch
 import java.util.concurrent.TimeoutException
 import javax.inject.Inject
 
@@ -36,10 +35,16 @@ class HomeViewModel @Inject constructor(
     private val _uiEvent = Channel<UiEvent>()
     var uiEvent: Flow<UiEvent>? = _uiEvent.receiveAsFlow()
 
+    private val _openAddGroupDialog = Channel<UiEvent>()
+    var openAddGroupDialog: Flow<UiEvent>? = _openAddGroupDialog.receiveAsFlow()
 
     private var getAllGroup: Job? = null
 
     private val _isRefreshing = MutableStateFlow(false)
+
+    val id by mutableStateOf(authPreference.getUserId())
+
+    var isOpen by mutableStateOf(false)
 
     val isRefreshing: StateFlow<Boolean>
         get() = _isRefreshing.asStateFlow()
@@ -70,16 +75,16 @@ class HomeViewModel @Inject constructor(
                 getAllGroup?.cancel()
 
                 getAllGroup = homeUseCases.getAllGroup.execute()
-                        .onEach { groupList ->
-                            val data = groupList.data
-                            val mapData = data?.map {
-                                it.toGroupSuccess()
-                            }
-                            state = state.copy(
-                                group = mapData?: listOf(),
-                                screenState = null
-                            )
-                }.launchIn(viewModelScope)
+                    .onEach { groupList ->
+                        val data = groupList.data
+                        val mapData = data?.map {
+                            it.toGroupSuccess()
+                        }
+                        state = state.copy(
+                            group = mapData ?: listOf(),
+                            screenState = null
+                        )
+                    }.launchIn(viewModelScope)
             }
 
             is HomeEvent.DeleteGroup -> {
@@ -98,6 +103,18 @@ class HomeViewModel @Inject constructor(
 
             }
 
+            is HomeEvent.FabClick -> {
+
+//                viewModelScope.launch {
+//                    _openAddGroupDialog.send(
+//                        UiEvent.OpenAddGroupDialog(true)
+//                    )
+//                }
+            }
+
+            is HomeEvent.OnNewGroupNameEnter -> {
+                state = state.copy(newGroupName = event.newGroupName)
+            }
         }
     }
 
@@ -116,10 +133,9 @@ class HomeViewModel @Inject constructor(
 
 
     fun refresh() {
-        if(!Variables.isNetworkConnected){
+        if (!Variables.isNetworkConnected) {
             HomeEvent.GetAllGroup.loadingType = LoadingType.LoadingFromDB(state.group)
-        }
-        else {
+        } else {
             HomeEvent.GetAllGroup.loadingType = LoadingType.ElementLoading(state.group)
         }
 //        viewModelScope.launch {
@@ -132,17 +148,25 @@ class HomeViewModel @Inject constructor(
 
     }
 
-
     private fun logOutUser() {
+
         viewModelScope.launch {
             authPreference.setStoredToken("")
             authPreference.setStoredEmail("")
+            authPreference.setUserId("")
             onEvent(authUseCases.logoutUser.execute())
             authPreference.setStoredPassword("")
         }
+
     }
 
     fun getToken(): String {
         return authPreference.getStoredToken()
+    }
+
+
+    override fun onCleared() {
+        super.onCleared()
+        Log.d("LOL", "onCleared: ")
     }
 }

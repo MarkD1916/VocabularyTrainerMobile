@@ -46,4 +46,21 @@ class AuthRepositoryImpl @Inject constructor(
             LoginEvent.Error(e.message!!)
         }
     }
+
+    override suspend fun getCurrentUser(): AuthEvent {
+        return try {
+            val response = authApi.getCurrentUser()
+            return if (response.isSuccessful) {
+                LoginEvent.SetUserId(response.body())
+            } else {
+                if (response.code() == 400) {
+                    LoginEvent.Error(response.message())
+                } else {
+                    LoginEvent.Error(response.message())
+                }
+            }
+        } catch (e: Exception) {
+            LoginEvent.Error(e.message!!)
+        }
+    }
 }

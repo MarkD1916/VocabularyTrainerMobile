@@ -5,6 +5,7 @@ import android.content.res.AssetManager
 import android.os.Build
 import android.os.Bundle
 import android.util.Log
+import android.view.MotionEvent
 import androidx.activity.ComponentActivity
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.compose.BackHandler
@@ -12,20 +13,21 @@ import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.annotation.RequiresApi
 import androidx.compose.animation.*
+import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.material.Scaffold
+import androidx.compose.foundation.shape.CornerSize
+import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.icons.filled.Home
-import androidx.compose.material.icons.filled.Info
-import androidx.compose.material.icons.filled.Settings
-import androidx.compose.material.rememberScaffoldState
-import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.material.icons.filled.*
+import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.scale
+import androidx.compose.ui.input.pointer.pointerInteropFilter
 import androidx.fragment.app.viewModels
+import androidx.lifecycle.lifecycleScope
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
@@ -36,6 +38,7 @@ import com.example.vocabularytrainer.presentation.auth.AuthScreen
 import com.example.vocabularytrainer.presentation.auth.RegisterScreen
 import com.example.vocabularytrainer.presentation.auth.login.LoginEvent
 import com.example.vocabularytrainer.presentation.auth.login.LoginViewModel
+import com.example.vocabularytrainer.presentation.home.HomeEvent
 import com.example.vocabularytrainer.presentation.home.HomeScreen
 import com.example.vocabularytrainer.presentation.home.HomeViewModel
 import com.example.vocabularytrainer.presentation.home.components.AppBar
@@ -62,7 +65,7 @@ class MainActivity : ComponentActivity() {
 
     @RequiresApi(Build.VERSION_CODES.O)
     @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
-    @OptIn(ExperimentalAnimationApi::class)
+    @OptIn(ExperimentalAnimationApi::class, androidx.compose.ui.ExperimentalComposeUiApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
@@ -76,7 +79,9 @@ class MainActivity : ComponentActivity() {
                 ) {
                     NavHost(
                         navController = navController,
-                        startDestination = if(authPreference.getStoredToken().isBlank()) Route.WELCOME else Route.HOME
+                        startDestination = if (authPreference.getStoredToken()
+                                .isBlank()
+                        ) Route.WELCOME else Route.HOME
                     ) {
                         composable(Route.WELCOME)
                         {
@@ -92,69 +97,129 @@ class MainActivity : ComponentActivity() {
                         }
                         composable(Route.HOME)
                         {
-                                Scaffold(
-                                    scaffoldState = scaffoldState,
-                                    topBar = {
-                                        AppBar(
-                                            onNavigationIconClick = {
-                                                scope.launch {
-                                                    scaffoldState.drawerState.open()
-                                                }
-                                            }
+                            var selected by remember { mutableStateOf(false) }
+                            var finished by remember { mutableStateOf(false) }
+                            var open by remember { mutableStateOf(false) }
+                            val flashFinished: (Float) -> Unit = {
+                                finished = true
+                                if (finished && !selected) {
+                                    viewModel.isOpen = true
+                                }
+                            }
+                            val scale = animateFloatAsState(
+                                if (selected) 0.8f else 1.0f,
+                                tween(durationMillis = 150),
+                                finishedListener = flashFinished
+                            )
+
+                            Scaffold(
+                                scaffoldState = scaffoldState,
+                                bottomBar = {
+                                    BottomAppBar(
+                                        cutoutShape = MaterialTheme.shapes.small.copy(
+                                            CornerSize(percent = 50)
                                         )
-                                    },
-                                    drawerGesturesEnabled = scaffoldState.drawerState.isOpen,
-                                    drawerContent = {
-                                        DrawerHeader()
-                                        DrawerBody(
-                                            items = listOf(
-                                                MenuItem(
-                                                    id = "home",
-                                                    title = "Home",
-                                                    contentDescription = "Go to home screen",
-                                                    icon = Icons.Default.Home
-                                                ),
-                                                MenuItem(
-                                                    id = "settings",
-                                                    title = "Settings",
-                                                    contentDescription = "Go to settings screen",
-                                                    icon = Icons.Default.Settings
-                                                ),
-                                                MenuItem(
-                                                    id = "help",
-                                                    title = "Help",
-                                                    contentDescription = "Get help",
-                                                    icon = Icons.Default.Info
-                                                ),
-                                                MenuItem(
-                                                    id = "logout",
-                                                    title = "Logout",
-                                                    contentDescription = "Logout",
-                                                    icon = Icons.Default.Close
-                                                ),
-                                            ),
-                                            onItemClick = {
-                                                when(it.id) {
-                                                    "logout" -> {
-                                                        scope.launch {
-                                                            scaffoldState.drawerState.close()
-                                                        }
-                                                        viewModel.onEvent(LoginEvent.LogOut)
-                                                        navController.navigateEvent(
-                                                            UiEvent.Navigate(
-                                                                Route.WELCOME
-                                                            )
-                                                        )
+                                    ) {
+                                    }
+                                },
+                                floatingActionButton = {
+                                    FloatingActionButton(
+                                        modifier = Modifier
+                                            .scale(scale.value)
+                                            .pointerInteropFilter {
+                                                selected = when (it.action) {
+                                                    MotionEvent.ACTION_UP -> {
+                                                        false
 
                                                     }
-
+                                                    MotionEvent.ACTION_DOWN -> {
+                                                        true
+                                                    }
+                                                    else -> {
+                                                        false
+                                                    }
                                                 }
-                                            }
+
+                                                true
+                                            },
+                                        onClick = {}
+                                    ) {
+                                        Icon(
+                                            imageVector = Icons.Default.Add,
+                                            contentDescription = "Add group"
                                         )
                                     }
-                                ) {
-                                    HomeScreen(onNavigate = navController::navigateEvent)
+                                },
+
+                                isFloatingActionButtonDocked = true,
+
+                                floatingActionButtonPosition = FabPosition.Center,
+                                topBar = {
+                                    AppBar(
+                                        onNavigationIconClick = {
+                                            scope.launch {
+                                                scaffoldState.drawerState.open()
+                                            }
+                                        }
+                                    )
+                                },
+                                drawerGesturesEnabled = scaffoldState.drawerState.isOpen,
+                                drawerContent = {
+                                    DrawerHeader()
+                                    DrawerBody(
+                                        items = listOf(
+                                            MenuItem(
+                                                id = "home",
+                                                title = "Home",
+                                                contentDescription = "Go to home screen",
+                                                icon = Icons.Default.Home
+                                            ),
+                                            MenuItem(
+                                                id = "settings",
+                                                title = "Settings",
+                                                contentDescription = "Go to settings screen",
+                                                icon = Icons.Default.Settings
+                                            ),
+                                            MenuItem(
+                                                id = "help",
+                                                title = "Help",
+                                                contentDescription = "Get help",
+                                                icon = Icons.Default.Info
+                                            ),
+                                            MenuItem(
+                                                id = "logout",
+                                                title = "Logout",
+                                                contentDescription = "Logout",
+                                                icon = Icons.Default.Close
+                                            ),
+                                        ),
+                                        onItemClick = {
+                                            when (it.id) {
+                                                "logout" -> {
+                                                    scope.launch {
+                                                        scaffoldState.drawerState.close()
+                                                    }
+                                                    viewModel.onEvent(LoginEvent.LogOut)
+                                                    navController.navigateEvent(
+                                                        UiEvent.Navigate(
+                                                            Route.WELCOME
+                                                        )
+                                                    )
+
+                                                }
+
+                                            }
+                                        }
+                                    )
                                 }
+                            ) {
+                                HomeScreen(
+                                    onNavigate = navController::navigateEvent,
+                                    scaffoldState,
+                                    open,
+                                    viewModel
+                                )
+                            }
 
 
                         }

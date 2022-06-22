@@ -59,10 +59,6 @@ class HomeRepositoryImpl @Inject constructor(
         return result
     }
 
-    private suspend fun getGroupFromServer() {
-        curGroupResponse = homeApi.getAllGroup()
-    }
-
     override suspend fun deleteGroup(groupId: String) {
         val response = try {
             homeApi.deleteGroup(groupId)

@@ -1,5 +1,6 @@
 package com.example.vocabularytrainer.presentation.auth.login
 
+import android.util.Log
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
@@ -48,7 +49,7 @@ class LoginViewModel @Inject constructor(
                 }
             }
         }
-        if(authPreference.getStoredToken().isNotBlank()) {
+        if (authPreference.getStoredToken().isNotBlank()) {
             viewModelScope.launch {
                 _uiEvent.send(
                     UiEvent.Navigate(
@@ -65,14 +66,7 @@ class LoginViewModel @Inject constructor(
                 state = state.copy(loginResponseResult = AuthResponseResult.Loading)
             }
             is LoginEvent.SuccessLogin -> {
-                authPreference.setStoredToken(event.result?.token?:"")
-                viewModelScope.launch {
-                    _uiEvent.send(
-                        UiEvent.Navigate(
-                            route = Route.HOME
-                        )
-                    )
-                }
+                authPreference.setStoredToken(event.result?.token ?: "")
             }
 
             is LoginEvent.Error -> {
@@ -90,6 +84,18 @@ class LoginViewModel @Inject constructor(
             }
             is AuthEvent.OnPasswordEnter -> {
                 state = state.copy(password = event.password)
+            }
+
+            is LoginEvent.SetUserId -> {
+
+                viewModelScope.launch {
+                    authPreference.setUserId(event.result?.id.toString())
+                    _uiEvent.send(
+                        UiEvent.Navigate(
+                            route = Route.HOME
+                        )
+                    )
+                }
             }
 
         }
@@ -110,8 +116,7 @@ class LoginViewModel @Inject constructor(
                 passwordError = passwordResult.error
             )
             return
-        }
-        else {
+        } else {
             state = state.copy(
                 emailError = null,
                 passwordError = null
@@ -121,9 +126,15 @@ class LoginViewModel @Inject constructor(
     }
 
     private fun loginUser() {
+        onEvent(AuthEvent.Loading)
         viewModelScope.launch {
-            onEvent(AuthEvent.Loading)
-            onEvent(authUseCases.loginUser.execute(state.password, state.email))
+            val job1 = launch {
+                Log.d("LOL", "HomeScreen: login")
+                onEvent(authUseCases.loginUser.execute(state.password, state.email))
+            }
+            job1.join()
+            Log.d("LOL", "HomeScreen: set User")
+            onEvent(authUseCases.getCurrentUser.execute())
         }
     }
 

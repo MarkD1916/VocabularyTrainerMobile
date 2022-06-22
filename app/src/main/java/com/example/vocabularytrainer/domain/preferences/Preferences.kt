@@ -12,4 +12,8 @@ interface Preferences {
     fun getStoredToken(): String
 
     fun setStoredToken(token: String)
+
+    fun getUserId(): String
+
+    fun setUserId(id: String)
 }

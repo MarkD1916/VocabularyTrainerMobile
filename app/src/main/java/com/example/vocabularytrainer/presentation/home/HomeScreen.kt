@@ -1,18 +1,21 @@
 package com.example.vocabularytrainer.presentation.home
 
+import android.annotation.SuppressLint
 import android.util.Log
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.material.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import com.example.vocabularytrainer.domain.home.model.Group
+import androidx.lifecycle.viewModelScope
+import com.example.vocabularytrainer.navigation.Route
 import com.example.vocabularytrainer.presentation.components.LoadAnimation
 import com.example.vocabularytrainer.presentation.components.LoadingAnimationType
 import com.example.vocabularytrainer.presentation.home.components.GroupItem
@@ -20,21 +23,32 @@ import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import com.vmakd1916gmail.com.core.util.UiEvent
 import kotlinx.coroutines.flow.collectIndexed
+import kotlinx.coroutines.launch
 
+@SuppressLint("UnrememberedMutableState")
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
 fun HomeScreen(
     onNavigate: (UiEvent.Navigate) -> Unit,
-    viewModel: HomeViewModel = hiltViewModel()
+    scaffoldState: ScaffoldState,
+    open: Boolean,
+    viewModel: HomeViewModel
 ) {
 
     val context = LocalContext.current
 
+
     val state = viewModel.state
+
+
+
+    Log.d("LOL", "HomeScreen: ${viewModel.id} ")
     LaunchedEffect(key1 = context) {
         viewModel.uiEvent?.collectIndexed { index, event ->
             when (event) {
                 is UiEvent.Navigate -> onNavigate(event)
+                is UiEvent.OpenAddGroupDialog -> {
+                }
                 else -> Unit
             }
         }
@@ -46,11 +60,47 @@ fun HomeScreen(
     var visible by remember { mutableStateOf(false) }
     val isRefreshing by viewModel.isRefreshing.collectAsState()
 
-//    val groups: List<Group> = state.group ?: listOf()
 
+    if (viewModel.isOpen) {
 
+        AlertDialog(
+            onDismissRequest = {
+                state.newGroupName = ""
+                viewModel.isOpen = false
+            },
+            title = {
+                Text("Create new group")
+            },
+            text = {
+                TextField(
+                    value = state.newGroupName,
+                    onValueChange = {
+                        viewModel.onHomeEvent(HomeEvent.OnNewGroupNameEnter(it))
+                    },
+                    placeholder = { Text(text = "Enter group name") }
+                )
 
-
+            },
+            confirmButton = {
+                Button(
+                    onClick = {
+                        state.newGroupName = ""
+                        viewModel.isOpen = false
+                    }) {
+                    Text("Add")
+                }
+            },
+            dismissButton = {
+                Button(
+                    onClick = {
+                        state.newGroupName = ""
+                        viewModel.isOpen = false
+                    }) {
+                    Text("Cancel")
+                }
+            }
+        )
+    }
 
     SwipeRefresh(
         state = rememberSwipeRefreshState(isRefreshing),
@@ -59,7 +109,7 @@ fun HomeScreen(
         },
     ) {
 
-        when(state.screenState){
+        when (state.screenState) {
             is LoadingType.FullScreenLoading -> {
                 Box(modifier = Modifier.fillMaxSize()) {
                     LoadAnimation(

@@ -1,11 +1,16 @@
 package com.example.vocabularytrainer.presentation.auth.login
 
 import com.example.vocabularytrainer.data.remote.auth.response.LoginResponse
+import com.example.vocabularytrainer.data.remote.auth.response.UserResponse
 import com.example.vocabularytrainer.presentation.auth.AuthEvent
 
 sealed class LoginEvent : AuthEvent {
     data class SuccessLogin(
         val result: LoginResponse? = null
+    ) : LoginEvent()
+
+    data class SetUserId(
+        val result: UserResponse? = null
     ) : LoginEvent()
 
     data class Error(val message: String) : LoginEvent()

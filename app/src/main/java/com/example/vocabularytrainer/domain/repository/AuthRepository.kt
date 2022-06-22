@@ -17,4 +17,6 @@ interface AuthRepository {
     ): AuthEvent
 
     suspend fun logout(): AuthEvent
+
+    suspend fun getCurrentUser(): AuthEvent
 }

@@ -27,7 +27,8 @@ object DomainModule {
             validatePassword = ValidatePassword(),
             registerUser = RegisterUser(repository),
             loginUser = LoginUser(repository),
-            logoutUser = LogoutUser(repository)
+            logoutUser = LogoutUser(repository),
+            getCurrentUser = GetCurrentUser(repository)
         )
     }
 

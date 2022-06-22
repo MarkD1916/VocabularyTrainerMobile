@@ -6,5 +6,6 @@ data class AuthUseCases(
     val validateConfirmPassword: ValidateConfirmPassword,
     val registerUser: RegisterUser,
     val loginUser: LoginUser,
-    val logoutUser: LogoutUser
+    val logoutUser: LogoutUser,
+    val getCurrentUser: GetCurrentUser
 )
