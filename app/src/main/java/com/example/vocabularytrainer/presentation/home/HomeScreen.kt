@@ -8,6 +8,8 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material.*
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -15,15 +17,18 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.vocabularytrainer.domain.home.model.Group
 import com.example.vocabularytrainer.navigation.Route
 import com.example.vocabularytrainer.presentation.components.LoadAnimation
 import com.example.vocabularytrainer.presentation.components.LoadingAnimationType
+import com.example.vocabularytrainer.presentation.home.components.FabLoadingAnimation
 import com.example.vocabularytrainer.presentation.home.components.GroupItem
 import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import com.vmakd1916gmail.com.core.util.UiEvent
 import kotlinx.coroutines.flow.collectIndexed
 import kotlinx.coroutines.launch
+import java.util.*
 
 @SuppressLint("UnrememberedMutableState")
 @OptIn(ExperimentalFoundationApi::class)
@@ -42,7 +47,6 @@ fun HomeScreen(
 
 
 
-    Log.d("LOL", "HomeScreen: ${viewModel.id} ")
     LaunchedEffect(key1 = context) {
         viewModel.uiEvent?.collectIndexed { index, event ->
             when (event) {
@@ -65,13 +69,14 @@ fun HomeScreen(
 
         AlertDialog(
             onDismissRequest = {
-                state.newGroupName = ""
+
                 viewModel.isOpen = false
             },
             title = {
                 Text("Create new group")
             },
             text = {
+
                 TextField(
                     value = state.newGroupName,
                     onValueChange = {
@@ -80,12 +85,25 @@ fun HomeScreen(
                     placeholder = { Text(text = "Enter group name") }
                 )
 
+
+
+
             },
             confirmButton = {
                 Button(
                     onClick = {
-                        state.newGroupName = ""
+
                         viewModel.isOpen = false
+                        viewModel.onHomeEvent(
+                            HomeEvent.PostNewGroup(
+                                Group(
+                                    id = UUID.randomUUID().toString(),
+                                    name = state.newGroupName,
+                                    isSync = false,
+                                    state = Resource.NoAction(null)
+                                )
+                            )
+                        )
                     }) {
                     Text("Add")
                 }
@@ -93,7 +111,6 @@ fun HomeScreen(
             dismissButton = {
                 Button(
                     onClick = {
-                        state.newGroupName = ""
                         viewModel.isOpen = false
                     }) {
                     Text("Cancel")
@@ -188,6 +205,9 @@ fun HomeScreen(
                     }
                 }
             }
+//            item {
+//                FabLoadingAnimation(percentage = 0.9f)
+//            }
         }
     }
 }

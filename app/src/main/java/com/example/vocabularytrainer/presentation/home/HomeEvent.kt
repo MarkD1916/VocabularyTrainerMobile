@@ -42,9 +42,11 @@ sealed class HomeEvent {
 
     data class OnNewGroupNameEnter(val newGroupName: String) : HomeEvent()
 
-    data class AddNewGroup(val group: Group) : HomeEvent(){
+    data class PostNewGroup(val group: Group) : HomeEvent(){
         var loadingType: LoadingType<Unit> = LoadingType.FabLoading()
     }
+
+    data class AddNewGroup(val group: NewGroup) : HomeEvent()
 
 }
 

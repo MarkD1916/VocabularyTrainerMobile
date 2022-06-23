@@ -36,4 +36,7 @@ interface VocabularyDao {
     @Query("DELETE FROM grouptable")
     suspend fun deleteAllGroups()
 
+    @Query("SELECT MAX(id) FROM grouptable")
+    suspend fun getMaxGroupId(): String
+
 }

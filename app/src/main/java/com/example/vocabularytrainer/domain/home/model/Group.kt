@@ -4,7 +4,7 @@ import com.example.vocabularytrainer.data.local.home.entity.GroupEntity
 import com.example.vocabularytrainer.presentation.home.Resource
 
 data class Group(
-    val id: String,
+    var id: String,
     val name: String,
     val isSync: Boolean,
     val state: Resource<*>

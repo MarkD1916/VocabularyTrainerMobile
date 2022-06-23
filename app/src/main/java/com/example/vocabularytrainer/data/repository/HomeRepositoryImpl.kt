@@ -6,6 +6,8 @@ import com.example.vocabularytrainer.data.local.home.dao.VocabularyDao
 import com.example.vocabularytrainer.data.local.home.entity.GroupEntity
 import com.example.vocabularytrainer.data.local.home.entity.LocallyDeletedGroupID
 import com.example.vocabularytrainer.data.mapper.home.toGroupEntity
+import com.example.vocabularytrainer.data.mapper.home.toGroupRequest
+import com.example.vocabularytrainer.data.preferences.AuthPreference
 import com.example.vocabularytrainer.data.remote.home.remote.api.HomeApi
 import com.example.vocabularytrainer.data.remote.home.remote.request.GroupRequest
 import com.example.vocabularytrainer.data.remote.home.remote.response.GroupResponse
@@ -13,13 +15,16 @@ import com.example.vocabularytrainer.domain.home.model.Group
 import com.example.vocabularytrainer.domain.repository.HomeRepository
 import com.example.vocabularytrainer.presentation.home.Resource
 import com.example.vocabularytrainer.util.networkBoundResource
+import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.withContext
 import retrofit2.Response
 import javax.inject.Inject
 
 class HomeRepositoryImpl @Inject constructor(
     private val homeApi: HomeApi,
-    private val dao: VocabularyDao
+    private val dao: VocabularyDao,
+    private val authSharedPreferences: AuthPreference
 ) : HomeRepository {
     private var curGroupResponse: Response<List<GroupResponse>>? = null
 
@@ -56,6 +61,7 @@ class HomeRepositoryImpl @Inject constructor(
                 Variables.isNetworkConnected
             }
         )
+
         return result
     }
 
@@ -65,6 +71,7 @@ class HomeRepositoryImpl @Inject constructor(
         } catch (e: Exception) {
             null
         }
+        Log.d("LOL", "deleteGroup: ${response?.isSuccessful},${groupId}")
         dao.deleteGroupById(groupId)
         if (response == null || !response.isSuccessful) {
             dao.insertLocallyDeletedGroupID(LocallyDeletedGroupID(groupId))
@@ -79,7 +86,7 @@ class HomeRepositoryImpl @Inject constructor(
 
         val unsyncedGroups = dao.getAllUnsyncedGroups()
 
-        unsyncedGroups.forEach { group -> insertGroup(group) }
+        unsyncedGroups.forEach { group -> postGroup(group.toGroupRequest(authSharedPreferences.getUserId())) }
 
         curGroupResponse = homeApi.getAllGroup()
         curGroupResponse?.body()?.let { groups ->
@@ -96,7 +103,16 @@ class HomeRepositoryImpl @Inject constructor(
     }
 
     override suspend fun postGroup(groupRequest: GroupRequest) {
-        TODO("Not yet implemented")
+            val response = try {
+                homeApi.postGroup(groupRequest)
+            } catch (e: Exception) {
+                null
+            }
+            if (response != null && response.isSuccessful) {
+                dao.insertGroup(groupRequest.toGroupEntity().apply { isSync = true })
+            } else {
+                dao.insertGroup(groupRequest.toGroupEntity())
+            }
     }
 
     override suspend fun insertGroup(groupEntity: GroupEntity) {

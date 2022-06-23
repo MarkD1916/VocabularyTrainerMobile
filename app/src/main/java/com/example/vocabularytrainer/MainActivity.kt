@@ -38,9 +38,12 @@ import com.example.vocabularytrainer.presentation.auth.AuthScreen
 import com.example.vocabularytrainer.presentation.auth.RegisterScreen
 import com.example.vocabularytrainer.presentation.auth.login.LoginEvent
 import com.example.vocabularytrainer.presentation.auth.login.LoginViewModel
+import com.example.vocabularytrainer.presentation.components.DotLoadingAnimation
+import com.example.vocabularytrainer.presentation.components.LoadAnimation
 import com.example.vocabularytrainer.presentation.home.HomeEvent
 import com.example.vocabularytrainer.presentation.home.HomeScreen
 import com.example.vocabularytrainer.presentation.home.HomeViewModel
+import com.example.vocabularytrainer.presentation.home.LoadingType
 import com.example.vocabularytrainer.presentation.home.components.AppBar
 import com.example.vocabularytrainer.presentation.home.components.DrawerBody
 import com.example.vocabularytrainer.presentation.home.components.DrawerHeader
@@ -68,6 +71,7 @@ class MainActivity : ComponentActivity() {
     @OptIn(ExperimentalAnimationApi::class, androidx.compose.ui.ExperimentalComposeUiApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
         setContent {
             VocabularyTrainerTheme {
                 val navController = rememberNavController()
@@ -97,6 +101,7 @@ class MainActivity : ComponentActivity() {
                         }
                         composable(Route.HOME)
                         {
+                            val fabState = viewModel.state.fabState
                             var selected by remember { mutableStateOf(false) }
                             var finished by remember { mutableStateOf(false) }
                             var open by remember { mutableStateOf(false) }
@@ -144,10 +149,20 @@ class MainActivity : ComponentActivity() {
                                             },
                                         onClick = {}
                                     ) {
-                                        Icon(
-                                            imageVector = Icons.Default.Add,
-                                            contentDescription = "Add group"
-                                        )
+                                        when (fabState) {
+                                            is LoadingType.FabLoading -> {
+                                                Icon(
+                                                    imageVector = Icons.Default.Add,
+                                                    contentDescription = "Add group"
+                                                )
+                                            }
+                                            else -> {
+                                                Icon(
+                                                    imageVector = Icons.Default.Add,
+                                                    contentDescription = "Add group"
+                                                )
+                                            }
+                                        }
                                     }
                                 },
 

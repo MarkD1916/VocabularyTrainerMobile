@@ -29,7 +29,8 @@ fun LoadAnimation(
     modifier: Modifier = Modifier,
     radius: Float = 20f,
     stroke: Float = 7f,
-    animationType: LoadingAnimationType = LoadingAnimationType.Button
+    animationType: LoadingAnimationType = LoadingAnimationType.Button,
+    showText:Boolean = true
 ) {
     val infiniteTransition = rememberInfiniteTransition()
 
@@ -73,14 +74,16 @@ fun LoadAnimation(
                         radius = radius//200f
                     )
                 }
-                Spacer(modifier = Modifier.height(4.dp))
-                Text(
-                    modifier = Modifier
-                        .align(Alignment.Center)
-                        .alpha(animationAlpha.value),
-                    text = "Loading...",
-                    color = Color.Black
-                )
+                if(showText) {
+                    Spacer(modifier = Modifier.height(4.dp))
+                    Text(
+                        modifier = Modifier
+                            .align(Alignment.Center)
+                            .alpha(animationAlpha.value),
+                        text = "Loading...",
+                        color = Color.Black
+                    )
+                }
             }
 
         }
@@ -99,13 +102,15 @@ fun LoadAnimation(
                         radius = radius//200f
                     )
                 }
-                Spacer(modifier = Modifier.height(14.dp))
-                Text(
-                    modifier = Modifier
-                        .align(Alignment.CenterHorizontally),
-                    text = "Loading...",
-                    color = Color.White
-                )
+                if(showText) {
+                    Spacer(modifier = Modifier.height(14.dp))
+                    Text(
+                        modifier = Modifier
+                            .align(Alignment.CenterHorizontally),
+                        text = "Loading...",
+                        color = Color.White
+                    )
+                }
             }
         }
     }

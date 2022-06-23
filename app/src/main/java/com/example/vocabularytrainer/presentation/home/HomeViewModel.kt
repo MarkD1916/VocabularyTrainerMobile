@@ -7,12 +7,10 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.androiddevs.ktornoteapp.data.remote.interceptors.Variables
-import com.example.vocabularytrainer.data.local.home.entity.GroupEntity
-import com.example.vocabularytrainer.data.mapper.home.toGroup
 import com.example.vocabularytrainer.data.mapper.home.toGroupSuccess
 import com.example.vocabularytrainer.data.preferences.AuthPreference
 import com.example.vocabularytrainer.domain.auth.use_case.AuthUseCases
-import com.example.vocabularytrainer.domain.home.use_case.GetAllGroup
+import com.example.vocabularytrainer.domain.home.model.Group
 import com.example.vocabularytrainer.domain.home.use_case.HomeUseCases
 import com.example.vocabularytrainer.presentation.auth.AuthEvent
 import com.example.vocabularytrainer.presentation.auth.login.LoginEvent
@@ -21,8 +19,9 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.*
-import java.util.concurrent.TimeoutException
+import okhttp3.internal.threadName
 import javax.inject.Inject
+import kotlin.coroutines.coroutineContext
 
 @HiltViewModel
 class HomeViewModel @Inject constructor(
@@ -35,10 +34,9 @@ class HomeViewModel @Inject constructor(
     private val _uiEvent = Channel<UiEvent>()
     var uiEvent: Flow<UiEvent>? = _uiEvent.receiveAsFlow()
 
-    private val _openAddGroupDialog = Channel<UiEvent>()
-    var openAddGroupDialog: Flow<UiEvent>? = _openAddGroupDialog.receiveAsFlow()
-
     private var getAllGroup: Job? = null
+
+    private var getAllNewGroup: Job? = null
 
     private val _isRefreshing = MutableStateFlow(false)
 
@@ -84,7 +82,8 @@ class HomeViewModel @Inject constructor(
                             group = mapData ?: listOf(),
                             screenState = null
                         )
-                    }.launchIn(viewModelScope)
+                        Log.d("LOL", "onHomeEvent: ${coroutineContext.job}")
+                    }.launchIn(viewModelScope.plus(Dispatchers.IO))
             }
 
             is HomeEvent.DeleteGroup -> {
@@ -95,25 +94,30 @@ class HomeViewModel @Inject constructor(
                         } else it
                     }
                 )
-                viewModelScope.launch {
+                viewModelScope.launch(Dispatchers.IO) {
                     homeUseCases.deleteGroup.execute(event.id)
                 }
-
-//                doAction1(event.index)
-
             }
 
             is HomeEvent.FabClick -> {
-
-//                viewModelScope.launch {
-//                    _openAddGroupDialog.send(
-//                        UiEvent.OpenAddGroupDialog(true)
-//                    )
-//                }
             }
 
             is HomeEvent.OnNewGroupNameEnter -> {
                 state = state.copy(newGroupName = event.newGroupName)
+            }
+
+            is HomeEvent.PostNewGroup -> {
+                state = state.copy(fabState = event.loadingType)
+                viewModelScope.launch(Dispatchers.IO) {
+                    homeUseCases.addGroup.execute(event.group)
+                    var list = state.group
+                    list = list.plus(event.group)
+                    state = state.copy(
+                        group = list
+                    )
+                }
+
+
             }
         }
     }
@@ -150,7 +154,7 @@ class HomeViewModel @Inject constructor(
 
     private fun logOutUser() {
 
-        viewModelScope.launch {
+        viewModelScope.launch(Dispatchers.IO) {
             authPreference.setStoredToken("")
             authPreference.setStoredEmail("")
             authPreference.setUserId("")

@@ -90,8 +90,8 @@ object DataModule {
 
     @Provides
     @Singleton
-    fun provideHomeRepository(homeApi: HomeApi, dao: VocabularyDao): HomeRepository {
-        return HomeRepositoryImpl(homeApi,dao)
+    fun provideHomeRepository(homeApi: HomeApi, dao: VocabularyDao,authSharedPreferences: AuthPreference): HomeRepository {
+        return HomeRepositoryImpl(homeApi,dao,authSharedPreferences)
     }
 
 }

@@ -1,12 +1,10 @@
 package com.example.vocabularytrainer.data.remote.home.remote.api
 
+import com.example.vocabularytrainer.data.remote.home.remote.request.GroupRequest
 import com.example.vocabularytrainer.data.remote.home.remote.response.GroupResponse
 import com.example.vocabularytrainer.data.remote.home.remote.response.SimpleResponse
 import retrofit2.Response
-import retrofit2.http.DELETE
-import retrofit2.http.GET
-import retrofit2.http.Path
-import retrofit2.http.Query
+import retrofit2.http.*
 
 interface HomeApi {
     @GET("mobile_api/group/get")
@@ -17,5 +15,6 @@ interface HomeApi {
         @Path("id") groupId: String
     ): Response<SimpleResponse>
 
-
+    @POST("/mobile_api/group/post/")
+    suspend fun postGroup( @Body group: GroupRequest): Response<GroupResponse>
 }
