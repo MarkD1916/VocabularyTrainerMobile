@@ -39,7 +39,9 @@ data class RegistrationState(
         val year = calendar[Calendar.YEAR]
         val month = calendar[Calendar.MONTH]
         val day = calendar[Calendar.DAY_OF_MONTH]
-        return LocalDate.of(year, month, day)
+        val h = calendar[Calendar.HOUR]
+        val m = calendar[Calendar.MINUTE]
+        return LocalDate.now()
     }
 
 }

@@ -15,9 +15,7 @@ import androidx.annotation.RequiresApi
 import androidx.compose.animation.*
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CornerSize
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
@@ -28,9 +26,11 @@ import androidx.compose.ui.draw.scale
 import androidx.compose.ui.input.pointer.pointerInteropFilter
 import androidx.fragment.app.viewModels
 import androidx.lifecycle.lifecycleScope
+import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.rememberNavController
+import androidx.navigation.navArgument
 import com.example.vocabularytrainer.data.preferences.AuthPreference
 import com.example.vocabularytrainer.extantions.navigateEvent
 import com.example.vocabularytrainer.navigation.Route
@@ -40,6 +40,7 @@ import com.example.vocabularytrainer.presentation.auth.login.LoginEvent
 import com.example.vocabularytrainer.presentation.auth.login.LoginViewModel
 import com.example.vocabularytrainer.presentation.components.DotLoadingAnimation
 import com.example.vocabularytrainer.presentation.components.LoadAnimation
+import com.example.vocabularytrainer.presentation.detail_group.DetailGroupScreen
 import com.example.vocabularytrainer.presentation.home.HomeEvent
 import com.example.vocabularytrainer.presentation.home.HomeScreen
 import com.example.vocabularytrainer.presentation.home.HomeViewModel
@@ -77,166 +78,240 @@ class MainActivity : ComponentActivity() {
                 val navController = rememberNavController()
                 val scaffoldState = rememberScaffoldState()
                 val scope = rememberCoroutineScope()
+                val showBottomBar = remember {
+                    mutableStateOf(false)
+                }
+                val showAppBar = remember {
+                    mutableStateOf(false)
+                }
+                val showFabButton = remember {
+                    mutableStateOf(true)
+                }
+
                 Scaffold(
-                    modifier = Modifier.fillMaxWidth(),
-                    scaffoldState = scaffoldState
-                ) {
-                    NavHost(
-                        navController = navController,
-                        startDestination = if (authPreference.getStoredToken()
-                                .isBlank()
-                        ) Route.WELCOME else Route.HOME
-                    ) {
-                        composable(Route.WELCOME)
-                        {
-                            WelcomeScreen(onNavigate = navController::navigateEvent)
-                        }
-                        composable(Route.LOGIN)
-                        {
-                            AuthScreen(onNavigate = navController::navigateEvent)
-                        }
-                        composable(Route.REGISTER)
-                        {
-                            RegisterScreen(onNavigate = navController::navigateEvent)
-                        }
-                        composable(Route.HOME)
-                        {
-                            val fabState = viewModel.state.fabState
-                            var selected by remember { mutableStateOf(false) }
-                            var finished by remember { mutableStateOf(false) }
-                            var open by remember { mutableStateOf(false) }
-                            val flashFinished: (Float) -> Unit = {
-                                finished = true
-                                if (finished && !selected) {
-                                    viewModel.isOpen = true
-                                }
-                            }
-                            val scale = animateFloatAsState(
-                                if (selected) 0.8f else 1.0f,
-                                tween(durationMillis = 150),
-                                finishedListener = flashFinished
-                            )
-
-                            Scaffold(
-                                scaffoldState = scaffoldState,
-                                bottomBar = {
-                                    BottomAppBar(
-                                        cutoutShape = MaterialTheme.shapes.small.copy(
-                                            CornerSize(percent = 50)
-                                        )
-                                    ) {
-                                    }
-                                },
-                                floatingActionButton = {
-                                    FloatingActionButton(
-                                        modifier = Modifier
-                                            .scale(scale.value)
-                                            .pointerInteropFilter {
-                                                selected = when (it.action) {
-                                                    MotionEvent.ACTION_UP -> {
-                                                        false
-
-                                                    }
-                                                    MotionEvent.ACTION_DOWN -> {
-                                                        true
-                                                    }
-                                                    else -> {
-                                                        false
-                                                    }
-                                                }
-
-                                                true
-                                            },
-                                        onClick = {}
-                                    ) {
-                                        when (fabState) {
-                                            is LoadingType.FabLoading -> {
-                                                Icon(
-                                                    imageVector = Icons.Default.Add,
-                                                    contentDescription = "Add group"
-                                                )
-                                            }
-                                            else -> {
-                                                Icon(
-                                                    imageVector = Icons.Default.Add,
-                                                    contentDescription = "Add group"
-                                                )
-                                            }
-                                        }
-                                    }
-                                },
-
-                                isFloatingActionButtonDocked = true,
-
-                                floatingActionButtonPosition = FabPosition.Center,
-                                topBar = {
-                                    AppBar(
-                                        onNavigationIconClick = {
-                                            scope.launch {
-                                                scaffoldState.drawerState.open()
-                                            }
-                                        }
-                                    )
-                                },
-                                drawerGesturesEnabled = scaffoldState.drawerState.isOpen,
-                                drawerContent = {
-                                    DrawerHeader()
-                                    DrawerBody(
-                                        items = listOf(
-                                            MenuItem(
-                                                id = "home",
-                                                title = "Home",
-                                                contentDescription = "Go to home screen",
-                                                icon = Icons.Default.Home
-                                            ),
-                                            MenuItem(
-                                                id = "settings",
-                                                title = "Settings",
-                                                contentDescription = "Go to settings screen",
-                                                icon = Icons.Default.Settings
-                                            ),
-                                            MenuItem(
-                                                id = "help",
-                                                title = "Help",
-                                                contentDescription = "Get help",
-                                                icon = Icons.Default.Info
-                                            ),
-                                            MenuItem(
-                                                id = "logout",
-                                                title = "Logout",
-                                                contentDescription = "Logout",
-                                                icon = Icons.Default.Close
-                                            ),
-                                        ),
-                                        onItemClick = {
-                                            when (it.id) {
-                                                "logout" -> {
-                                                    scope.launch {
-                                                        scaffoldState.drawerState.close()
-                                                    }
-                                                    viewModel.onEvent(LoginEvent.LogOut)
-                                                    navController.navigateEvent(
-                                                        UiEvent.Navigate(
-                                                            Route.WELCOME
-                                                        )
-                                                    )
-
-                                                }
-
-                                            }
-                                        }
-                                    )
-                                }
+                    scaffoldState = scaffoldState,
+                    bottomBar = {
+                        AnimatedVisibility(
+                            visible = showBottomBar.value,
+                            enter = scaleIn(),
+                            exit = scaleOut(),
+                        ) {
+                            BottomAppBar(
+                                cutoutShape = MaterialTheme.shapes.small.copy(
+                                    CornerSize(percent = 50)
+                                )
                             ) {
-                                HomeScreen(
-                                    onNavigate = navController::navigateEvent,
-                                    scaffoldState,
-                                    open,
-                                    viewModel
+                                BottomNavigationItem(
+                                    icon = {
+                                        Icon(Icons.Default.Home, "")
+                                    },
+                                    label = { Text(text = "Save") },
+                                    selected = true,
+                                    onClick = {
+                                    },
+                                    alwaysShowLabel = false
+                                )
+
+                                BottomNavigationItem(
+                                    icon = {
+                                        Icon(Icons.Default.List, "")
+                                    },
+
+
+                                    label = { Text(text = "Upload") },
+                                    selected = false,//selectedItem.value == "upload",
+                                    onClick = {
+
+                                    },
+                                    alwaysShowLabel = false
                                 )
                             }
+                        }
+                    },
+                    floatingActionButton = {
+                                val fabState = viewModel.state.fabState
+                                var selected by remember { mutableStateOf(false) }
+                                var finished by remember { mutableStateOf(false) }
+                                var open by remember { mutableStateOf(false) }
+                                val flashFinished: (Float) -> Unit = {
+                                    finished = true
+                                    if (finished && !selected) {
+                                        viewModel.isOpen = true
+                                    }
+                                }
+                                val scale = animateFloatAsState(
+                                    if (selected) 0.8f else 1.0f,
+                                    tween(durationMillis = 150),
+                                    finishedListener = flashFinished
+                                )
+                                val selectedItem = remember { mutableStateOf("home") }
 
+                        AnimatedVisibility(
+                            visible = showFabButton.value,
+                            enter = scaleIn(),
+                            exit = scaleOut(),
+                        ) {
+                                FloatingActionButton(
+                                    modifier = Modifier
+                                        .scale(scale.value)
+                                        .pointerInteropFilter {
+                                            selected = when (it.action) {
+                                                MotionEvent.ACTION_UP -> {
+                                                    false
 
+                                                }
+                                                MotionEvent.ACTION_DOWN -> {
+                                                    true
+                                                }
+                                                else -> {
+                                                    false
+                                                }
+                                            }
+
+                                            true
+                                        },
+                                    onClick = {}
+                                ) {
+                                    when (fabState) {
+                                        is LoadingType.FabLoading -> {
+                                            Icon(
+                                                imageVector = Icons.Default.Add,
+                                                contentDescription = "Add group"
+                                            )
+                                        }
+                                        else -> {
+                                            Icon(
+                                                imageVector = Icons.Default.Add,
+                                                contentDescription = "Add group"
+                                            )
+                                        }
+                                    }
+                                }
+                            }
+                        },
+
+                    isFloatingActionButtonDocked = true,
+
+                    floatingActionButtonPosition = FabPosition.Center,
+                    topBar = {
+                        if (showAppBar.value) {
+                            AppBar(
+                                onNavigationIconClick = {
+                                    scope.launch {
+                                        scaffoldState.drawerState.open()
+                                    }
+                                }
+                            )
+                        }
+                    },
+                    drawerGesturesEnabled = scaffoldState.drawerState.isOpen,
+                    drawerContent = {
+                        DrawerHeader()
+                        DrawerBody(
+                            items = listOf(
+                                MenuItem(
+                                    id = "home",
+                                    title = "Home",
+                                    contentDescription = "Go to home screen",
+                                    icon = Icons.Default.Home
+                                ),
+                                MenuItem(
+                                    id = "settings",
+                                    title = "Settings",
+                                    contentDescription = "Go to settings screen",
+                                    icon = Icons.Default.Settings
+                                ),
+                                MenuItem(
+                                    id = "help",
+                                    title = "Help",
+                                    contentDescription = "Get help",
+                                    icon = Icons.Default.Info
+                                ),
+                                MenuItem(
+                                    id = "logout",
+                                    title = "Logout",
+                                    contentDescription = "Logout",
+                                    icon = Icons.Default.Close
+                                ),
+                            ),
+                            onItemClick = {
+                                when (it.id) {
+                                    "logout" -> {
+                                        scope.launch {
+                                            scaffoldState.drawerState.close()
+                                        }
+                                        viewModel.onEvent(LoginEvent.LogOut)
+                                        navController.navigateEvent(
+                                            UiEvent.Navigate(
+                                                Route.WELCOME
+                                            )
+                                        )
+
+                                    }
+
+                                }
+                            }
+                        )
+                    }
+                ) {
+                    Box(modifier = Modifier.padding(it)) {
+                        NavHost(
+                            navController = navController,
+                            startDestination = if (authPreference.getStoredToken()
+                                    .isBlank()
+                            ) Route.WELCOME else Route.HOME
+                        ) {
+                            composable(Route.WELCOME)
+                            {
+                                WelcomeScreen(onNavigate = navController::navigateEvent)
+                                showBottomBar.value = false
+                                showFabButton.value = false
+                                showAppBar.value = false
+                            }
+                            composable(Route.LOGIN)
+                            {
+                                AuthScreen(onNavigate = navController::navigateEvent)
+                                showBottomBar.value = false
+                                showFabButton.value = false
+                                showAppBar.value = false
+                            }
+                            composable(Route.REGISTER)
+                            {
+                                RegisterScreen(onNavigate = navController::navigateEvent)
+                                showBottomBar.value = false
+                                showFabButton.value = false
+                                showAppBar.value = false
+                            }
+                            composable(Route.HOME)
+                            {
+                                HomeScreen(
+                                    onNavigate = navController::navigateEvent,
+                                    viewModel
+                                ) {
+                                }
+                                showBottomBar.value = true
+                                showFabButton.value = true
+                                showAppBar.value = true
+                            }
+
+                            composable(
+                                route = Route.DETAIL_GROUP+ "/{groupId}",
+                                arguments = listOf(
+                                    navArgument("groupId") {
+                                        type = NavType.StringType
+                                    }
+                                )
+                            )
+                            {
+                                val groupId = it.arguments?.getString("groupId")!!
+
+                                DetailGroupScreen(
+                                    groupId = groupId,
+                                    onNavigate = navController::navigateEvent,
+                                )
+                                showBottomBar.value = false
+                                showFabButton.value = true
+                            }
                         }
                     }
                 }
@@ -244,4 +319,5 @@ class MainActivity : ComponentActivity() {
         }
     }
 }
+
 

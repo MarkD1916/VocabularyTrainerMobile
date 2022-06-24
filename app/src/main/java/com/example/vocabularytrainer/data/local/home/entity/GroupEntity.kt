@@ -8,5 +8,8 @@ import java.util.*
 data class GroupEntity(
     @PrimaryKey(autoGenerate = false) val id: String = UUID.randomUUID().toString(),
     val name: String,
-    var isSync: Boolean
-)
+    var isSync: Boolean,
+    val date: Long
+){
+
+}

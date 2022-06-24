@@ -15,7 +15,7 @@ interface VocabularyDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertGroup(group: GroupEntity)
 
-    @Query("SELECT * FROM GroupTable ORDER BY id DESC")
+    @Query("SELECT * FROM GroupTable ORDER BY name DESC")
     fun selectAllGroups(): Flow<List<GroupEntity>>
 
     @Query("DELETE FROM GroupTable WHERE id = :groupId")
@@ -30,7 +30,7 @@ interface VocabularyDao {
     @Query("SELECT * FROM localy_deleted_group_ids")
     suspend fun getAllLocallyDeletedGroupId(): List<LocallyDeletedGroupID>
 
-    @Query("SELECT * FROM GroupTable WHERE isSync = 0 ORDER BY id DESC")
+    @Query("SELECT * FROM GroupTable WHERE isSync = 0 ORDER BY name DESC")
     suspend fun getAllUnsyncedGroups(): List<GroupEntity>
 
     @Query("DELETE FROM grouptable")

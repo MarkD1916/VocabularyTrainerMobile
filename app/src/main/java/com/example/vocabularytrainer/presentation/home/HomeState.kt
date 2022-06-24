@@ -3,7 +3,6 @@ package com.example.vocabularytrainer.presentation.home
 import com.example.vocabularytrainer.data.remote.home.local.Item
 import com.example.vocabularytrainer.domain.home.model.Group
 import java.util.*
-import kotlin.collections.ArrayList
 
 
 data class HomeState(
