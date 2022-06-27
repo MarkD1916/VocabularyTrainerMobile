@@ -1,6 +1,6 @@
 package com.example.vocabularytrainer.domain.preferences
 
-interface Preferences {
+interface AuthPreferences {
     fun getStoredEmail(): String
 
     fun setStoredEmail(email: String)

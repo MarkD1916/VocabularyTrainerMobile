@@ -15,13 +15,10 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
-import com.example.vocabularytrainer.extantions.navigateEvent
 import com.example.vocabularytrainer.navigation.Route
-import com.example.vocabularytrainer.presentation.home.HomeEvent
 import com.example.vocabularytrainer.presentation.home.LoadingType
 import com.example.vocabularytrainer.presentation.home.components.GroupItem
 import com.vmakd1916gmail.com.core.util.UiEvent
-import kotlinx.coroutines.flow.collectIndexed
 
 @OptIn(ExperimentalFoundationApi::class)
 @Composable
@@ -38,8 +35,8 @@ fun DetailGroupScreen(
     LaunchedEffect(key1 = context) {
         changeFabPosition()
         Log.d("LOL1", "DetailGroupScreen: ${state.words}")
-        DetailGroupEvent.GetAllWords.loadingType = LoadingType.FullScreenLoading()
-        viewModel.onDetailGroupEvent(DetailGroupEvent.GetAllWords)
+        DetailGroupEvent.GetAllWordsByGroup.loadingType = LoadingType.FullScreenLoading()
+        viewModel.onDetailGroupEvent(DetailGroupEvent.GetAllWordsByGroup)
     }
 
 

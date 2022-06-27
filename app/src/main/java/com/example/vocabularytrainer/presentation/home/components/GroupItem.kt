@@ -29,6 +29,7 @@ fun GroupItem(
     onToggleClick: () -> Unit,
     isSync: Boolean,
     isExpanded: Boolean,
+    isMainGroup: Boolean = true,
     content: @Composable () -> Unit,
 ) {
     Card(
@@ -61,21 +62,23 @@ fun GroupItem(
                         )
                     }
                     Column {
-                        Button(
-                            modifier = Modifier,
-                            onClick = {
-                                onDelete()
-                            }
-                        ) {
+                        if (!isMainGroup) {
+                            Button(
+                                modifier = Modifier,
+                                onClick = {
+                                    onDelete()
+                                }
+                            ) {
 
-                            Icon(
-                                modifier = Modifier
-                                    .align(Alignment.CenterVertically)
-                                    .size(15.dp),
-                                imageVector = Icons.Default.Delete,
-                                contentDescription = "choose",
-                                tint = Color.White
-                            )
+                                Icon(
+                                    modifier = Modifier
+                                        .align(Alignment.CenterVertically)
+                                        .size(15.dp),
+                                    imageVector = Icons.Default.Delete,
+                                    contentDescription = "choose",
+                                    tint = Color.White
+                                )
+                            }
                         }
                         Text(
                             modifier = Modifier.align(Alignment.CenterHorizontally),

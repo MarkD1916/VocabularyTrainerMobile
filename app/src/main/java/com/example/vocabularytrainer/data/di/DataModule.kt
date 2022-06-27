@@ -3,10 +3,11 @@ package com.example.vocabularytrainer.data.di
 import android.app.Application
 import androidx.room.Room
 import com.androiddevs.ktornoteapp.data.remote.interceptors.TokenInterceptor
-import com.example.vocabularytrainer.data.preferences.AuthPreference
+import com.example.vocabularytrainer.data.preferences.AuthPreferenceImpl
 import com.example.vocabularytrainer.data.remote.auth.api.AuthApi
 import com.example.vocabularytrainer.data.local.home.VocabularyDatabase
 import com.example.vocabularytrainer.data.local.home.dao.VocabularyDao
+import com.example.vocabularytrainer.data.preferences.HomePreferenceImpl
 import com.example.vocabularytrainer.data.remote.home.remote.api.HomeApi
 import com.example.vocabularytrainer.data.repository.AuthRepositoryImpl
 import com.example.vocabularytrainer.data.repository.HomeRepositoryImpl
@@ -28,7 +29,7 @@ object DataModule {
 
     @Singleton
     @Provides
-    fun provideTokenInterceptor(authSharedPreferences: AuthPreference): TokenInterceptor =
+    fun provideTokenInterceptor(authSharedPreferences: AuthPreferenceImpl): TokenInterceptor =
         TokenInterceptor(authSharedPreferences)
 
     @Singleton
@@ -90,8 +91,13 @@ object DataModule {
 
     @Provides
     @Singleton
-    fun provideHomeRepository(homeApi: HomeApi, dao: VocabularyDao,authSharedPreferences: AuthPreference): HomeRepository {
-        return HomeRepositoryImpl(homeApi,dao,authSharedPreferences)
+    fun provideHomeRepository(
+        homeApi: HomeApi,
+        dao: VocabularyDao,
+        authSharedPreferences: AuthPreferenceImpl,
+        homeSharedPreferences: HomePreferenceImpl,
+    ): HomeRepository {
+        return HomeRepositoryImpl(homeApi,dao,authSharedPreferences,homeSharedPreferences)
     }
 
 }

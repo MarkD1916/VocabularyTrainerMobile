@@ -1,15 +1,15 @@
 package com.example.vocabularytrainer.data.preferences
 
 import android.content.SharedPreferences
-import com.example.vocabularytrainer.domain.preferences.Preferences
+import com.example.vocabularytrainer.domain.preferences.AuthPreferences
 import com.example.vocabularytrainer.util.Constants.KEY_LOGGED_IN_EMAIL
 import com.example.vocabularytrainer.util.Constants.KEY_PASSWORD
 import com.example.vocabularytrainer.util.Constants.KEY_TOKEN
 import com.example.vocabularytrainer.util.Constants.KEY_USER_ID
 
-class AuthPreference(
+class AuthPreferenceImpl(
     private val prefs: SharedPreferences
-) : Preferences {
+) : AuthPreferences {
 
     override fun getStoredEmail(): String {
         return prefs.getString(KEY_LOGGED_IN_EMAIL, "")!!
@@ -54,4 +54,6 @@ class AuthPreference(
             .putString(KEY_USER_ID, id)
             .apply()
     }
+
+
 }

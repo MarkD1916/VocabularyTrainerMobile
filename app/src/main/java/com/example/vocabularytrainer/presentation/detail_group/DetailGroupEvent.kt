@@ -8,7 +8,11 @@ sealed class DetailGroupEvent() {
     data class OnNewWordNativeEnter(val newWordNative: String) : DetailGroupEvent()
     data class OnNewWordTranslateEnter(val newWordTranslate: String) : DetailGroupEvent()
 
-    object GetAllWords : DetailGroupEvent() {
+    object GetAllWordsByGroup : DetailGroupEvent() {
+        var loadingType: LoadingType<List<Group>> = LoadingType.FullScreenLoading()
+    }
+
+    object GetAllWordsByMainGroup : DetailGroupEvent() {
         var loadingType: LoadingType<List<Group>> = LoadingType.FullScreenLoading()
     }
 }

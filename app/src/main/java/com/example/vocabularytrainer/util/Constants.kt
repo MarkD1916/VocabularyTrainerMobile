@@ -15,6 +15,7 @@ object Constants {
     const val KEY_PASSWORD = "KEY_PASSWORD"
     const val KEY_TOKEN = "KEY_TOKEN"
     const val KEY_USER_ID = "KEY_USER_ID"
+    const val KEY_ALL_GROUP_ID = "KEY_ALL_GROUP_ID"
 
     //INTERCEPTOR CONSTANTS
     val IGNORE_AUTH_URL = listOf("/mobile/users/", "/mobile/token/login")
@@ -22,5 +23,7 @@ object Constants {
 
     fun getTokenValue(token: String) = "Token $token"
     fun getCountryFlagUrl(countryShortName: String) = "https://countryflagsapi.com/svg/$countryShortName"
+
+    const val MAIN_GROUP_NAME = "All"
 
 }

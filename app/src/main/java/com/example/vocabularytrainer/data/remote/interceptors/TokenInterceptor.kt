@@ -1,6 +1,6 @@
 package com.androiddevs.ktornoteapp.data.remote.interceptors
 
-import com.example.vocabularytrainer.data.preferences.AuthPreference
+import com.example.vocabularytrainer.data.preferences.AuthPreferenceImpl
 import com.example.vocabularytrainer.util.Constants.IGNORE_AUTH_URL
 import com.example.vocabularytrainer.util.Constants.TOKEN_HEADER_NAME
 import com.example.vocabularytrainer.util.Constants.getTokenValue
@@ -10,7 +10,7 @@ import okhttp3.Response
 import javax.inject.Inject
 
 class TokenInterceptor @Inject constructor(
-    private val authPreference: AuthPreference
+    private val authPreference: AuthPreferenceImpl
 ) : Interceptor {
     override fun intercept(chain: Interceptor.Chain): Response {
         val request: Request = chain.request()

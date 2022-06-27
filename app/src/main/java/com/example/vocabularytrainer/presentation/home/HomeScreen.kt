@@ -190,7 +190,8 @@ fun HomeScreen(
                             },
                             onToggleClick = {
                                 viewModel.onHomeEvent(HomeEvent.OnToggleGroupClick(item.id))
-                            }
+                            },
+                            isMainGroup = item.id == viewModel.mainGroupId
                         )
                     }
 
@@ -269,7 +270,8 @@ fun HomeScreen(
                             },
                             onToggleClick = {
                                 viewModel.onHomeEvent(HomeEvent.OnToggleGroupClick(item.id))
-                            }
+                            },
+                            isMainGroup = item.id == viewModel.mainGroupId
                         )
                     }
 

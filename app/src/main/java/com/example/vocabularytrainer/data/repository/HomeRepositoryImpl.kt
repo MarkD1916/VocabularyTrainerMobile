@@ -10,7 +10,8 @@ import com.example.vocabularytrainer.data.local.home.entity.relations.GroupWithW
 import com.example.vocabularytrainer.data.mapper.home.toGroupEntity
 import com.example.vocabularytrainer.data.mapper.home.toGroupRequest
 import com.example.vocabularytrainer.data.mapper.home.toWordEntity
-import com.example.vocabularytrainer.data.preferences.AuthPreference
+import com.example.vocabularytrainer.data.preferences.AuthPreferenceImpl
+import com.example.vocabularytrainer.data.preferences.HomePreferenceImpl
 import com.example.vocabularytrainer.data.remote.home.remote.api.HomeApi
 import com.example.vocabularytrainer.data.remote.home.remote.request.GroupRequest
 import com.example.vocabularytrainer.data.remote.home.remote.response.GroupResponse
@@ -19,6 +20,8 @@ import com.example.vocabularytrainer.domain.home.model.Group
 import com.example.vocabularytrainer.domain.repository.HomeRepository
 import com.example.vocabularytrainer.domain.repository.SyncController
 import com.example.vocabularytrainer.presentation.home.Resource
+import com.example.vocabularytrainer.util.Constants
+import com.example.vocabularytrainer.util.Constants.MAIN_GROUP_NAME
 import com.example.vocabularytrainer.util.networkBoundResource
 import kotlinx.coroutines.flow.Flow
 import retrofit2.Response
@@ -27,7 +30,8 @@ import javax.inject.Inject
 class HomeRepositoryImpl @Inject constructor(
     private val homeApi: HomeApi,
     private val dao: VocabularyDao,
-    private val authSharedPreferences: AuthPreference
+    private val authSharedPreferences: AuthPreferenceImpl,
+    private val homeSharedPreferences: HomePreferenceImpl
 ) : HomeRepository, SyncController {
     private var curGroupResponse: Response<List<GroupResponse>>? = null
     private var curWordResponse: Response<List<WordResponse>>? = null
@@ -115,16 +119,16 @@ class HomeRepositoryImpl @Inject constructor(
 
     @RequiresApi(Build.VERSION_CODES.O)
     override suspend fun postGroup(groupRequest: GroupRequest) {
-            val response = try {
-                homeApi.postGroup(groupRequest)
-            } catch (e: Exception) {
-                null
-            }
-            if (response != null && response.isSuccessful) {
-                dao.insertGroup(groupRequest.toGroupEntity().apply { isSync = true })
-            } else {
-                dao.insertGroup(groupRequest.toGroupEntity())
-            }
+        val response = try {
+            homeApi.postGroup(groupRequest)
+        } catch (e: Exception) {
+            null
+        }
+        if (response != null && response.isSuccessful) {
+            dao.insertGroup(groupRequest.toGroupEntity().apply { isSync = true })
+        } else {
+            dao.insertGroup(groupRequest.toGroupEntity())
+        }
     }
 
     override suspend fun insertGroup(groupEntity: GroupEntity) {
@@ -138,6 +142,9 @@ class HomeRepositoryImpl @Inject constructor(
     @RequiresApi(Build.VERSION_CODES.O)
     override suspend fun insertGroups(groups: List<GroupResponse>) {
         groups.forEach {
+            if (it.name == MAIN_GROUP_NAME && homeSharedPreferences.getAllGroupId().isBlank()) {
+                homeSharedPreferences.setAllGroupId(it.id)
+            }
             dao.insertGroup(it.toGroupEntity())
         }
     }

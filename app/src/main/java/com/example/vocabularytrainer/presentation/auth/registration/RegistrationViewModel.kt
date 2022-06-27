@@ -6,7 +6,7 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.vocabularytrainer.data.preferences.AuthPreference
+import com.example.vocabularytrainer.data.preferences.AuthPreferenceImpl
 import com.example.vocabularytrainer.domain.auth.use_case.AuthUseCases
 import com.example.vocabularytrainer.presentation.auth.AuthEvent
 import com.example.vocabularytrainer.presentation.auth.getCountryList
@@ -25,7 +25,7 @@ sealed class ValidationEvent {
 @HiltViewModel
 class RegistrationViewModel @Inject constructor(
     private val authUseCases: AuthUseCases,
-    private val authPreference: AuthPreference
+    private val authPreference: AuthPreferenceImpl
 ) : ViewModel() {
 
     var state by mutableStateOf(RegistrationState())

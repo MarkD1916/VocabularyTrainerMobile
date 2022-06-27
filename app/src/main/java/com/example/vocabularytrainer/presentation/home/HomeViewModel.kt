@@ -1,7 +1,6 @@
 package com.example.vocabularytrainer.presentation.home
 
 import android.os.Build
-import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -10,26 +9,26 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.androiddevs.ktornoteapp.data.remote.interceptors.Variables
 import com.example.vocabularytrainer.data.mapper.home.toGroupSuccess
-import com.example.vocabularytrainer.data.preferences.AuthPreference
+import com.example.vocabularytrainer.data.preferences.AuthPreferenceImpl
+import com.example.vocabularytrainer.data.preferences.HomePreferenceImpl
 import com.example.vocabularytrainer.domain.auth.use_case.AuthUseCases
-import com.example.vocabularytrainer.domain.home.model.Group
 import com.example.vocabularytrainer.domain.home.use_case.HomeUseCases
 import com.example.vocabularytrainer.navigation.Route
 import com.example.vocabularytrainer.presentation.auth.AuthEvent
 import com.example.vocabularytrainer.presentation.auth.login.LoginEvent
+import com.example.vocabularytrainer.util.Constants
 import com.vmakd1916gmail.com.core.util.UiEvent
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.*
-import okhttp3.internal.threadName
 import javax.inject.Inject
-import kotlin.coroutines.coroutineContext
 
 @RequiresApi(Build.VERSION_CODES.O)
 @HiltViewModel
 class HomeViewModel @Inject constructor(
-    private val authPreference: AuthPreference,
+    private val authPreference: AuthPreferenceImpl,
+    private val homePreference: HomePreferenceImpl,
     private val authUseCases: AuthUseCases,
     private val homeUseCases: HomeUseCases
 ) : ViewModel() {
@@ -38,7 +37,9 @@ class HomeViewModel @Inject constructor(
     private val _uiEvent = Channel<UiEvent>()
     var uiEvent: Flow<UiEvent>? = _uiEvent.receiveAsFlow()
 
+    val mainGroupId = homePreference.getAllGroupId()
     private var getAllGroup: Job? = null
+    private var syncWords: Job? = null
 
     private val _isRefreshing = MutableStateFlow(false)
 
@@ -78,19 +79,19 @@ class HomeViewModel @Inject constructor(
                 getAllGroup = homeUseCases.getAllGroup.execute()
                     .map { it ->
                         val data = it.data
-                        Log.d("LOL1", "onHomeEvent: ${data?.size}")
                         data?.map {
+                            homeUseCases.syncWords.execute(it.id)
                             it.toGroupSuccess()
                         }
                     }
                     .flowOn(Dispatchers.IO)
                     .onEach { groupList ->
-                        Log.d("LOL1", "onHomeEvent: ${groupList?.size}")
                         state = state.copy(
                             group = groupList ?: listOf(),
                             screenState = null
                         )
                     }.launchIn(viewModelScope)
+
             }
 
             is HomeEvent.DeleteGroup -> {

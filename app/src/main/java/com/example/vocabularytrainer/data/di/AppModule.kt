@@ -4,7 +4,8 @@ import android.content.Context
 import android.content.SharedPreferences
 import androidx.security.crypto.EncryptedSharedPreferences
 import androidx.security.crypto.MasterKey
-import com.example.vocabularytrainer.data.preferences.AuthPreference
+import com.example.vocabularytrainer.data.preferences.AuthPreferenceImpl
+import com.example.vocabularytrainer.data.preferences.HomePreferenceImpl
 import com.example.vocabularytrainer.util.Constants.ENCRYPTED_SHARED_PREF_NAME
 import dagger.Module
 import dagger.Provides
@@ -33,7 +34,13 @@ object AppModule {
 
     @Provides
     @Singleton
-    fun provideAuthSharedPreference(sharedPreferences: SharedPreferences) : AuthPreference {
-        return AuthPreference(sharedPreferences)
+    fun provideAuthSharedPreference(sharedPreferences: SharedPreferences) : AuthPreferenceImpl {
+        return AuthPreferenceImpl(sharedPreferences)
+    }
+
+    @Provides
+    @Singleton
+    fun provideHomeSharedPreference(sharedPreferences: SharedPreferences) : HomePreferenceImpl {
+        return HomePreferenceImpl(sharedPreferences)
     }
 }

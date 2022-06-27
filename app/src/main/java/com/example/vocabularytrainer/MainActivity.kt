@@ -1,14 +1,10 @@
 package com.example.vocabularytrainer
 
 import android.annotation.SuppressLint
-import android.content.res.AssetManager
 import android.os.Build
 import android.os.Bundle
-import android.util.Log
 import android.view.MotionEvent
 import androidx.activity.ComponentActivity
-import androidx.activity.OnBackPressedCallback
-import androidx.activity.compose.BackHandler
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.annotation.RequiresApi
@@ -21,30 +17,23 @@ import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.runtime.*
-import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.input.pointer.pointerInteropFilter
-import androidx.fragment.app.viewModels
-import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
-import com.example.vocabularytrainer.data.preferences.AuthPreference
+import com.example.vocabularytrainer.data.preferences.AuthPreferenceImpl
 import com.example.vocabularytrainer.extantions.navigateEvent
 import com.example.vocabularytrainer.navigation.Route
 import com.example.vocabularytrainer.presentation.auth.AuthScreen
 import com.example.vocabularytrainer.presentation.auth.RegisterScreen
 import com.example.vocabularytrainer.presentation.auth.login.LoginEvent
-import com.example.vocabularytrainer.presentation.auth.login.LoginViewModel
-import com.example.vocabularytrainer.presentation.components.DotLoadingAnimation
-import com.example.vocabularytrainer.presentation.components.LoadAnimation
 import com.example.vocabularytrainer.presentation.detail_group.DetailGroupScreen
 import com.example.vocabularytrainer.presentation.detail_group.DetailGroupViewModel
-import com.example.vocabularytrainer.presentation.home.HomeEvent
 import com.example.vocabularytrainer.presentation.home.HomeScreen
 import com.example.vocabularytrainer.presentation.home.HomeViewModel
 import com.example.vocabularytrainer.presentation.home.LoadingType
@@ -52,15 +41,11 @@ import com.example.vocabularytrainer.presentation.home.components.AppBar
 import com.example.vocabularytrainer.presentation.home.components.DrawerBody
 import com.example.vocabularytrainer.presentation.home.components.DrawerHeader
 import com.example.vocabularytrainer.presentation.home.components.MenuItem
-import com.example.vocabularytrainer.presentation.welcome.WelcomeEvent
 import com.example.vocabularytrainer.presentation.welcome.WelcomeScreen
-import com.example.vocabularytrainer.presentation.welcome.WelcomeViewModel
 import com.example.vocabularytrainer.ui.theme.VocabularyTrainerTheme
 import com.vmakd1916gmail.com.core.util.UiEvent
 
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.flow.cancellable
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
@@ -71,7 +56,7 @@ class MainActivity : ComponentActivity() {
 
 
     @Inject
-    lateinit var authPreference: AuthPreference
+    lateinit var authPreference: AuthPreferenceImpl
 
     @RequiresApi(Build.VERSION_CODES.O)
     @SuppressLint("UnusedMaterialScaffoldPaddingParameter")

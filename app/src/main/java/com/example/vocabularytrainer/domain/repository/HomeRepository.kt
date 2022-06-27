@@ -31,5 +31,7 @@ interface HomeRepository {
     //Work with WORDS
     fun getAllWordsByGroupFromServer(groupId: String): Flow<Resource<List<GroupWithWords>>>
 
+    suspend fun syncWords(groupId: String)
+
 //    suspend fun getAllWordsByGroupFromBD(): List<Group>
 }

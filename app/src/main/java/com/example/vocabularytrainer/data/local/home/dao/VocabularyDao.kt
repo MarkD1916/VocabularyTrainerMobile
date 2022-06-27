@@ -53,7 +53,7 @@ interface VocabularyDao {
     @Query("DELETE FROM wordtable")
     suspend fun deleteAllWords()
 
-//    @Query("SELECT * FROM WordTable WHERE isSync = 0 ORDER BY word DESC")
-//    suspend fun checkIsAllGroup()
+    @Query("SELECT * FROM wordtable ORDER BY word DESC")
+    fun getAllWords(): Flow<List<WordEntity>>
 
 }
