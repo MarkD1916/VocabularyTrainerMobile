@@ -5,13 +5,12 @@ import androidx.room.Entity
 import androidx.room.PrimaryKey
 import java.util.*
 
-@Entity(tableName = "GroupTable")
-data class GroupEntity(
-    @ColumnInfo(name = "groupId")
+@Entity(tableName = "WordTable")
+data class WordEntity(
     @PrimaryKey(autoGenerate = false) val id: String = UUID.randomUUID().toString(),
-    val name: String,
-    var isSync: Boolean,
-    val date: Long
-){
-
-}
+    @ColumnInfo(name = "groupId") val groupId: String,
+    val word: String,
+    val translate: String,
+    val group_name: String,
+    val isSync: Boolean
+)

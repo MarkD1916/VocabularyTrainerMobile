@@ -91,11 +91,13 @@ fun HomeScreen(
             text = {
 
                 TextField(
+                    modifier = Modifier.heightIn(max=150.dp),
                     value = state.newGroupName,
                     onValueChange = {
                         viewModel.onHomeEvent(HomeEvent.OnNewGroupNameEnter(it))
                     },
-                    placeholder = { Text(text = "Enter group name") }
+                    placeholder = { Text(text = "Enter group name") },
+                    singleLine = true
                 )
 
 

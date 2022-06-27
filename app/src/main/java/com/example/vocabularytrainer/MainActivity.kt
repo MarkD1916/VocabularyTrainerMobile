@@ -21,6 +21,7 @@ import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.runtime.*
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.input.pointer.pointerInteropFilter
@@ -29,6 +30,7 @@ import androidx.lifecycle.lifecycleScope
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.example.vocabularytrainer.data.preferences.AuthPreference
@@ -41,6 +43,7 @@ import com.example.vocabularytrainer.presentation.auth.login.LoginViewModel
 import com.example.vocabularytrainer.presentation.components.DotLoadingAnimation
 import com.example.vocabularytrainer.presentation.components.LoadAnimation
 import com.example.vocabularytrainer.presentation.detail_group.DetailGroupScreen
+import com.example.vocabularytrainer.presentation.detail_group.DetailGroupViewModel
 import com.example.vocabularytrainer.presentation.home.HomeEvent
 import com.example.vocabularytrainer.presentation.home.HomeScreen
 import com.example.vocabularytrainer.presentation.home.HomeViewModel
@@ -56,6 +59,7 @@ import com.example.vocabularytrainer.ui.theme.VocabularyTrainerTheme
 import com.vmakd1916gmail.com.core.util.UiEvent
 
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.cancellable
 import kotlinx.coroutines.launch
 import javax.inject.Inject
@@ -63,6 +67,8 @@ import javax.inject.Inject
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
     private val viewModel: HomeViewModel by viewModels()
+    private val groupDetailViewModel: DetailGroupViewModel by viewModels()
+
 
     @Inject
     lateinit var authPreference: AuthPreference
@@ -85,8 +91,10 @@ class MainActivity : ComponentActivity() {
                     mutableStateOf(false)
                 }
                 val showFabButton = remember {
-                    mutableStateOf(true)
+                    mutableStateOf(false)
                 }
+                val currentRoute by navController.currentBackStackEntryAsState()
+
 
                 Scaffold(
                     scaffoldState = scaffoldState,
@@ -129,70 +137,86 @@ class MainActivity : ComponentActivity() {
                         }
                     },
                     floatingActionButton = {
-                                val fabState = viewModel.state.fabState
-                                var selected by remember { mutableStateOf(false) }
-                                var finished by remember { mutableStateOf(false) }
-                                var open by remember { mutableStateOf(false) }
-                                val flashFinished: (Float) -> Unit = {
-                                    finished = true
-                                    if (finished && !selected) {
+                        val fabState = viewModel.state.fabState
+                        var selected by remember { mutableStateOf(false) }
+                        var finished by remember { mutableStateOf(false) }
+                        var open by remember { mutableStateOf(false) }
+                        val flashFinished: (Float) -> Unit = {
+                            finished = true
+                            if (finished && !selected) {
+                                when (currentRoute?.destination?.route) {
+                                    Route.HOME -> {
                                         viewModel.isOpen = true
                                     }
+                                    Route.DETAIL_GROUP -> {
+                                        groupDetailViewModel.isOpen = true
+                                    }
                                 }
-                                val scale = animateFloatAsState(
-                                    if (selected) 0.8f else 1.0f,
-                                    tween(durationMillis = 150),
-                                    finishedListener = flashFinished
-                                )
-                                val selectedItem = remember { mutableStateOf("home") }
+
+                            }
+                        }
+                        val scale = animateFloatAsState(
+                            if (selected) 0.8f else 1.0f,
+                            tween(durationMillis = 150),
+                            finishedListener = flashFinished
+                        )
+                        val selectedItem = remember { mutableStateOf("home") }
 
                         AnimatedVisibility(
                             visible = showFabButton.value,
                             enter = scaleIn(),
                             exit = scaleOut(),
                         ) {
-                                FloatingActionButton(
-                                    modifier = Modifier
-                                        .scale(scale.value)
-                                        .pointerInteropFilter {
-                                            selected = when (it.action) {
-                                                MotionEvent.ACTION_UP -> {
-                                                    false
+                            FloatingActionButton(
+                                modifier = Modifier
+                                    .scale(scale.value)
+                                    .pointerInteropFilter {
+                                        selected = when (it.action) {
+                                            MotionEvent.ACTION_UP -> {
+                                                false
 
-                                                }
-                                                MotionEvent.ACTION_DOWN -> {
-                                                    true
-                                                }
-                                                else -> {
-                                                    false
-                                                }
                                             }
+                                            MotionEvent.ACTION_DOWN -> {
+                                                true
+                                            }
+                                            else -> {
+                                                false
+                                            }
+                                        }
 
-                                            true
-                                        },
-                                    onClick = {}
-                                ) {
-                                    when (fabState) {
-                                        is LoadingType.FabLoading -> {
-                                            Icon(
-                                                imageVector = Icons.Default.Add,
-                                                contentDescription = "Add group"
-                                            )
-                                        }
-                                        else -> {
-                                            Icon(
-                                                imageVector = Icons.Default.Add,
-                                                contentDescription = "Add group"
-                                            )
-                                        }
+                                        true
+                                    },
+                                onClick = {}
+                            ) {
+                                when (fabState) {
+                                    is LoadingType.FabLoading -> {
+                                        Icon(
+                                            imageVector = Icons.Default.Add,
+                                            contentDescription = "Add group"
+                                        )
+                                    }
+                                    else -> {
+                                        Icon(
+                                            imageVector = Icons.Default.Add,
+                                            contentDescription = "Add group"
+                                        )
                                     }
                                 }
                             }
-                        },
+                        }
+                    },
 
                     isFloatingActionButtonDocked = true,
 
-                    floatingActionButtonPosition = FabPosition.Center,
+                    floatingActionButtonPosition =when (currentRoute?.destination?.route) {
+                        "detail_group/{groupId}" -> {
+                            FabPosition.Center
+                        }
+                        Route.HOME -> {
+                            FabPosition.Center
+                        }
+                        else -> FabPosition.Center
+                    },
                     topBar = {
                         if (showAppBar.value) {
                             AppBar(
@@ -284,18 +308,19 @@ class MainActivity : ComponentActivity() {
                             }
                             composable(Route.HOME)
                             {
+                                showBottomBar.value = true
+                                showFabButton.value = true
+                                showAppBar.value = true
                                 HomeScreen(
                                     onNavigate = navController::navigateEvent,
                                     viewModel
                                 ) {
                                 }
-                                showBottomBar.value = true
-                                showFabButton.value = true
-                                showAppBar.value = true
+
                             }
 
                             composable(
-                                route = Route.DETAIL_GROUP+ "/{groupId}",
+                                route = Route.DETAIL_GROUP + "/{groupId}",
                                 arguments = listOf(
                                     navArgument("groupId") {
                                         type = NavType.StringType
@@ -304,13 +329,19 @@ class MainActivity : ComponentActivity() {
                             )
                             {
                                 val groupId = it.arguments?.getString("groupId")!!
-
+                                DetailGroupViewModel.groupId = groupId
                                 DetailGroupScreen(
                                     groupId = groupId,
                                     onNavigate = navController::navigateEvent,
-                                )
+                                    viewModel = groupDetailViewModel
+                                ){
+
+
+                                }
                                 showBottomBar.value = false
                                 showFabButton.value = true
+
+
                             }
                         }
                     }

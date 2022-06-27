@@ -1,24 +1,24 @@
 package com.example.vocabularytrainer.data.local.home.dao
 
-import androidx.room.Dao
-import androidx.room.Insert
-import androidx.room.OnConflictStrategy
-import androidx.room.Query
+import androidx.room.*
 import com.example.vocabularytrainer.data.local.home.entity.GroupEntity
 import com.example.vocabularytrainer.data.local.home.entity.LocallyDeletedGroupID
+import com.example.vocabularytrainer.data.local.home.entity.WordEntity
+import com.example.vocabularytrainer.data.local.home.entity.relations.GroupWithWords
 import kotlinx.coroutines.flow.Flow
 import retrofit2.http.DELETE
 
 @Dao
 interface VocabularyDao {
 
+    //Group QUERY
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertGroup(group: GroupEntity)
 
     @Query("SELECT * FROM GroupTable ORDER BY name DESC")
     fun selectAllGroups(): Flow<List<GroupEntity>>
 
-    @Query("DELETE FROM GroupTable WHERE id = :groupId")
+    @Query("DELETE FROM GroupTable WHERE groupId = :groupId")
     suspend fun deleteGroupById(groupId: String)
 
     @Insert(onConflict = OnConflictStrategy.REPLACE)
@@ -36,7 +36,24 @@ interface VocabularyDao {
     @Query("DELETE FROM grouptable")
     suspend fun deleteAllGroups()
 
-    @Query("SELECT MAX(id) FROM grouptable")
+    @Query("SELECT MAX(groupId) FROM grouptable")
     suspend fun getMaxGroupId(): String
+
+    //Word QUERY
+    @Insert(onConflict = OnConflictStrategy.REPLACE)
+    suspend fun insertWord(word: WordEntity)
+
+    @Transaction
+    @Query("SELECT * FROM GroupTable WHERE groupId = :groupId")
+    fun getGroupWithWords(groupId: String): Flow<List<GroupWithWords>>
+
+    @Query("SELECT * FROM WordTable WHERE isSync = 0 ORDER BY word DESC")
+    suspend fun getAllUnsyncedWords(): List<WordEntity>
+
+    @Query("DELETE FROM wordtable")
+    suspend fun deleteAllWords()
+
+//    @Query("SELECT * FROM WordTable WHERE isSync = 0 ORDER BY word DESC")
+//    suspend fun checkIsAllGroup()
 
 }

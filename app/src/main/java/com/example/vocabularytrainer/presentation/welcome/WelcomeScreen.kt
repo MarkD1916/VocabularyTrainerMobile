@@ -157,39 +157,6 @@ fun WelcomeScreen(
                     viewModel = viewModel
                 )
             }
-
-        }
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .height(70.dp)
-                .align(Alignment.BottomCenter)
-                .clip(
-                    RoundedCornerShape(
-                        topEnd = 50.dp,
-                        topStart = 50.dp
-                    )
-                )
-                .background(MaterialTheme.colors.primary)
-                .padding(
-                    horizontal = 15.dp,
-                    vertical = 15.dp
-                )
-        ) {
-            Row(
-                modifier = Modifier
-                    .align(Alignment.CenterHorizontally)
-            ) {
-                Text(
-                    text = "Made by vmakd1916@gmail.com in 2022",
-                    color = Color(0xFFFFFFFF),
-                    style = TextStyle(
-                        fontFamily = FontFamily.Default,
-                        fontWeight = FontWeight.Normal,
-                        fontSize = 12.sp
-                    )
-                )
-            }
         }
     }
 }

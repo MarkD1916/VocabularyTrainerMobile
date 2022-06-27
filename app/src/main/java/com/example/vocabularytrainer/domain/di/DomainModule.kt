@@ -2,6 +2,8 @@ package com.example.vocabularytrainer.domain.di
 
 import com.example.vocabularytrainer.data.preferences.AuthPreference
 import com.example.vocabularytrainer.domain.auth.use_case.*
+import com.example.vocabularytrainer.domain.detail_group.use_case.GetWordsByGroup
+import com.example.vocabularytrainer.domain.detail_group.use_case.GroupDetailUseCase
 import com.example.vocabularytrainer.domain.home.use_case.AddGroup
 import com.example.vocabularytrainer.domain.home.use_case.DeleteGroup
 import com.example.vocabularytrainer.domain.home.use_case.GetAllGroup
@@ -44,6 +46,16 @@ object DomainModule {
             getAllGroup = GetAllGroup(repository),
             deleteGroup = DeleteGroup(repository),
             addGroup = AddGroup(repository,authPreference)
+        )
+    }
+
+    @ViewModelScoped
+    @Provides
+    fun provideGroupDetailUseCases(
+        repository: HomeRepository
+    ): GroupDetailUseCase {
+        return GroupDetailUseCase(
+            getWordsByGroup = GetWordsByGroup(repository)
         )
     }
 

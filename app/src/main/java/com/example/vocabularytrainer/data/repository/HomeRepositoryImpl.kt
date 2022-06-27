@@ -1,23 +1,26 @@
 package com.example.vocabularytrainer.data.repository
 
-import android.util.Log
+import android.os.Build
+import androidx.annotation.RequiresApi
 import com.androiddevs.ktornoteapp.data.remote.interceptors.Variables
 import com.example.vocabularytrainer.data.local.home.dao.VocabularyDao
 import com.example.vocabularytrainer.data.local.home.entity.GroupEntity
 import com.example.vocabularytrainer.data.local.home.entity.LocallyDeletedGroupID
+import com.example.vocabularytrainer.data.local.home.entity.relations.GroupWithWords
 import com.example.vocabularytrainer.data.mapper.home.toGroupEntity
 import com.example.vocabularytrainer.data.mapper.home.toGroupRequest
+import com.example.vocabularytrainer.data.mapper.home.toWordEntity
 import com.example.vocabularytrainer.data.preferences.AuthPreference
 import com.example.vocabularytrainer.data.remote.home.remote.api.HomeApi
 import com.example.vocabularytrainer.data.remote.home.remote.request.GroupRequest
 import com.example.vocabularytrainer.data.remote.home.remote.response.GroupResponse
+import com.example.vocabularytrainer.data.remote.home.remote.response.WordResponse
 import com.example.vocabularytrainer.domain.home.model.Group
 import com.example.vocabularytrainer.domain.repository.HomeRepository
+import com.example.vocabularytrainer.domain.repository.SyncController
 import com.example.vocabularytrainer.presentation.home.Resource
 import com.example.vocabularytrainer.util.networkBoundResource
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.withContext
 import retrofit2.Response
 import javax.inject.Inject
 
@@ -25,25 +28,17 @@ class HomeRepositoryImpl @Inject constructor(
     private val homeApi: HomeApi,
     private val dao: VocabularyDao,
     private val authSharedPreferences: AuthPreference
-) : HomeRepository {
+) : HomeRepository, SyncController {
     private var curGroupResponse: Response<List<GroupResponse>>? = null
+    private var curWordResponse: Response<List<WordResponse>>? = null
 
+    @RequiresApi(Build.VERSION_CODES.O)
+    override suspend fun syncGroupsAndWords() {
+        syncGroups()
+    }
+
+    @RequiresApi(Build.VERSION_CODES.O)
     override fun getAllGroupFromServer(): Flow<Resource<List<GroupEntity>>> {
-//        val result = try {
-//            safeCall {
-//                val response = homeApi.getAllGroup()
-//                if (response.isSuccessful && response.body() != null) {
-//                    insertGroups(response.body()!!)
-//                    Resource.Success(response.body()!!)
-//                } else {
-//                    Resource.Error(response.message())
-//                }
-//            }
-//        }
-//        catch(e: Exception) {
-//            Resource.Error(e.message!!)
-//        }
-//        emit(result)
         val result = networkBoundResource(
             query = {
                 dao.selectAllGroups()
@@ -71,7 +66,6 @@ class HomeRepositoryImpl @Inject constructor(
         } catch (e: Exception) {
             null
         }
-        Log.d("LOL", "deleteGroup: ${response?.isSuccessful},${groupId}")
         dao.deleteGroupById(groupId)
         if (response == null || !response.isSuccessful) {
             dao.insertLocallyDeletedGroupID(LocallyDeletedGroupID(groupId))
@@ -80,6 +74,7 @@ class HomeRepositoryImpl @Inject constructor(
         }
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     override suspend fun syncGroups() {
         val locallyDeletedGroupIDs = dao.getAllLocallyDeletedGroupId()
         locallyDeletedGroupIDs.forEach { id -> deleteGroup(id.deletedGroupId) }
@@ -98,10 +93,27 @@ class HomeRepositoryImpl @Inject constructor(
         }
     }
 
+    override suspend fun syncWords(groupId: String) {
+
+        val unsyncedWords = dao.getAllUnsyncedWords()
+
+//        unsyncedWords.forEach { word -> postGroup(group.toGroupRequest(authSharedPreferences.getUserId())) }
+
+        curWordResponse = homeApi.getWordByGroup(groupId)
+        curWordResponse?.body()?.let { words ->
+            dao.deleteAllWords()
+
+            insertWords(words.onEach { word ->
+                word.toWordEntity()
+            })
+        }
+    }
+
     override suspend fun deleteLocallyDeletedGroupID(deletedGroupID: String) {
         dao.deleteLocallyDeletedNoteID(deletedGroupID)
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     override suspend fun postGroup(groupRequest: GroupRequest) {
             val response = try {
                 homeApi.postGroup(groupRequest)
@@ -123,9 +135,38 @@ class HomeRepositoryImpl @Inject constructor(
         TODO("Not yet implemented")
     }
 
+    @RequiresApi(Build.VERSION_CODES.O)
     override suspend fun insertGroups(groups: List<GroupResponse>) {
         groups.forEach {
             dao.insertGroup(it.toGroupEntity())
         }
+    }
+
+    suspend fun insertWords(words: List<WordResponse>) {
+        words.forEach {
+            dao.insertWord(it.toWordEntity())
+        }
+    }
+
+    override fun getAllWordsByGroupFromServer(groupId: String): Flow<Resource<List<GroupWithWords>>> {
+        val result = networkBoundResource(
+            query = {
+                dao.getGroupWithWords(groupId)
+            },
+            fetch = {
+                syncWords(groupId)
+                curWordResponse
+            },
+            saveFetchResult = { response ->
+                response?.body()?.let {
+                    insertWords(it)
+                }
+            },
+            shouldFetch = {
+                Variables.isNetworkConnected
+            }
+        )
+
+        return result
     }
 }

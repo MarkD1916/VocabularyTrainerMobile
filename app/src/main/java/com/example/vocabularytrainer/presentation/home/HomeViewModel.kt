@@ -40,8 +40,6 @@ class HomeViewModel @Inject constructor(
 
     private var getAllGroup: Job? = null
 
-    private var getAllNewGroup: Job? = null
-
     private val _isRefreshing = MutableStateFlow(false)
 
     val id by mutableStateOf(authPreference.getUserId())
@@ -80,12 +78,14 @@ class HomeViewModel @Inject constructor(
                 getAllGroup = homeUseCases.getAllGroup.execute()
                     .map { it ->
                         val data = it.data
+                        Log.d("LOL1", "onHomeEvent: ${data?.size}")
                         data?.map {
                             it.toGroupSuccess()
                         }
                     }
                     .flowOn(Dispatchers.IO)
                     .onEach { groupList ->
+                        Log.d("LOL1", "onHomeEvent: ${groupList?.size}")
                         state = state.copy(
                             group = groupList ?: listOf(),
                             screenState = null
