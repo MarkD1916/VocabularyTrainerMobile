@@ -20,7 +20,6 @@ import com.example.vocabularytrainer.domain.home.model.Group
 import com.example.vocabularytrainer.domain.repository.HomeRepository
 import com.example.vocabularytrainer.domain.repository.SyncController
 import com.example.vocabularytrainer.presentation.home.Resource
-import com.example.vocabularytrainer.util.Constants
 import com.example.vocabularytrainer.util.Constants.MAIN_GROUP_NAME
 import com.example.vocabularytrainer.util.networkBoundResource
 import kotlinx.coroutines.flow.Flow
@@ -143,7 +142,7 @@ class HomeRepositoryImpl @Inject constructor(
     @RequiresApi(Build.VERSION_CODES.O)
     override suspend fun insertGroups(groups: List<GroupResponse>) {
         groups.forEach {
-            if (it.name == MAIN_GROUP_NAME && homeSharedPreferences.getAllGroupId().isBlank()) {
+            if (it.name == MAIN_GROUP_NAME) {
                 homeSharedPreferences.setAllGroupId(it.id)
             }
             dao.insertGroup(it.toGroupEntity())

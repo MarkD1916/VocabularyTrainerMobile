@@ -1,6 +1,5 @@
 package com.example.vocabularytrainer.presentation.detail_group
 
-import android.util.Log
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.layout.Column
@@ -9,7 +8,6 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
-import androidx.compose.material.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
@@ -28,17 +26,14 @@ fun DetailGroupScreen(
     viewModel: DetailGroupViewModel,
     changeFabPosition: () -> Unit
 ) {
-    Text(text = groupId)
     val state = viewModel.state
     DetailGroupViewModel.groupId = groupId
     val context = LocalContext.current
     LaunchedEffect(key1 = context) {
         changeFabPosition()
-        Log.d("LOL1", "DetailGroupScreen: ${state.words}")
         DetailGroupEvent.GetAllWordsByGroup.loadingType = LoadingType.FullScreenLoading()
         viewModel.onDetailGroupEvent(DetailGroupEvent.GetAllWordsByGroup)
     }
-
 
     BackHandler {
         state.groupId = ""
@@ -49,7 +44,8 @@ fun DetailGroupScreen(
             )
         )
     }
-    LazyColumn(){
+
+    LazyColumn {
         items(state.words, key = { it.word }) { item ->
             GroupItem(
                 modifier = Modifier

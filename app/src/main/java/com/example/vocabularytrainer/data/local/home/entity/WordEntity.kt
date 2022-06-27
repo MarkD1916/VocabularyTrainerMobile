@@ -1,11 +1,19 @@
 package com.example.vocabularytrainer.data.local.home.entity
 
-import androidx.room.ColumnInfo
-import androidx.room.Entity
-import androidx.room.PrimaryKey
+import androidx.room.*
+import androidx.room.ForeignKey.CASCADE
 import java.util.*
 
-@Entity(tableName = "WordTable")
+@Entity(
+    tableName = "WordTable",
+    foreignKeys = [
+        ForeignKey(
+            entity = GroupEntity::class,
+            parentColumns = ["groupId"],
+            childColumns = ["groupId"],
+            onDelete = ForeignKey.CASCADE //<<<<<
+        )
+    ])
 data class WordEntity(
     @PrimaryKey(autoGenerate = false) val id: String = UUID.randomUUID().toString(),
     @ColumnInfo(name = "groupId") val groupId: String,
