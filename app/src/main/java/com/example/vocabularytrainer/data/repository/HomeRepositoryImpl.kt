@@ -98,18 +98,19 @@ class HomeRepositoryImpl @Inject constructor(
     }
 
     override suspend fun syncWords(groupId: String) {
-
-        val unsyncedWords = dao.getAllUnsyncedWords()
+        if (Variables.isNetworkConnected) {
+            val unsyncedWords = dao.getAllUnsyncedWords()
 
 //        unsyncedWords.forEach { word -> postGroup(group.toGroupRequest(authSharedPreferences.getUserId())) }
 
-        curWordResponse = homeApi.getWordByGroup(groupId)
-        curWordResponse?.body()?.let { words ->
-            dao.deleteAllWords()
+            curWordResponse = homeApi.getWordByGroup(groupId)
+            curWordResponse?.body()?.let { words ->
+                dao.deleteAllWords()
 
-            insertWords(words.onEach { word ->
-                word.toWordEntity()
-            })
+                insertWords(words.onEach { word ->
+                    word.toWordEntity()
+                })
+            }
         }
     }
 
