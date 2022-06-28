@@ -119,7 +119,7 @@ fun AuthScreen(
                             state.emailError?.let {
                                 ErrorText(
                                     modifier = Modifier.padding(horizontal = 30.dp),
-                                    errorMessage = it,
+                                    errorMessage = it.asString(context),
                                     textColor = Color.Red
                                 )
                             }
@@ -145,7 +145,7 @@ fun AuthScreen(
                             state.passwordError?.let {
                                 ErrorText(
                                     modifier = Modifier.padding(horizontal = 30.dp),
-                                    errorMessage = it,
+                                    errorMessage = it.asString(context),
                                     textColor = Color.Red
                                 )
                             }

@@ -2,6 +2,7 @@ package com.example.vocabularytrainer.presentation.auth.registration
 
 import android.os.Build
 import androidx.annotation.RequiresApi
+import com.vmakd1916gmail.com.core.util.UiText
 import java.time.LocalDate
 import java.util.*
 
@@ -14,12 +15,12 @@ sealed class AuthResponseResult {
 
 data class RegistrationState(
     val email: String = "",
-    val emailError: String? = null,
+    val emailError: UiText.StringResource? = null,
     val password: String = "",
-    val passwordError: String? = null,
+    val passwordError: UiText.StringResource? = null,
     val passwordRequire: String? = "",
     val confirmPassword: String = "",
-    val confirmPasswordError: String? = null,
+    val confirmPasswordError: UiText.StringResource? = null,
     val confirmPasswordRequire: String? = "",
 
     val registerResponseResult: AuthResponseResult? = null,

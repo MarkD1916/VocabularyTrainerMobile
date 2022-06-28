@@ -19,6 +19,9 @@ import com.example.vocabularytrainer.presentation.auth.login.LoginEvent
 import com.example.vocabularytrainer.util.Constants
 import com.vmakd1916gmail.com.core.util.UiEvent
 import dagger.hilt.android.lifecycle.HiltViewModel
+import io.reactivex.rxjava3.disposables.CompositeDisposable
+import io.reactivex.rxjava3.kotlin.subscribeBy
+import io.reactivex.rxjava3.schedulers.Schedulers
 import kotlinx.coroutines.*
 import kotlinx.coroutines.channels.Channel
 import kotlinx.coroutines.flow.*
@@ -95,6 +98,7 @@ class HomeViewModel @Inject constructor(
             }
 
             is HomeEvent.DeleteGroup -> {
+                val subscriptions = CompositeDisposable()
                 state = state.copy(
                     group = state.group.map {
                         if (it.id == event.id) {

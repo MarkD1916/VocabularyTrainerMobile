@@ -1,3 +1,9 @@
 <resources>
     <string name="app_name">VocabularyTrainer</string>
+    <string name="error_blank_password">The password can\'t be blank</string>
+    <string name="error_short_password">Your password must contain at least 9 characters</string>
+    <string name="error_blank_confirm_password">The confirm password can\'t be blank</string>
+    <string name="error_password_dont_match">The passwords don\'t match</string>
+    <string name="error_blank_email">The passwords don\'t match</string>
+    <string name="error_not_valid_email">The passwords don\'t match</string>
 </resources>

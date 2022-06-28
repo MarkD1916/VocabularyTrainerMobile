@@ -22,8 +22,13 @@ import com.example.vocabularytrainer.domain.repository.SyncController
 import com.example.vocabularytrainer.presentation.home.Resource
 import com.example.vocabularytrainer.util.Constants.MAIN_GROUP_NAME
 import com.example.vocabularytrainer.util.networkBoundResource
+import io.reactivex.rxjava3.core.Completable
+import io.reactivex.rxjava3.core.Single
+import io.reactivex.rxjava3.disposables.CompositeDisposable
 import kotlinx.coroutines.flow.Flow
 import retrofit2.Response
+import java.io.File
+import java.io.FileNotFoundException
 import javax.inject.Inject
 
 class HomeRepositoryImpl @Inject constructor(

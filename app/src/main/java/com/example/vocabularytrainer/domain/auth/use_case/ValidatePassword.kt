@@ -1,6 +1,8 @@
 package com.example.vocabularytrainer.domain.auth.use_case
 
+import com.example.vocabularytrainer.R
 import com.example.vocabularytrainer.util.Constants.PASSWORD_LENGTH
+import com.vmakd1916gmail.com.core.util.UiText
 
 class ValidatePassword {
 
@@ -8,14 +10,14 @@ class ValidatePassword {
         if (password.isBlank()) {
             return ValidationResult(
                 success = false,
-                error = "The password can't be blank"
+                error = UiText.StringResource(R.string.error_blank_password)
             )
         }
 
         if (password.length < PASSWORD_LENGTH) {
             return ValidationResult(
                 success = false,
-                error = "Your password must contain at least 9 characters"
+                error = UiText.StringResource(R.string.error_short_password)
             )
         }
         return ValidationResult(success = true)

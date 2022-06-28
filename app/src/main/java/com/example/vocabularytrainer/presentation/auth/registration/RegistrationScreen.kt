@@ -295,7 +295,7 @@ private fun EmailPasswordSubView(
                     state.emailError?.let {
                         ErrorText(
                             modifier = Modifier.padding(horizontal = 30.dp),
-                            errorMessage = state.emailError ?: "",
+                            errorMessage = state.emailError.asString(context) ?: "",
                             textColor = Color.Red
                         )
                     }
@@ -346,7 +346,7 @@ private fun EmailPasswordSubView(
                     state.passwordError?.let {
                         ErrorText(
                             modifier = Modifier.padding(horizontal = 30.dp),
-                            errorMessage = it,
+                            errorMessage = it.asString(context),
                             textColor = Color.Red
                         )
                     }
@@ -374,7 +374,7 @@ private fun EmailPasswordSubView(
                     state.confirmPasswordError?.let {
                         ErrorText(
                             modifier = Modifier.padding(horizontal = 30.dp),
-                            errorMessage = it,
+                            errorMessage = it.asString(context),
                             textColor = Color.Red
                         )
                     }

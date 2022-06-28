@@ -162,7 +162,7 @@ fun HomeScreen(
                 .padding(bottom = 30.dp)
         ) {
 
-            items(state.group.distinct(), key = { it.name }) { item ->
+            items(state.group.distinct(), key = { it.id }) { item ->
                 when (item.state) {
                     is Resource.NoAction -> {
                         visible = true
