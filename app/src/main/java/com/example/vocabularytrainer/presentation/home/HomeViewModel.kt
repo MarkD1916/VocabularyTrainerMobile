@@ -11,8 +11,10 @@ import com.androiddevs.ktornoteapp.data.remote.interceptors.Variables
 import com.example.vocabularytrainer.data.mapper.home.toGroupSuccess
 import com.example.vocabularytrainer.data.preferences.AuthPreferenceImpl
 import com.example.vocabularytrainer.data.preferences.HomePreferenceImpl
+import com.example.vocabularytrainer.data.repository.HomeRepositoryImpl
 import com.example.vocabularytrainer.domain.auth.use_case.AuthUseCases
 import com.example.vocabularytrainer.domain.home.use_case.HomeUseCases
+import com.example.vocabularytrainer.domain.repository.HomeRepository
 import com.example.vocabularytrainer.navigation.Route
 import com.example.vocabularytrainer.presentation.auth.AuthEvent
 import com.example.vocabularytrainer.presentation.auth.login.LoginEvent
@@ -33,7 +35,8 @@ class HomeViewModel @Inject constructor(
     private val authPreference: AuthPreferenceImpl,
     private val homePreference: HomePreferenceImpl,
     private val authUseCases: AuthUseCases,
-    private val homeUseCases: HomeUseCases
+    private val homeUseCases: HomeUseCases,
+    private val homeRepository: HomeRepositoryImpl
 ) : ViewModel() {
 
     var state by mutableStateOf(HomeState())
@@ -78,7 +81,7 @@ class HomeViewModel @Inject constructor(
                     screenState = event.loadingType
                 )
                 getAllGroup?.cancel()
-
+                homeRepository.testFun()
                 getAllGroup = homeUseCases.getAllGroup.execute()
                     .map { it ->
                         val data = it.data

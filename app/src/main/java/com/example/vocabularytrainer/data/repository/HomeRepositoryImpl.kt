@@ -1,6 +1,7 @@
 package com.example.vocabularytrainer.data.repository
 
 import android.os.Build
+import android.util.Log
 import androidx.annotation.RequiresApi
 import com.androiddevs.ktornoteapp.data.remote.interceptors.Variables
 import com.example.vocabularytrainer.data.local.home.dao.VocabularyDao
@@ -23,8 +24,11 @@ import com.example.vocabularytrainer.presentation.home.Resource
 import com.example.vocabularytrainer.util.Constants.MAIN_GROUP_NAME
 import com.example.vocabularytrainer.util.networkBoundResource
 import io.reactivex.rxjava3.core.Completable
+import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.core.Single
 import io.reactivex.rxjava3.disposables.CompositeDisposable
+import io.reactivex.rxjava3.kotlin.subscribeBy
+import io.reactivex.rxjava3.schedulers.Schedulers
 import kotlinx.coroutines.flow.Flow
 import retrofit2.Response
 import java.io.File
@@ -44,7 +48,37 @@ class HomeRepositoryImpl @Inject constructor(
     override suspend fun syncGroupsAndWords() {
         syncGroups()
     }
+    @RequiresApi(Build.VERSION_CODES.O)
+    fun testFun(){
+//        val disposables = CompositeDisposable()
 
+        homeApi.getAllGroup()
+            .observeOn(Schedulers.io())
+            .subscribeBy(
+                onSuccess = {
+                    Log.d("LOL2", "syncGroups: ")
+                    curGroupResponse = it
+                    it?.body()?.let {
+                        dao.deleteAllGroups()
+                        it.onEach { group ->
+                            if (group.name == MAIN_GROUP_NAME) {
+                                homeSharedPreferences.setAllGroupId(group.id)
+                            }
+                            Log.d("LOL2", "syncGroups: ")
+                            dao.insertGroup(group.toGroupEntity())
+                        }
+                    }
+                },
+                onError = {
+                    Log.d("LOL2", "error: ")
+                }
+            )
+
+//        disposables.add(observer)
+
+
+//        disposables.dispose()
+    }
     @RequiresApi(Build.VERSION_CODES.O)
     override fun getAllGroupFromServer(): Flow<Resource<List<GroupEntity>>> {
         val result = networkBoundResource(
@@ -91,14 +125,7 @@ class HomeRepositoryImpl @Inject constructor(
 
         unsyncedGroups.forEach { group -> postGroup(group.toGroupRequest(authSharedPreferences.getUserId())) }
 
-        curGroupResponse = homeApi.getAllGroup()
-        curGroupResponse?.body()?.let { groups ->
-            dao.deleteAllGroups()
 
-            insertGroups(groups.onEach { group ->
-                group.toGroupEntity()
-            })
-        }
     }
 
     override suspend fun syncWords(groupId: String) {

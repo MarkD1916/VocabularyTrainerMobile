@@ -4,13 +4,16 @@ import com.example.vocabularytrainer.data.remote.home.remote.request.GroupReques
 import com.example.vocabularytrainer.data.remote.home.remote.response.GroupResponse
 import com.example.vocabularytrainer.data.remote.home.remote.response.SimpleResponse
 import com.example.vocabularytrainer.data.remote.home.remote.response.WordResponse
+import io.reactivex.rxjava3.core.Observable
+import io.reactivex.rxjava3.core.Single
 import retrofit2.Response
 import retrofit2.http.*
+import java.util.*
 
 interface HomeApi {
     // Group request
     @GET("mobile_api/group/get")
-    suspend fun getAllGroup(): Response<List<GroupResponse>>
+    fun getAllGroup(): Single<Response<List<GroupResponse>>>
 
     @DELETE("/mobile_api/group/delete/{id}/")
     suspend fun deleteGroup(

@@ -5,6 +5,7 @@ import com.example.vocabularytrainer.data.local.home.entity.GroupEntity
 import com.example.vocabularytrainer.data.local.home.entity.LocallyDeletedGroupID
 import com.example.vocabularytrainer.data.local.home.entity.WordEntity
 import com.example.vocabularytrainer.data.local.home.entity.relations.GroupWithWords
+import io.reactivex.rxjava3.core.Completable
 import kotlinx.coroutines.flow.Flow
 import retrofit2.http.DELETE
 
@@ -13,7 +14,7 @@ interface VocabularyDao {
 
     //Group QUERY
     @Insert(onConflict = OnConflictStrategy.REPLACE)
-    suspend fun insertGroup(group: GroupEntity)
+    fun insertGroup(group: GroupEntity)
 
     @Query("SELECT * FROM GroupTable ORDER BY name DESC")
     fun selectAllGroups(): Flow<List<GroupEntity>>
@@ -34,7 +35,7 @@ interface VocabularyDao {
     suspend fun getAllUnsyncedGroups(): List<GroupEntity>
 
     @Query("DELETE FROM grouptable")
-    suspend fun deleteAllGroups()
+    fun deleteAllGroups(): Completable
 
     @Query("SELECT MAX(groupId) FROM grouptable")
     suspend fun getMaxGroupId(): String

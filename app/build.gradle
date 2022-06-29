@@ -180,6 +180,9 @@ dependencies {
 
     implementation "org.jetbrains.kotlin:kotlin-stdlib-jdk8"
     implementation "io.reactivex.rxjava3:rxkotlin:3.0.0"
+    implementation 'com.squareup.retrofit2:adapter-rxjava3:2.9.0'
+
+    implementation "androidx.room:room-rxjava3:$room_version"
 
 
     implementation 'androidx.preference:preference:1.2.0'
