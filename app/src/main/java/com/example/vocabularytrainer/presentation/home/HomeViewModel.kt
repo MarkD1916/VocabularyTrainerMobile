@@ -81,7 +81,7 @@ class HomeViewModel @Inject constructor(
                     screenState = event.loadingType
                 )
                 getAllGroup?.cancel()
-                homeRepository.testFun()
+
                 getAllGroup = homeUseCases.getAllGroup.execute()
                     .map { it ->
                         val data = it.data

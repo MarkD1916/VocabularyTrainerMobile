@@ -27,6 +27,7 @@ import io.reactivex.rxjava3.core.Completable
 import io.reactivex.rxjava3.core.Observable
 import io.reactivex.rxjava3.core.Single
 import io.reactivex.rxjava3.disposables.CompositeDisposable
+import io.reactivex.rxjava3.kotlin.addTo
 import io.reactivex.rxjava3.kotlin.subscribeBy
 import io.reactivex.rxjava3.schedulers.Schedulers
 import kotlinx.coroutines.flow.Flow
@@ -48,37 +49,7 @@ class HomeRepositoryImpl @Inject constructor(
     override suspend fun syncGroupsAndWords() {
         syncGroups()
     }
-    @RequiresApi(Build.VERSION_CODES.O)
-    fun testFun(){
-//        val disposables = CompositeDisposable()
 
-        homeApi.getAllGroup()
-            .observeOn(Schedulers.io())
-            .subscribeBy(
-                onSuccess = {
-                    Log.d("LOL2", "syncGroups: ")
-                    curGroupResponse = it
-                    it?.body()?.let {
-                        dao.deleteAllGroups()
-                        it.onEach { group ->
-                            if (group.name == MAIN_GROUP_NAME) {
-                                homeSharedPreferences.setAllGroupId(group.id)
-                            }
-                            Log.d("LOL2", "syncGroups: ")
-                            dao.insertGroup(group.toGroupEntity())
-                        }
-                    }
-                },
-                onError = {
-                    Log.d("LOL2", "error: ")
-                }
-            )
-
-//        disposables.add(observer)
-
-
-//        disposables.dispose()
-    }
     @RequiresApi(Build.VERSION_CODES.O)
     override fun getAllGroupFromServer(): Flow<Resource<List<GroupEntity>>> {
         val result = networkBoundResource(
@@ -125,7 +96,25 @@ class HomeRepositoryImpl @Inject constructor(
 
         unsyncedGroups.forEach { group -> postGroup(group.toGroupRequest(authSharedPreferences.getUserId())) }
 
-
+        val disposables = CompositeDisposable()
+        homeApi.getAllGroup()
+            .observeOn(Schedulers.io())
+            .subscribeBy(
+                onSuccess = {
+                    curGroupResponse = it
+                    it?.body()?.let {
+                        dao.deleteAllGroups()
+                        it.onEach { group ->
+                            if (group.name == MAIN_GROUP_NAME) {
+                                homeSharedPreferences.setAllGroupId(group.id)
+                            }
+                            dao.insertGroup(group.toGroupEntity())
+                        }
+                    }
+                },
+                onError = {
+                }
+            ).addTo(disposables)
     }
 
     override suspend fun syncWords(groupId: String) {
