@@ -174,7 +174,6 @@ fun HomeScreen(
                 .padding(bottom = 30.dp)
         ) {
             items(state.group, key = { it.id }) { item ->
-                Log.d("LOL", "HomeScreen: ${item.state}")
                 when (item.state) {
                     is Resource.NoAction -> {
                         visible = true

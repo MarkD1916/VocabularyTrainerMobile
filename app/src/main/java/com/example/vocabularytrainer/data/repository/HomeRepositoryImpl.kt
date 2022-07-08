@@ -1,12 +1,12 @@
 package com.example.vocabularytrainer.data.repository
 
 import android.os.Build
-import android.util.Log
 import androidx.annotation.RequiresApi
 import com.androiddevs.ktornoteapp.data.remote.interceptors.Variables
 import com.example.vocabularytrainer.data.local.home.dao.VocabularyDao
 import com.example.vocabularytrainer.data.local.home.entity.GroupEntity
 import com.example.vocabularytrainer.data.local.home.entity.LocallyDeletedGroupID
+import com.example.vocabularytrainer.data.local.home.entity.WordEntity
 import com.example.vocabularytrainer.data.local.home.entity.relations.GroupWithWords
 import com.example.vocabularytrainer.data.mapper.home.toGroupEntity
 import com.example.vocabularytrainer.data.mapper.home.toGroupRequest
@@ -97,7 +97,11 @@ class HomeRepositoryImpl @Inject constructor(
         }
     }
 
-    override suspend fun syncWords(groupId: String) {
+    override fun getAllWords(): Flow<List<WordEntity>> {
+        return dao.getAllWords()
+    }
+
+    override suspend fun syncWordsByGroup(groupId: String) {
         if (Variables.isNetworkConnected) {
             val unsyncedWords = dao.getAllUnsyncedWords()
 
@@ -144,6 +148,9 @@ class HomeRepositoryImpl @Inject constructor(
     override suspend fun insertGroups(groups: List<GroupResponse>) {
         groups.forEach {
             val groupEntity = it.toGroupEntity()
+            if(groupEntity.name == MAIN_GROUP_NAME) {
+                homeSharedPreferences.setAllGroupId(groupEntity.id)
+            }
             dao.insertGroup(groupEntity)
         }
     }
@@ -154,13 +161,13 @@ class HomeRepositoryImpl @Inject constructor(
         }
     }
 
-    override fun getAllWordsByGroupFromServer(groupId: String): Flow<Resource<List<GroupWithWords>>> {
+    override fun getWordsByGroupFromServer(groupId: String): Flow<Resource<List<GroupWithWords>>> {
         val result = networkBoundResource(
             query = {
                 dao.getGroupWithWords(groupId)
             },
             fetch = {
-                syncWords(groupId)
+                syncWordsByGroup(groupId)
                 curWordResponse
             },
             saveFetchResult = { response ->

@@ -29,9 +29,11 @@ interface HomeRepository {
     suspend fun deleteLocallyDeletedGroupID(deletedGroupID: String)
 
     //Work with WORDS
-    fun getAllWordsByGroupFromServer(groupId: String): Flow<Resource<List<GroupWithWords>>>
+    fun getWordsByGroupFromServer(groupId: String): Flow<Resource<List<GroupWithWords>>>
 
-    suspend fun syncWords(groupId: String)
+    suspend fun syncWordsByGroup(groupId: String)
+
+    fun getAllWords(): Flow<List<WordEntity>>
 
 //    suspend fun getAllWordsByGroupFromBD(): List<Group>
 }

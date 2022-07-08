@@ -36,15 +36,7 @@ fun DetailGroupScreen(
         viewModel.onDetailGroupEvent(DetailGroupEvent.GetAllWordsByGroup)
     }
 
-    BackHandler {
-        state.groupId = ""
-        state.words = listOf()
-        onNavigate(
-            UiEvent.Navigate(
-                Route.HOME
-            )
-        )
-    }
+
 
     LazyColumn {
         items(state.words, key = { it.word }) { item ->

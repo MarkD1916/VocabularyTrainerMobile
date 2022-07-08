@@ -43,7 +43,7 @@ object DataModule {
 
     @Provides
     @Named("VocabularyUrl")
-    fun providesBaseUrlAuth(): String = "https://vmakd1916vocabularytrainer.herokuapp.com"
+    fun providesBaseUrlAuth(): String = "http://10.0.2.2:8000/"
 
 
     @Provides

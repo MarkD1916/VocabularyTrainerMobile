@@ -2,6 +2,7 @@ package com.example.vocabularytrainer.domain.di
 
 import com.example.vocabularytrainer.data.preferences.AuthPreferenceImpl
 import com.example.vocabularytrainer.domain.auth.use_case.*
+import com.example.vocabularytrainer.domain.detail_group.use_case.GetAllWords
 import com.example.vocabularytrainer.domain.detail_group.use_case.GetWordsByGroup
 import com.example.vocabularytrainer.domain.detail_group.use_case.GroupDetailUseCase
 import com.example.vocabularytrainer.domain.home.use_case.*
@@ -53,7 +54,8 @@ object DomainModule {
         repository: HomeRepository
     ): GroupDetailUseCase {
         return GroupDetailUseCase(
-            getWordsByGroup = GetWordsByGroup(repository)
+            getWordsByGroup = GetWordsByGroup(repository),
+            getAllWords = GetAllWords(repository)
         )
     }
 
