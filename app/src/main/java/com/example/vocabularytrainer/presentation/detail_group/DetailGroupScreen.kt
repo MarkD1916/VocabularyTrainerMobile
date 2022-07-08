@@ -13,6 +13,7 @@ import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
+import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.vocabularytrainer.navigation.Route
 import com.example.vocabularytrainer.presentation.home.LoadingType
 import com.example.vocabularytrainer.presentation.home.components.GroupItem
@@ -23,7 +24,7 @@ import com.vmakd1916gmail.com.core.util.UiEvent
 fun DetailGroupScreen(
     groupId: String,
     onNavigate: (UiEvent.Navigate) -> Unit,
-    viewModel: DetailGroupViewModel,
+    viewModel: DetailGroupViewModel = hiltViewModel(),
     changeFabPosition: () -> Unit
 ) {
     val state = viewModel.state

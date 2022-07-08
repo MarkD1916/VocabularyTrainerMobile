@@ -1,6 +1,7 @@
 package com.example.vocabularytrainer.presentation.home
 
 import android.os.Build
+import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -37,7 +38,7 @@ class HomeViewModel @Inject constructor(
     private val _uiEvent = Channel<UiEvent>()
     var uiEvent: Flow<UiEvent>? = _uiEvent.receiveAsFlow()
 
-    val mainGroupId = homePreference.getAllGroupId()
+    val mainGroupId by mutableStateOf(homePreference.getAllGroupId())
     private var getAllGroup: Job? = null
     private var syncWords: Job? = null
 
@@ -45,15 +46,12 @@ class HomeViewModel @Inject constructor(
 
     val id by mutableStateOf(authPreference.getUserId())
 
-    var isOpen by mutableStateOf(false)
+
 
     val isRefreshing: StateFlow<Boolean>
         get() = _isRefreshing.asStateFlow()
 
     init {
-        HomeEvent.GetAllGroup.loadingType = LoadingType.FullScreenLoading()
-        onHomeEvent(HomeEvent.GetAllGroup)
-
     }
 
     fun onEvent(event: AuthEvent) {
@@ -79,6 +77,7 @@ class HomeViewModel @Inject constructor(
                 getAllGroup = homeUseCases.getAllGroup.execute()
                     .map { it ->
                         val data = it.data
+
                         data?.map {
                             homeUseCases.syncWords.execute(it.id)
                             it.toGroupSuccess()
@@ -115,7 +114,7 @@ class HomeViewModel @Inject constructor(
             }
 
             is HomeEvent.PostNewGroup -> {
-                state = state.copy(fabState = event.loadingType)
+
                 viewModelScope.launch(Dispatchers.IO) {
                     homeUseCases.addGroup.execute(event.group)
                     var list = state.group

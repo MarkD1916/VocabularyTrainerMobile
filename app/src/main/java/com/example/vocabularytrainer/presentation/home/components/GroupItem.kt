@@ -29,7 +29,7 @@ fun GroupItem(
     onToggleClick: () -> Unit,
     isSync: Boolean,
     isExpanded: Boolean,
-    isMainGroup: Boolean = true,
+    isMainGroup: Boolean = false,
     content: @Composable () -> Unit,
 ) {
     Card(

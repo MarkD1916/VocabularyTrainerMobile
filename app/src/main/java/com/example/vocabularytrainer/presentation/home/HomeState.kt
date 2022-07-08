@@ -13,8 +13,6 @@ data class HomeState(
 
     var screenState: Resource<*>? = null,
 
-    var fabState: Resource<*>? = Resource.NoAction(null),
-
     var newGroupName: String = ""
 ) {
 

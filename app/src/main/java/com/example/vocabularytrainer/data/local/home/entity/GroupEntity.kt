@@ -10,8 +10,7 @@ data class GroupEntity(
     @ColumnInfo(name = "groupId")
     @PrimaryKey(autoGenerate = false) val id: String = UUID.randomUUID().toString(),
     val name: String,
-    var isSync: Boolean,
-    val date: Long
+    var isSync: Boolean
 ){
 
 }

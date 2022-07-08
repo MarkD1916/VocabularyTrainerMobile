@@ -7,6 +7,5 @@ data class Group(
     val name: String,
     val isSync: Boolean,
     val state: Resource<*>,
-    val date: Long,
     val isExpanded: Boolean = false
 )

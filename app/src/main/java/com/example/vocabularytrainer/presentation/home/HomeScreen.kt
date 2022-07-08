@@ -5,14 +5,18 @@ import android.os.Build
 import android.util.Log
 import androidx.activity.compose.BackHandler
 import androidx.annotation.RequiresApi
+import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.Crossfade
 import androidx.compose.animation.core.tween
+import androidx.compose.animation.scaleIn
+import androidx.compose.animation.scaleOut
 import androidx.compose.foundation.ExperimentalFoundationApi
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
+import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
@@ -26,13 +30,16 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.vocabularytrainer.MainActivity
 import com.example.vocabularytrainer.R
 import com.example.vocabularytrainer.domain.home.model.Group
 import com.example.vocabularytrainer.navigation.Route
+import com.example.vocabularytrainer.presentation.MainActivityViewModel
 import com.example.vocabularytrainer.presentation.components.LoadAnimation
 import com.example.vocabularytrainer.presentation.components.LoadingAnimationType
 import com.example.vocabularytrainer.presentation.home.components.FabLoadingAnimation
 import com.example.vocabularytrainer.presentation.home.components.GroupItem
+import com.example.vocabularytrainer.util.Constants
 import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import com.vmakd1916gmail.com.core.util.UiEvent
@@ -44,24 +51,26 @@ import java.time.ZoneOffset
 import java.util.*
 
 @RequiresApi(Build.VERSION_CODES.O)
-@SuppressLint("UnrememberedMutableState")
-@OptIn(ExperimentalFoundationApi::class)
+@SuppressLint("UnrememberedMutableState", "CoroutineCreationDuringComposition")
+@OptIn(ExperimentalFoundationApi::class, androidx.compose.animation.ExperimentalAnimationApi::class)
 @Composable
 fun HomeScreen(
     onNavigate: (UiEvent.Navigate) -> Unit,
-    viewModel: HomeViewModel,
+    viewModel: HomeViewModel = hiltViewModel(),
+    mainActivityViewModel: MainActivityViewModel,
     showBars: () -> Unit
 ) {
     showBars()
     val context = LocalContext.current
 
-
+    val scrollState = rememberLazyListState()
     val state = viewModel.state
-
+    val scope = rememberCoroutineScope()
 
 
     LaunchedEffect(key1 = context) {
-
+        HomeEvent.GetAllGroup.loadingType = LoadingType.FullScreenLoading()
+        viewModel.onHomeEvent(HomeEvent.GetAllGroup)
         viewModel.uiEvent?.collectIndexed { index, event ->
             when (event) {
                 is UiEvent.Navigate -> onNavigate(event)
@@ -78,12 +87,11 @@ fun HomeScreen(
     var visible by remember { mutableStateOf(false) }
     val isRefreshing by viewModel.isRefreshing.collectAsState()
 
-    if (viewModel.isOpen) {
-
+    if (mainActivityViewModel.isOpen) {
         AlertDialog(
             onDismissRequest = {
 
-                viewModel.isOpen = false
+                mainActivityViewModel.isOpen = false
             },
             title = {
                 Text("Create new group")
@@ -105,16 +113,14 @@ fun HomeScreen(
             confirmButton = {
                 Button(
                     onClick = {
-
-                        viewModel.isOpen = false
+                        mainActivityViewModel.isOpen = false
                         viewModel.onHomeEvent(
                             HomeEvent.PostNewGroup(
                                 Group(
                                     id = UUID.randomUUID().toString(),
                                     name = state.newGroupName,
                                     isSync = false,
-                                    state = Resource.NoAction(null),
-                                    date = LocalDateTime.now().toEpochSecond(ZoneOffset.UTC)
+                                    state = Resource.NoAction(null)
                                 )
                             )
                         )
@@ -125,7 +131,7 @@ fun HomeScreen(
             dismissButton = {
                 Button(
                     onClick = {
-                        viewModel.isOpen = false
+                        mainActivityViewModel.isOpen = false
                     }) {
                     Text("Cancel")
                 }
@@ -155,14 +161,20 @@ fun HomeScreen(
                 }
             }
         }
+        AnimatedVisibility(
+            visible = state.screenState !is LoadingType.FullScreenLoading,
+            enter = scaleIn(),
+            exit = scaleOut(),
+        ) {
 
         LazyColumn(
+            state = scrollState,
             modifier = Modifier
                 .fillMaxSize()
                 .padding(bottom = 30.dp)
         ) {
-
-            items(state.group.distinct(), key = { it.name }) { item ->
+            items(state.group, key = { it.id }) { item ->
+                Log.d("LOL", "HomeScreen: ${item.state}")
                 when (item.state) {
                     is Resource.NoAction -> {
                         visible = true
@@ -191,7 +203,7 @@ fun HomeScreen(
                             onToggleClick = {
                                 viewModel.onHomeEvent(HomeEvent.OnToggleGroupClick(item.id))
                             },
-                            isMainGroup = item.id == viewModel.mainGroupId
+                            isMainGroup = item.name == Constants.MAIN_GROUP_NAME
                         )
                     }
 
@@ -271,7 +283,7 @@ fun HomeScreen(
                             onToggleClick = {
                                 viewModel.onHomeEvent(HomeEvent.OnToggleGroupClick(item.id))
                             },
-                            isMainGroup = item.id == viewModel.mainGroupId
+                            isMainGroup = item.name == Constants.MAIN_GROUP_NAME
                         )
                     }
 
@@ -287,6 +299,7 @@ fun HomeScreen(
                             onDelete = {},
                             isSync = item.isSync,
                             isExpanded = item.isExpanded,
+                            isMainGroup = item.name == Constants.MAIN_GROUP_NAME,
                             content = {
                                 Column(
                                     modifier = Modifier
@@ -313,6 +326,7 @@ fun HomeScreen(
                             onDelete = {},
                             isSync = item.isSync,
                             isExpanded = item.isExpanded,
+                            isMainGroup = item.name == Constants.MAIN_GROUP_NAME,
                             content = {
                                 Column(
                                     modifier = Modifier
@@ -328,6 +342,7 @@ fun HomeScreen(
                     }
                 }
             }
+        }
 //            item {
 //                FabLoadingAnimation(percentage = 0.9f)
 //            }

@@ -11,6 +11,19 @@ class AuthPreferenceImpl(
     private val prefs: SharedPreferences
 ) : AuthPreferences {
 
+    override fun clearStoredData() {
+        prefs.apply {
+            edit().apply{
+                putString(KEY_LOGGED_IN_EMAIL, "")
+                putString(KEY_PASSWORD, "")
+                putString(KEY_TOKEN, "")
+                putString(KEY_USER_ID, "")
+                apply()
+            }
+        }
+
+    }
+
     override fun getStoredEmail(): String {
         return prefs.getString(KEY_LOGGED_IN_EMAIL, "")!!
     }

@@ -20,6 +20,8 @@ import androidx.compose.runtime.*
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
 import androidx.compose.ui.input.pointer.pointerInteropFilter
+import androidx.compose.ui.platform.LocalContext
+import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -29,6 +31,7 @@ import androidx.navigation.navArgument
 import com.example.vocabularytrainer.data.preferences.AuthPreferenceImpl
 import com.example.vocabularytrainer.extantions.navigateEvent
 import com.example.vocabularytrainer.navigation.Route
+import com.example.vocabularytrainer.presentation.MainActivityViewModel
 import com.example.vocabularytrainer.presentation.auth.AuthScreen
 import com.example.vocabularytrainer.presentation.auth.RegisterScreen
 import com.example.vocabularytrainer.presentation.auth.login.LoginEvent
@@ -46,23 +49,27 @@ import com.example.vocabularytrainer.ui.theme.VocabularyTrainerTheme
 import com.vmakd1916gmail.com.core.util.UiEvent
 
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.flow.collectIndexed
+import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 
 @AndroidEntryPoint
 class MainActivity : ComponentActivity() {
-    private val viewModel: HomeViewModel by viewModels()
-    private val groupDetailViewModel: DetailGroupViewModel by viewModels()
-
 
     @Inject
     lateinit var authPreference: AuthPreferenceImpl
+
+    val viewModel: MainActivityViewModel by viewModels()
 
     @RequiresApi(Build.VERSION_CODES.O)
     @SuppressLint("UnusedMaterialScaffoldPaddingParameter")
     @OptIn(ExperimentalAnimationApi::class, androidx.compose.ui.ExperimentalComposeUiApi::class)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
+
+
 
         setContent {
             VocabularyTrainerTheme {
@@ -79,8 +86,25 @@ class MainActivity : ComponentActivity() {
                     mutableStateOf(false)
                 }
                 val currentRoute by navController.currentBackStackEntryAsState()
+                val context = LocalContext.current
 
 
+                LaunchedEffect(key1 = context) {
+                    viewModel.uiEvent?.collect { event ->
+
+                        when (event) {
+                            is UiEvent.Navigate -> {
+                                navController.navigateEvent(
+                                    UiEvent.Navigate(
+                                        Route.WELCOME
+                                    )
+                                )
+                            }
+                            else -> Unit
+                        }
+
+                    }
+                }
                 Scaffold(
                     scaffoldState = scaffoldState,
                     bottomBar = {
@@ -122,7 +146,7 @@ class MainActivity : ComponentActivity() {
                         }
                     },
                     floatingActionButton = {
-                        val fabState = viewModel.state.fabState
+
                         var selected by remember { mutableStateOf(false) }
                         var finished by remember { mutableStateOf(false) }
                         var open by remember { mutableStateOf(false) }
@@ -134,7 +158,7 @@ class MainActivity : ComponentActivity() {
                                         viewModel.isOpen = true
                                     }
                                     Route.DETAIL_GROUP -> {
-                                        groupDetailViewModel.isOpen = true
+
                                     }
                                 }
 
@@ -173,27 +197,18 @@ class MainActivity : ComponentActivity() {
                                     },
                                 onClick = {}
                             ) {
-                                when (fabState) {
-                                    is LoadingType.FabLoading -> {
-                                        Icon(
-                                            imageVector = Icons.Default.Add,
-                                            contentDescription = "Add group"
-                                        )
-                                    }
-                                    else -> {
-                                        Icon(
-                                            imageVector = Icons.Default.Add,
-                                            contentDescription = "Add group"
-                                        )
-                                    }
-                                }
+
+                                Icon(
+                                    imageVector = Icons.Default.Add,
+                                    contentDescription = "Add group"
+                                )
                             }
                         }
                     },
 
                     isFloatingActionButtonDocked = true,
 
-                    floatingActionButtonPosition =when (currentRoute?.destination?.route) {
+                    floatingActionButtonPosition = when (currentRoute?.destination?.route) {
                         "detail_group/{groupId}" -> {
                             FabPosition.Center
                         }
@@ -250,12 +265,6 @@ class MainActivity : ComponentActivity() {
                                             scaffoldState.drawerState.close()
                                         }
                                         viewModel.onEvent(LoginEvent.LogOut)
-                                        navController.navigateEvent(
-                                            UiEvent.Navigate(
-                                                Route.WELCOME
-                                            )
-                                        )
-
                                     }
 
                                 }
@@ -298,7 +307,7 @@ class MainActivity : ComponentActivity() {
                                 showAppBar.value = true
                                 HomeScreen(
                                     onNavigate = navController::navigateEvent,
-                                    viewModel
+                                    mainActivityViewModel = viewModel
                                 ) {
                                 }
 
@@ -317,16 +326,13 @@ class MainActivity : ComponentActivity() {
                                 DetailGroupViewModel.groupId = groupId
                                 DetailGroupScreen(
                                     groupId = groupId,
-                                    onNavigate = navController::navigateEvent,
-                                    viewModel = groupDetailViewModel
-                                ){
+                                    onNavigate = navController::navigateEvent
+                                ) {
 
 
                                 }
                                 showBottomBar.value = false
                                 showFabButton.value = true
-
-
                             }
                         }
                     }

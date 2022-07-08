@@ -15,7 +15,7 @@ interface VocabularyDao {
     @Insert(onConflict = OnConflictStrategy.REPLACE)
     suspend fun insertGroup(group: GroupEntity)
 
-    @Query("SELECT * FROM GroupTable ORDER BY name DESC")
+    @Query("SELECT * FROM GroupTable")
     fun selectAllGroups(): Flow<List<GroupEntity>>
 
     @Query("DELETE FROM GroupTable WHERE groupId = :groupId")

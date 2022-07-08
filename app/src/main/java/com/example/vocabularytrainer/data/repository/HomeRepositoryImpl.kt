@@ -1,6 +1,7 @@
 package com.example.vocabularytrainer.data.repository
 
 import android.os.Build
+import android.util.Log
 import androidx.annotation.RequiresApi
 import com.androiddevs.ktornoteapp.data.remote.interceptors.Variables
 import com.example.vocabularytrainer.data.local.home.dao.VocabularyDao
@@ -142,10 +143,8 @@ class HomeRepositoryImpl @Inject constructor(
     @RequiresApi(Build.VERSION_CODES.O)
     override suspend fun insertGroups(groups: List<GroupResponse>) {
         groups.forEach {
-            if (it.name == MAIN_GROUP_NAME) {
-                homeSharedPreferences.setAllGroupId(it.id)
-            }
-            dao.insertGroup(it.toGroupEntity())
+            val groupEntity = it.toGroupEntity()
+            dao.insertGroup(groupEntity)
         }
     }
 

@@ -16,4 +16,6 @@ interface AuthPreferences {
     fun getUserId(): String
 
     fun setUserId(id: String)
+
+    fun clearStoredData()
 }
