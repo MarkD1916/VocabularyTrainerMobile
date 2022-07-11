@@ -99,7 +99,7 @@ class HomeViewModel @Inject constructor(
             is HomeEvent.DeleteGroup -> {
                 state = state.copy(
                     group = state.group.map {
-                        if (it.id == event.id && !Variables.isNetworkConnected) {
+                        if (it.id == event.id) {
                             it.copy(state = event.loadingType)
                         } else it
                     }

@@ -1,5 +1,6 @@
 package com.example.vocabularytrainer.presentation.home
 
+import com.androiddevs.ktornoteapp.data.remote.interceptors.Variables
 import com.example.vocabularytrainer.domain.home.model.Group
 
 
@@ -34,7 +35,7 @@ sealed class HomeEvent {
     data class DeleteGroup(
         val id: String
     ) : HomeEvent() {
-        var loadingType: LoadingType<Group> = LoadingType.ElementLoading()
+        var loadingType: LoadingType<Group> = if (!Variables.isNetworkConnected) LoadingType.LoadingFromDB() else  LoadingType.ElementLoading()
     }
 
     data class Action1(val index: Int) : HomeEvent()
