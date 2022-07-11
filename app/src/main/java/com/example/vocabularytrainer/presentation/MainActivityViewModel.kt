@@ -38,6 +38,7 @@ class MainActivityViewModel @Inject constructor(
     val id by mutableStateOf(authPreference.getUserId())
 
     var isOpen by mutableStateOf(false)
+    var changeState by mutableStateOf(false)
 
     fun onEvent(event: AuthEvent) {
         when (event) {

@@ -12,6 +12,7 @@ import com.example.vocabularytrainer.domain.detail_group.use_case.GroupDetailUse
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.Job
+import kotlinx.coroutines.delay
 import kotlinx.coroutines.flow.*
 import javax.inject.Inject
 

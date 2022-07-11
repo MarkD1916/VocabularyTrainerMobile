@@ -11,16 +11,21 @@ import androidx.annotation.RequiresApi
 import androidx.compose.animation.*
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
+import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.CornerSize
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.runtime.*
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.scale
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.input.pointer.pointerInteropFilter
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.unit.dp
 import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
@@ -35,6 +40,9 @@ import com.example.vocabularytrainer.presentation.MainActivityViewModel
 import com.example.vocabularytrainer.presentation.auth.AuthScreen
 import com.example.vocabularytrainer.presentation.auth.RegisterScreen
 import com.example.vocabularytrainer.presentation.auth.login.LoginEvent
+import com.example.vocabularytrainer.presentation.components.Fab
+import com.example.vocabularytrainer.presentation.components.MultiFab
+import com.example.vocabularytrainer.presentation.components.MultiFabState
 import com.example.vocabularytrainer.presentation.detail_group.DetailGroupScreen
 import com.example.vocabularytrainer.presentation.detail_group.DetailGroupViewModel
 import com.example.vocabularytrainer.presentation.home.HomeScreen
@@ -76,15 +84,7 @@ class MainActivity : ComponentActivity() {
                 val navController = rememberNavController()
                 val scaffoldState = rememberScaffoldState()
                 val scope = rememberCoroutineScope()
-                val showBottomBar = remember {
-                    mutableStateOf(false)
-                }
-                val showAppBar = remember {
-                    mutableStateOf(false)
-                }
-                val showFabButton = remember {
-                    mutableStateOf(false)
-                }
+
                 val currentRoute by navController.currentBackStackEntryAsState()
                 val context = LocalContext.current
 
@@ -108,125 +108,121 @@ class MainActivity : ComponentActivity() {
                 Scaffold(
                     scaffoldState = scaffoldState,
                     bottomBar = {
-                        AnimatedVisibility(
-                            visible = showBottomBar.value,
-                            enter = scaleIn(),
-                            exit = scaleOut(),
+                        BottomAppBar(
+//                                cutoutShape = MaterialTheme.shapes.small.copy(
+//                                    CornerSize(percent = 50)
+//                                )
                         ) {
-                            BottomAppBar(
-                                cutoutShape = MaterialTheme.shapes.small.copy(
-                                    CornerSize(percent = 50)
-                                )
-                            ) {
-                                BottomNavigationItem(
-                                    icon = {
-                                        Icon(Icons.Default.Home, "")
-                                    },
-                                    label = { Text(text = "Save") },
-                                    selected = true,
-                                    onClick = {
-                                    },
-                                    alwaysShowLabel = false
-                                )
+                            BottomNavigationItem(
+                                icon = {
+                                    Icon(Icons.Default.Home, "")
+                                },
+                                label = { Text(text = "Save") },
+                                selected = true,
+                                onClick = {
+                                },
+                                alwaysShowLabel = false
+                            )
 
-                                BottomNavigationItem(
-                                    icon = {
-                                        Icon(Icons.Default.List, "")
-                                    },
+                            BottomNavigationItem(
+                                icon = {
+                                    Icon(Icons.Default.List, "")
+                                },
 
 
-                                    label = { Text(text = "Upload") },
-                                    selected = false,//selectedItem.value == "upload",
-                                    onClick = {
+                                label = { Text(text = "Upload") },
+                                selected = false,//selectedItem.value == "upload",
+                                onClick = {
 
-                                    },
-                                    alwaysShowLabel = false
-                                )
-                            }
+                                },
+                                alwaysShowLabel = false
+                            )
                         }
                     },
                     floatingActionButton = {
+                        var toState by remember { mutableStateOf(MultiFabState.COLLAPSED) }
 
-                        var selected by remember { mutableStateOf(false) }
-                        var finished by remember { mutableStateOf(false) }
-                        var open by remember { mutableStateOf(false) }
-                        val flashFinished: (Float) -> Unit = {
-                            finished = true
-                            if (finished && !selected) {
-                                when (currentRoute?.destination?.route) {
-                                    Route.HOME -> {
-                                        viewModel.isOpen = true
-                                    }
-                                    Route.DETAIL_GROUP -> {
-
-                                    }
+                        currentRoute?.destination?.route?.let {
+                            when (it) {
+                                Route.HOME -> {
+                                    Fab(
+                                        currentRoute,
+                                        viewModel
+                                    )
                                 }
 
-                            }
-                        }
-                        val scale = animateFloatAsState(
-                            if (selected) 0.8f else 1.0f,
-                            tween(durationMillis = 150),
-                            finishedListener = flashFinished
-                        )
-                        val selectedItem = remember { mutableStateOf("home") }
-
-                        AnimatedVisibility(
-                            visible = showFabButton.value,
-                            enter = scaleIn(),
-                            exit = scaleOut(),
-                        ) {
-                            FloatingActionButton(
-                                modifier = Modifier
-                                    .scale(scale.value)
-                                    .pointerInteropFilter {
-                                        selected = when (it.action) {
-                                            MotionEvent.ACTION_UP -> {
-                                                false
-
-                                            }
-                                            MotionEvent.ACTION_DOWN -> {
-                                                true
-                                            }
-                                            else -> {
-                                                false
-                                            }
+                                else -> {
+                                    MultiFab(
+                                        currentRoute,
+                                        viewModel,
+                                        toState,
+                                        stateChanged = { state ->
+                                            toState = state
                                         }
+                                    ) {
+                                        Column(
+                                            modifier = Modifier.padding(end = 10.dp),
+                                            horizontalAlignment = Alignment.CenterHorizontally
+                                        ) {
+                                            OutlinedButton(
+                                                onClick = { /*TODO*/ },
+                                                modifier = Modifier.size(50.dp),  //avoid the oval shape
+                                                shape = CircleShape,
+                                                border = BorderStroke(
+                                                    1.dp,
+                                                    MaterialTheme.colors.primary
+                                                ),
+                                                contentPadding = PaddingValues(0.dp),  //avoid the little icon
+                                                colors = ButtonDefaults.outlinedButtonColors(
+                                                    contentColor = MaterialTheme.colors.primary
+                                                )
+                                            ) {
+                                                Icon(
+                                                    Icons.Default.Add,
+                                                    contentDescription = "content description"
+                                                )
+                                            }
+                                            Spacer(modifier = Modifier.height(15.dp))
+                                            OutlinedButton(
+                                                onClick = { /*TODO*/ },
+                                                modifier = Modifier.size(50.dp),  //avoid the oval shape
+                                                shape = CircleShape,
+                                                border = BorderStroke(
+                                                    1.dp,
+                                                    MaterialTheme.colors.primary
+                                                ),
+                                                contentPadding = PaddingValues(0.dp),  //avoid the little icon
+                                                colors = ButtonDefaults.outlinedButtonColors(
+                                                    contentColor = MaterialTheme.colors.primary
+                                                )
+                                            ) {
+                                                Icon(
+                                                    Icons.Default.Add,
+                                                    contentDescription = "content description"
+                                                )
+                                            }
+                                            Spacer(modifier = Modifier.height(15.dp))
 
-                                        true
-                                    },
-                                onClick = {}
-                            ) {
-
-                                Icon(
-                                    imageVector = Icons.Default.Add,
-                                    contentDescription = "Add group"
-                                )
+                                        }
+                                    }
+                                }
                             }
                         }
                     },
 
-                    isFloatingActionButtonDocked = true,
+                    isFloatingActionButtonDocked = false,
 
-                    floatingActionButtonPosition = when (currentRoute?.destination?.route) {
-                        "detail_group/{groupId}" -> {
-                            FabPosition.Center
-                        }
-                        Route.HOME -> {
-                            FabPosition.Center
-                        }
-                        else -> FabPosition.Center
-                    },
+                    floatingActionButtonPosition = FabPosition.End,
                     topBar = {
-                        if (showAppBar.value) {
-                            AppBar(
-                                onNavigationIconClick = {
-                                    scope.launch {
-                                        scaffoldState.drawerState.open()
-                                    }
+
+                        AppBar(
+                            onNavigationIconClick = {
+                                scope.launch {
+                                    scaffoldState.drawerState.open()
                                 }
-                            )
-                        }
+                            }
+                        )
+
                     },
                     drawerGesturesEnabled = scaffoldState.drawerState.isOpen,
                     drawerContent = {
@@ -282,29 +278,17 @@ class MainActivity : ComponentActivity() {
                             composable(Route.WELCOME)
                             {
                                 WelcomeScreen(onNavigate = navController::navigateEvent)
-                                showBottomBar.value = false
-                                showFabButton.value = false
-                                showAppBar.value = false
                             }
                             composable(Route.LOGIN)
                             {
                                 AuthScreen(onNavigate = navController::navigateEvent)
-                                showBottomBar.value = false
-                                showFabButton.value = false
-                                showAppBar.value = false
                             }
                             composable(Route.REGISTER)
                             {
                                 RegisterScreen(onNavigate = navController::navigateEvent)
-                                showBottomBar.value = false
-                                showFabButton.value = false
-                                showAppBar.value = false
                             }
                             composable(Route.HOME)
                             {
-                                showBottomBar.value = true
-                                showFabButton.value = true
-                                showAppBar.value = true
                                 HomeScreen(
                                     onNavigate = navController::navigateEvent,
                                     mainActivityViewModel = viewModel
@@ -329,10 +313,7 @@ class MainActivity : ComponentActivity() {
                                     onNavigate = navController::navigateEvent
                                 ) {
 
-
                                 }
-                                showBottomBar.value = false
-                                showFabButton.value = true
                             }
                         }
                     }

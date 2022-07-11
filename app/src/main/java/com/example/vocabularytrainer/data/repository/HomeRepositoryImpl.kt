@@ -130,7 +130,9 @@ class HomeRepositoryImpl @Inject constructor(
             null
         }
         if (response != null && response.isSuccessful) {
-            dao.insertGroup(groupRequest.toGroupEntity().apply { isSync = true })
+            dao.insertGroup(groupRequest.toGroupEntity().apply {
+                isSync = true
+            })
         } else {
             dao.insertGroup(groupRequest.toGroupEntity())
         }

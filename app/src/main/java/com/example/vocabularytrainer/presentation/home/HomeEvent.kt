@@ -28,7 +28,7 @@ sealed class LoadingType<T>(override val data: T? = null) : Resource.Loading<T>(
 
 sealed class HomeEvent {
     object GetAllGroup : HomeEvent() {
-        var loadingType: LoadingType<List<Group>> = LoadingType.FullScreenLoading()
+        var loadingType: LoadingType<List<Group>> = LoadingType.LoadingFromDB()
     }
 
     data class DeleteGroup(
@@ -49,6 +49,8 @@ sealed class HomeEvent {
     data class OnToggleGroupClick(val groupId: String) : HomeEvent()
 
     data class OnDetailGroupClick(val groupId: String) : HomeEvent()
+
+    object ShowFullScreenLoading : HomeEvent()
 
 }
 

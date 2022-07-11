@@ -13,11 +13,11 @@ import com.example.vocabularytrainer.data.mapper.home.toGroupSuccess
 import com.example.vocabularytrainer.data.preferences.AuthPreferenceImpl
 import com.example.vocabularytrainer.data.preferences.HomePreferenceImpl
 import com.example.vocabularytrainer.domain.auth.use_case.AuthUseCases
+import com.example.vocabularytrainer.domain.home.model.Group
 import com.example.vocabularytrainer.domain.home.use_case.HomeUseCases
 import com.example.vocabularytrainer.navigation.Route
 import com.example.vocabularytrainer.presentation.auth.AuthEvent
 import com.example.vocabularytrainer.presentation.auth.login.LoginEvent
-import com.example.vocabularytrainer.util.Constants
 import com.vmakd1916gmail.com.core.util.UiEvent
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.*
@@ -38,21 +38,15 @@ class HomeViewModel @Inject constructor(
     private val _uiEvent = Channel<UiEvent>()
     var uiEvent: Flow<UiEvent>? = _uiEvent.receiveAsFlow()
 
-    val mainGroupId by mutableStateOf(homePreference.getAllGroupId())
-    private var getAllGroup: Job? = null
-    private var syncWords: Job? = null
 
     private val _isRefreshing = MutableStateFlow(false)
 
     val id by mutableStateOf(authPreference.getUserId())
 
-
-
+    var getAllGroup: Job? = null
     val isRefreshing: StateFlow<Boolean>
         get() = _isRefreshing.asStateFlow()
 
-    init {
-    }
 
     fun onEvent(event: AuthEvent) {
         when (event) {
@@ -69,34 +63,43 @@ class HomeViewModel @Inject constructor(
                 state = state.copy(
                     group = state.group.map {
                         it.copy(state = event.loadingType)
-                    },
-                    screenState = event.loadingType
+                    }
                 )
+
                 getAllGroup?.cancel()
-
-                getAllGroup = homeUseCases.getAllGroup.execute()
-                    .map { it ->
-                        val data = it.data
-
-                        data?.map {
-                            homeUseCases.syncWords.execute(it.id)
-                            it.toGroupSuccess()
+                viewModelScope.async {
+                    val jobLoad = async(Dispatchers.Main) {
+                        delay(1000L)
+                        if (event.loadingType is LoadingType.FullScreenLoading) {
+                            onHomeEvent(HomeEvent.ShowFullScreenLoading)
                         }
                     }
-                    .flowOn(Dispatchers.IO)
-                    .onEach { groupList ->
-                        state = state.copy(
-                            group = groupList ?: listOf(),
-                            screenState = null
-                        )
-                    }.launchIn(viewModelScope)
 
+                    getAllGroup = launch {
+                        homeUseCases.getAllGroup.execute()
+                            .map { it ->
+                                val data = it.data
+                                data?.map {
+                                    homeUseCases.syncWords.execute(it.id)
+                                    it.toGroupSuccess()
+                                }
+                            }
+                            .flowOn(Dispatchers.IO)
+                            .collect { groupList ->
+                                jobLoad.cancel()
+                                state = state.copy(
+                                    group = groupList ?: listOf(),
+                                    screenState = null
+                                )
+                            }
+                    }
+                }
             }
 
             is HomeEvent.DeleteGroup -> {
                 state = state.copy(
                     group = state.group.map {
-                        if (it.id == event.id) {
+                        if (it.id == event.id && !Variables.isNetworkConnected) {
                             it.copy(state = event.loadingType)
                         } else it
                     }
@@ -104,9 +107,16 @@ class HomeViewModel @Inject constructor(
                 viewModelScope.launch(Dispatchers.IO) {
                     homeUseCases.deleteGroup.execute(event.id)
                 }
+
             }
 
             is HomeEvent.FabClick -> {
+            }
+
+            is HomeEvent.ShowFullScreenLoading -> {
+                state = state.copy(
+                    screenState = LoadingType.FullScreenLoading(null)
+                )
             }
 
             is HomeEvent.OnNewGroupNameEnter -> {
@@ -123,6 +133,7 @@ class HomeViewModel @Inject constructor(
                         group = list
                     )
                 }
+
             }
 
             is HomeEvent.OnToggleGroupClick -> {

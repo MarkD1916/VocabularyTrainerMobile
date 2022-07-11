@@ -2,20 +2,20 @@ package com.example.vocabularytrainer.presentation.detail_group
 
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.ExperimentalFoundationApi
-import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.vocabularytrainer.navigation.Route
 import com.example.vocabularytrainer.presentation.home.LoadingType
+import com.example.vocabularytrainer.presentation.home.Resource
 import com.example.vocabularytrainer.presentation.home.components.GroupItem
 import com.vmakd1916gmail.com.core.util.UiEvent
 
@@ -38,35 +38,41 @@ fun DetailGroupScreen(
 
 
 
-    LazyColumn {
-        items(state.words, key = { it.word }) { item ->
-            GroupItem(
-                modifier = Modifier
-                    .animateItemPlacement()
-                    .fillMaxWidth()
-                    .padding(vertical = 10.dp),
-                groupName = item.word,
-                visible = true,
-                onDelete = {
+    LazyColumn(modifier = Modifier
+        .fillMaxSize()
+        .padding(bottom = 30.dp)
+        .background(Color.Green)) {
 
-                },
-                isSync = item.isSync,
-                isExpanded = true,
-                content = {
-                    Column(
-                        modifier = Modifier
-                            .fillMaxWidth()
-                    ) {
-                        Row() {
+            items(state.words, key = { it.word }) { item ->
+                GroupItem(
+                    modifier = Modifier
+                        .animateItemPlacement()
+                        .fillMaxWidth()
+                        .padding(vertical = 10.dp),
+                    groupName = item.word,
+                    visible = true,
+                    onDelete = {
 
+                    },
+                    isSync = item.isSync,
+                    isExpanded = true,
+                    content = {
+                        Column(
+                            modifier = Modifier
+                                .fillMaxWidth()
+                        ) {
+                            Row() {
+
+                            }
                         }
-                    }
-                },
-                onToggleClick = {
+                    },
+                    onToggleClick = {
 
-                }
-            )
-        }
+                    }
+                )
+
+    }
+
     }
 
 }
