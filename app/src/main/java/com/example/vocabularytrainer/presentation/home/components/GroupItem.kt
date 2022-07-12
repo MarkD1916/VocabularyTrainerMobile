@@ -36,10 +36,10 @@ fun GroupItem(
         elevation = 10.dp, modifier = modifier
             .padding(horizontal = 25.dp)
     ) {
-        Column(modifier = modifier) {
-            Column(modifier = modifier.clickable {
-                onToggleClick()
-            }) {
+        Column(modifier = modifier.clickable {
+            onToggleClick()
+        }) {
+            Column(modifier = modifier) {
                 Row(
                     modifier = Modifier
                         .fillMaxWidth()

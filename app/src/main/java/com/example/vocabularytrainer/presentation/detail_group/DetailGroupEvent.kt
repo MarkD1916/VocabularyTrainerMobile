@@ -15,4 +15,6 @@ sealed class DetailGroupEvent() {
     object GetAllWordsByMainGroup : DetailGroupEvent() {
         var loadingType: LoadingType<List<Group>> = LoadingType.FullScreenLoading()
     }
+
+    data class  OnToggleClick(val wordId: String): DetailGroupEvent()
 }

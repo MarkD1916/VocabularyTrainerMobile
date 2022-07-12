@@ -3,7 +3,7 @@ package com.example.vocabularytrainer.data.remote.home.remote.api
 import com.example.vocabularytrainer.data.remote.home.remote.request.GroupRequest
 import com.example.vocabularytrainer.data.remote.home.remote.response.GroupResponse
 import com.example.vocabularytrainer.data.remote.home.remote.response.SimpleResponse
-import com.example.vocabularytrainer.data.remote.home.remote.response.WordResponse
+import com.example.vocabularytrainer.data.remote.detail_group.remote.response.WordResponse
 import retrofit2.Response
 import retrofit2.http.*
 

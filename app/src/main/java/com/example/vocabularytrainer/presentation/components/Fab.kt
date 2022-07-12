@@ -69,13 +69,12 @@ fun Fab(
 
 
     FloatingActionButton(
-        modifier = Modifier
+        modifier = Modifier.padding(end = 10.dp)
             .scale(scale.value)
             .pointerInteropFilter {
                 selected = when (it.action) {
                     MotionEvent.ACTION_UP -> {
                         false
-
                     }
                     MotionEvent.ACTION_DOWN -> {
                         true
@@ -84,7 +83,6 @@ fun Fab(
                         false
                     }
                 }
-
                 true
             },
         onClick = {},
@@ -120,7 +118,8 @@ fun MultiFab(
         }
 
         FloatingActionButton(
-            modifier = Modifier.padding(end = 10.dp),
+            modifier = Modifier
+                .padding(end = 10.dp),
             onClick = {
             stateChanged(
                 if (transition.currentState == MultiFabState.EXPANDED) {
@@ -131,8 +130,7 @@ fun MultiFab(
 
             Icon(
                 modifier = Modifier
-                    .rotate(rotation)
-                    .background(Color.Green),
+                    .rotate(rotation),
                 imageVector = Icons.Default.Add,
                 contentDescription = "Add group"
             )

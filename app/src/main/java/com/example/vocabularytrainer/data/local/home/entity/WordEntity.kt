@@ -11,7 +11,7 @@ import java.util.*
             entity = GroupEntity::class,
             parentColumns = ["groupId"],
             childColumns = ["groupId"],
-            onDelete = ForeignKey.CASCADE //<<<<<
+            onDelete = CASCADE //<<<<<
         )
     ])
 data class WordEntity(
@@ -20,5 +20,6 @@ data class WordEntity(
     val word: String,
     val translate: String,
     val group_name: String,
-    val isSync: Boolean
+    val isSync: Boolean,
+    val transcription: String
 )

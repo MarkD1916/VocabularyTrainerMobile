@@ -16,7 +16,7 @@ import com.example.vocabularytrainer.data.preferences.HomePreferenceImpl
 import com.example.vocabularytrainer.data.remote.home.remote.api.HomeApi
 import com.example.vocabularytrainer.data.remote.home.remote.request.GroupRequest
 import com.example.vocabularytrainer.data.remote.home.remote.response.GroupResponse
-import com.example.vocabularytrainer.data.remote.home.remote.response.WordResponse
+import com.example.vocabularytrainer.data.remote.detail_group.remote.response.WordResponse
 import com.example.vocabularytrainer.domain.home.model.Group
 import com.example.vocabularytrainer.domain.repository.HomeRepository
 import com.example.vocabularytrainer.domain.repository.SyncController

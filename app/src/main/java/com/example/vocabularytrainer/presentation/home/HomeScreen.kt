@@ -175,8 +175,8 @@ fun HomeScreen(
                 state = scrollState,
                 modifier = Modifier
                     .fillMaxSize()
-                    .padding(bottom = 30.dp)
-                    .background(Color.Yellow)
+                    .padding(end = 40.dp)
+                    .background(Color.White)
             ) {
                 items(state.group, key = { it.id }) { item ->
                     when (item.state) {

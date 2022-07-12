@@ -67,15 +67,15 @@ class HomeViewModel @Inject constructor(
                 )
 
                 getAllGroup?.cancel()
-                viewModelScope.async {
+                getAllGroup = viewModelScope.async {
                     val jobLoad = async(Dispatchers.Main) {
-                        delay(1000L)
+                        delay(500L)
                         if (event.loadingType is LoadingType.FullScreenLoading) {
                             onHomeEvent(HomeEvent.ShowFullScreenLoading)
                         }
                     }
 
-                    getAllGroup = launch {
+                   launch {
                         homeUseCases.getAllGroup.execute()
                             .map { it ->
                                 val data = it.data

@@ -1,4 +1,4 @@
-package com.example.vocabularytrainer.data.remote.home.remote.response
+package com.example.vocabularytrainer.data.remote.detail_group.remote.response
 
 import com.google.gson.annotations.SerializedName
 
@@ -7,5 +7,6 @@ data class WordResponse(
     @SerializedName("slug")val id: String,
     val word: String,
     val translate: String,
-    val group_name: String
+    val group_name: String,
+    val transcription: String
 )
