@@ -33,7 +33,8 @@ fun GroupEntity.toGroupSuccess(): Group {
 
 fun GroupEntity.toGroupRequest(userId: String): GroupRequest {
     return GroupRequest(
-        group_name = name,
+        id = id,
+        groupName = name,
         date = System.currentTimeMillis(),
         owners = listOf(userId)
     )
@@ -50,7 +51,8 @@ fun Group.toGroupEntity() : GroupEntity {
 
 fun Group.toGroupRequest(userId: String) : GroupRequest {
     return GroupRequest(
-        group_name=name,
+        id = id,
+        groupName=name,
         date = System.currentTimeMillis(),
         owners = listOf(userId)
     )
@@ -58,7 +60,6 @@ fun Group.toGroupRequest(userId: String) : GroupRequest {
 
 @RequiresApi(Build.VERSION_CODES.O)
 fun GroupResponse.toGroupEntity(): GroupEntity {
-
     return GroupEntity(
         id = id,
         name = name,
@@ -69,7 +70,8 @@ fun GroupResponse.toGroupEntity(): GroupEntity {
 @RequiresApi(Build.VERSION_CODES.O)
 fun GroupRequest.toGroupEntity(): GroupEntity {
     return GroupEntity(
-        name = group_name,
+        id = id,
+        name = groupName,
         isSync = false,
     )
 }

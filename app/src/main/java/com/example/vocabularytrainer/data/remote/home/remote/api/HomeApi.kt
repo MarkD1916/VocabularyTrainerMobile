@@ -12,13 +12,13 @@ interface HomeApi {
     @GET("getGroup")
     suspend fun getAllGroup(): Response<List<GroupResponse>>
 
-    @DELETE("/mobile_api/group/delete/{id}/")
+    @DELETE("deleteGroup/{id}")
     suspend fun deleteGroup(
         @Path("id") groupId: String
     ): Response<SimpleResponse>
 
-    @POST("/mobile_api/group/post/")
-    suspend fun postGroup(@Body group: GroupRequest): Response<GroupResponse>
+    @POST("postGroup")
+    suspend fun postGroup(@Body group: GroupRequest): Response<SimpleResponse>
 
     //Word request
     @GET("/mobile_api/words/get/")

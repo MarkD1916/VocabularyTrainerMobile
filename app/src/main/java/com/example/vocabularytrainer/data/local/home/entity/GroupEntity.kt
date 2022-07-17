@@ -8,7 +8,7 @@ import java.util.*
 @Entity(tableName = "GroupTable")
 data class GroupEntity(
     @ColumnInfo(name = "groupId")
-    @PrimaryKey(autoGenerate = false) val id: String = UUID.randomUUID().toString(),
+    @PrimaryKey(autoGenerate = false) val id: String,
     val name: String,
     var isSync: Boolean
 ){

@@ -1,6 +1,7 @@
 package com.example.vocabularytrainer.data.repository
 
 import android.os.Build
+import android.util.Log
 import androidx.annotation.RequiresApi
 import com.androiddevs.ktornoteapp.data.remote.interceptors.Variables
 import com.example.vocabularytrainer.data.local.home.dao.VocabularyDao
@@ -126,6 +127,7 @@ class HomeRepositoryImpl @Inject constructor(
         val response = try {
             homeApi.postGroup(groupRequest)
         } catch (e: Exception) {
+            Log.d("TestPost", "postGroup: ${e.message}")
             null
         }
         if (response != null && response.isSuccessful) {
