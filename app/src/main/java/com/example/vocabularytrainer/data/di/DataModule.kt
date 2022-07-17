@@ -43,7 +43,7 @@ object DataModule {
 
     @Provides
     @Named("VocabularyUrl")
-    fun providesBaseUrlAuth(): String =  "https://vmakd1916vocabularytrainer.herokuapp.com" //"http://10.0.2.2:8000/"
+    fun providesBaseUrlAuth(): String =  "http://10.0.2.2:8080/"//"https://vmakd1916vocabularytrainer.herokuapp.com" //
 
 
     @Provides
@@ -94,10 +94,9 @@ object DataModule {
     fun provideHomeRepository(
         homeApi: HomeApi,
         dao: VocabularyDao,
-        authSharedPreferences: AuthPreferenceImpl,
-        homeSharedPreferences: HomePreferenceImpl,
+        authSharedPreferences: AuthPreferenceImpl
     ): HomeRepository {
-        return HomeRepositoryImpl(homeApi,dao,authSharedPreferences,homeSharedPreferences)
+        return HomeRepositoryImpl(homeApi,dao,authSharedPreferences)
     }
 
 }

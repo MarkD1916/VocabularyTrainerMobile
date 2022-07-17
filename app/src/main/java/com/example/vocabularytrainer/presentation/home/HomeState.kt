@@ -13,7 +13,9 @@ data class HomeState(
 
     var screenState: Resource<*>? = null,
 
-    var newGroupName: String = ""
+    var newGroupName: String = "",
+
+    var mainGroupId: String = ""
 ) {
 
 }

@@ -2,12 +2,9 @@ package com.example.vocabularytrainer.presentation.home
 
 import android.annotation.SuppressLint
 import android.os.Build
-import android.util.Log
 import androidx.activity.compose.BackHandler
 import androidx.annotation.RequiresApi
 import androidx.compose.animation.AnimatedVisibility
-import androidx.compose.animation.Crossfade
-import androidx.compose.animation.core.tween
 import androidx.compose.animation.scaleIn
 import androidx.compose.animation.scaleOut
 import androidx.compose.foundation.ExperimentalFoundationApi
@@ -20,7 +17,9 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.*
+import androidx.compose.material.icons.filled.Edit
+import androidx.compose.material.icons.filled.Email
+import androidx.compose.material.icons.filled.Share
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -30,26 +29,16 @@ import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.hilt.navigation.compose.hiltViewModel
-import androidx.lifecycle.viewModelScope
-import com.androiddevs.ktornoteapp.data.remote.interceptors.Variables
-import com.example.vocabularytrainer.MainActivity
 import com.example.vocabularytrainer.R
 import com.example.vocabularytrainer.domain.home.model.Group
-import com.example.vocabularytrainer.navigation.Route
 import com.example.vocabularytrainer.presentation.MainActivityViewModel
 import com.example.vocabularytrainer.presentation.components.LoadAnimation
 import com.example.vocabularytrainer.presentation.components.LoadingAnimationType
-import com.example.vocabularytrainer.presentation.home.components.FabLoadingAnimation
 import com.example.vocabularytrainer.presentation.home.components.GroupItem
-import com.example.vocabularytrainer.util.Constants
 import com.google.accompanist.swiperefresh.SwipeRefresh
 import com.google.accompanist.swiperefresh.rememberSwipeRefreshState
 import com.vmakd1916gmail.com.core.util.UiEvent
-import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.collectIndexed
-import java.text.SimpleDateFormat
-import java.time.LocalDateTime
-import java.time.ZoneOffset
 import java.util.*
 
 @RequiresApi(Build.VERSION_CODES.O)
@@ -207,7 +196,7 @@ fun HomeScreen(
                                 onToggleClick = {
                                     viewModel.onHomeEvent(HomeEvent.OnToggleGroupClick(item.id))
                                 },
-                                isMainGroup = item.name == Constants.MAIN_GROUP_NAME
+                                isMainGroup = item.id == state.mainGroupId
                             )
                         }
 
@@ -287,7 +276,7 @@ fun HomeScreen(
                                 onToggleClick = {
                                     viewModel.onHomeEvent(HomeEvent.OnToggleGroupClick(item.id))
                                 },
-                                isMainGroup = item.name == Constants.MAIN_GROUP_NAME
+                                isMainGroup = item.id == state.mainGroupId
                             )
                         }
 
@@ -303,7 +292,7 @@ fun HomeScreen(
                                 onDelete = {},
                                 isSync = item.isSync,
                                 isExpanded = item.isExpanded,
-                                isMainGroup = item.name == Constants.MAIN_GROUP_NAME,
+                                isMainGroup = item.id == state.mainGroupId,
                                 content = {
                                     Column(
                                         modifier = Modifier
@@ -330,7 +319,7 @@ fun HomeScreen(
                                 onDelete = {},
                                 isSync = item.isSync,
                                 isExpanded = item.isExpanded,
-                                isMainGroup = item.name == Constants.MAIN_GROUP_NAME,
+                                isMainGroup = item.id == state.mainGroupId,
                                 content = {
                                     Column(
                                         modifier = Modifier

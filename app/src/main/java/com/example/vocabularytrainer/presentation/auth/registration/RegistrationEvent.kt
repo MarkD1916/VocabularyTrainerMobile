@@ -1,5 +1,6 @@
 package com.example.vocabularytrainer.presentation.auth.registration
 
+import com.example.response.SimpleResponse
 import com.example.vocabularytrainer.data.remote.auth.response.RegisterResponse
 import com.example.vocabularytrainer.presentation.auth.AuthEvent
 
@@ -12,7 +13,7 @@ sealed class RegistrationEvent: AuthEvent {
     object Submit : RegistrationEvent()
 
     data class Success(
-        val result: RegisterResponse? = null
+        val result: SimpleResponse? = null
     ) : RegistrationEvent()
 
     data class Error(val message: String) : RegistrationEvent()

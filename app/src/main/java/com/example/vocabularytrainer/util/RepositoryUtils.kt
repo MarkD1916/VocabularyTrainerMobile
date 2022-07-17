@@ -1,6 +1,7 @@
 package com.example.vocabularytrainer.util
 
 import com.androiddevs.ktornoteapp.data.remote.interceptors.Variables
+import com.example.response.SimpleResponse
 import com.example.vocabularytrainer.data.remote.auth.response.LoginResponse
 import com.example.vocabularytrainer.data.remote.auth.response.RegisterResponse
 import com.example.vocabularytrainer.presentation.auth.AuthEvent
@@ -28,7 +29,7 @@ inline fun <T> safeCall(action: () -> Resource<T>): Resource<T> {
 }
 
 //ToDo нужно как-то унифицировать эти функции
-fun getRegisterResponseFromServer(response: Response<RegisterResponse>): AuthEvent {
+fun getRegisterResponseFromServer(response: Response<SimpleResponse>): AuthEvent {
 
     return if (response.isSuccessful) {
         RegistrationEvent.Success(response.body())

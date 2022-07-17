@@ -52,6 +52,7 @@ import com.example.vocabularytrainer.presentation.home.components.AppBar
 import com.example.vocabularytrainer.presentation.home.components.DrawerBody
 import com.example.vocabularytrainer.presentation.home.components.DrawerHeader
 import com.example.vocabularytrainer.presentation.home.components.MenuItem
+import com.example.vocabularytrainer.presentation.train.TrainScreen
 import com.example.vocabularytrainer.presentation.welcome.WelcomeScreen
 import com.example.vocabularytrainer.ui.theme.VocabularyTrainerTheme
 import com.vmakd1916gmail.com.core.util.UiEvent
@@ -314,6 +315,22 @@ class MainActivity : ComponentActivity() {
                                 ) {
 
                                 }
+                            }
+
+                            composable(
+                                route = Route.TRAIN + "/{groupId}",
+                                arguments = listOf(
+                                    navArgument("groupId") {
+                                        type = NavType.StringType
+                                    }
+                                )
+                            )
+                            {
+                                val groupId = it.arguments?.getString("groupId")!!
+                                TrainScreen(
+                                    groupId = groupId,
+                                    onNavigate = navController::navigateEvent
+                                )
                             }
                         }
                     }

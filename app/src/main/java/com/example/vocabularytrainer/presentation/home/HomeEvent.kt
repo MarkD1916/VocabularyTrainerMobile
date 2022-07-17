@@ -53,6 +53,7 @@ sealed class HomeEvent {
 
     object ShowFullScreenLoading : HomeEvent()
 
+    object GetMainGroupId : HomeEvent()
 }
 
 

@@ -1,5 +1,6 @@
 package com.example.vocabularytrainer.data.remote.auth.api
 
+import com.example.response.SimpleResponse
 import com.example.vocabularytrainer.data.remote.auth.request.LoginRequest
 import com.example.vocabularytrainer.data.remote.auth.request.RegisterRequest
 import com.example.vocabularytrainer.data.remote.auth.response.LoginResponse
@@ -12,15 +13,15 @@ import retrofit2.http.POST
 
 interface AuthApi {
 
-    @POST("/mobile/users/")
-    suspend fun registerUser(@Body user: RegisterRequest): Response<RegisterResponse>
+    @POST("register")
+    suspend fun registerUser(@Body user: RegisterRequest): Response<SimpleResponse>
 
-    @POST("/mobile/token/login")
+    @POST("login")
     suspend fun logInUser(@Body user: LoginRequest): Response<LoginResponse>
 
     @POST("/mobile/token/logout")
     suspend fun logOutUser(): Response<LoginResponse>
 
-    @GET("mobile/users/me")
+    @GET("secret")
     suspend fun getCurrentUser(): Response<UserResponse>
 }

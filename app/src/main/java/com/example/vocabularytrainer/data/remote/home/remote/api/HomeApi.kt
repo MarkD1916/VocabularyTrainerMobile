@@ -9,7 +9,7 @@ import retrofit2.http.*
 
 interface HomeApi {
     // Group request
-    @GET("mobile_api/group/get")
+    @GET("getGroup")
     suspend fun getAllGroup(): Response<List<GroupResponse>>
 
     @DELETE("/mobile_api/group/delete/{id}/")

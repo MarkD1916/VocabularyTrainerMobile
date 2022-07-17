@@ -6,7 +6,9 @@ import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.vocabularytrainer.data.preferences.AuthPreferenceImpl
+import com.example.vocabularytrainer.data.preferences.HomePreferenceImpl
 import com.example.vocabularytrainer.domain.auth.use_case.AuthUseCases
+import com.example.vocabularytrainer.domain.preferences.HomePreferences
 import com.example.vocabularytrainer.navigation.Route
 import com.example.vocabularytrainer.presentation.auth.AuthEvent
 import com.example.vocabularytrainer.presentation.auth.registration.AuthResponseResult
@@ -21,7 +23,8 @@ import javax.inject.Inject
 @HiltViewModel
 class LoginViewModel @Inject constructor(
     private val authUseCases: AuthUseCases,
-    private val authPreference: AuthPreferenceImpl
+    private val authPreference: AuthPreferenceImpl,
+    private val homePreferences: HomePreferenceImpl
 ) : ViewModel() {
     var state by mutableStateOf(LoginState())
     private val _uiEvent = Channel<UiEvent>()
@@ -65,6 +68,7 @@ class LoginViewModel @Inject constructor(
             }
             is LoginEvent.SuccessLogin -> {
                 authPreference.setStoredToken(event.result?.token ?: "")
+                homePreferences.setAllGroupId(event.result?.mainGroupId ?:"")
             }
 
             is LoginEvent.Error -> {

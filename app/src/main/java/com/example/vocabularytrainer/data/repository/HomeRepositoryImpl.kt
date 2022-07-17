@@ -30,8 +30,7 @@ import javax.inject.Inject
 class HomeRepositoryImpl @Inject constructor(
     private val homeApi: HomeApi,
     private val dao: VocabularyDao,
-    private val authSharedPreferences: AuthPreferenceImpl,
-    private val homeSharedPreferences: HomePreferenceImpl
+    private val authSharedPreferences: AuthPreferenceImpl
 ) : HomeRepository, SyncController {
     private var curGroupResponse: Response<List<GroupResponse>>? = null
     private var curWordResponse: Response<List<WordResponse>>? = null
@@ -150,9 +149,6 @@ class HomeRepositoryImpl @Inject constructor(
     override suspend fun insertGroups(groups: List<GroupResponse>) {
         groups.forEach {
             val groupEntity = it.toGroupEntity()
-            if(groupEntity.name == MAIN_GROUP_NAME) {
-                homeSharedPreferences.setAllGroupId(groupEntity.id)
-            }
             dao.insertGroup(groupEntity)
         }
     }

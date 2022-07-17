@@ -4,6 +4,6 @@ import com.google.gson.annotations.SerializedName
 
 data class GroupRequest(
     val group_name: String,
-    val user: String,
-    @SerializedName("slug")val id: String,
+    val date: Long = System.currentTimeMillis(),
+    val owners: List<String>
 )

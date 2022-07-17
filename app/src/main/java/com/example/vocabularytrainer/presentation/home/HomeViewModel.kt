@@ -48,6 +48,11 @@ class HomeViewModel @Inject constructor(
         get() = _isRefreshing.asStateFlow()
 
 
+
+    init {
+        state.mainGroupId = homePreference.getAllGroupId()
+    }
+
     fun onEvent(event: AuthEvent) {
         when (event) {
             is LoginEvent.LogOut -> {

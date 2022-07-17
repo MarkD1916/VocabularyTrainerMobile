@@ -9,6 +9,6 @@ import javax.xml.parsers.DocumentBuilderFactory
 
 
 data class RegisterRequest(
-    @SerializedName("username") val email: String,
+    val email: String,
     val password: String
 )
