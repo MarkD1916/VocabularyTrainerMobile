@@ -51,7 +51,6 @@ class MainActivityViewModel @Inject constructor(
 
     private fun logOutUser() {
         viewModelScope.launch(Dispatchers.IO) {
-            onEvent(authUseCases.logoutUser.execute())
             authPreference.clearStoredData()
             _uiEvent.send(
                 UiEvent.Navigate(

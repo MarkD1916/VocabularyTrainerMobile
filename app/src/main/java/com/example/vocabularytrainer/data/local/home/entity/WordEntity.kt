@@ -15,11 +15,10 @@ import java.util.*
         )
     ])
 data class WordEntity(
-    @PrimaryKey(autoGenerate = false) val id: String = UUID.randomUUID().toString(),
+    @PrimaryKey(autoGenerate = false) val id: String,
     @ColumnInfo(name = "groupId") val groupId: String,
     val word: String,
     val translate: String,
-    val group_name: String,
     val isSync: Boolean,
     val transcription: String
 )

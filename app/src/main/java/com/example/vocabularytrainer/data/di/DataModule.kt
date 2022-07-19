@@ -8,6 +8,7 @@ import com.example.vocabularytrainer.data.remote.auth.api.AuthApi
 import com.example.vocabularytrainer.data.local.home.VocabularyDatabase
 import com.example.vocabularytrainer.data.local.home.dao.VocabularyDao
 import com.example.vocabularytrainer.data.preferences.HomePreferenceImpl
+import com.example.vocabularytrainer.data.remote.detail_group.remote.WordApi
 import com.example.vocabularytrainer.data.remote.home.remote.api.HomeApi
 import com.example.vocabularytrainer.data.repository.AuthRepositoryImpl
 import com.example.vocabularytrainer.data.repository.HomeRepositoryImpl
@@ -43,13 +44,17 @@ object DataModule {
 
     @Provides
     @Named("VocabularyUrl")
-    fun providesBaseUrlAuth(): String =  "http://10.0.2.2:8080/"//"https://vmakd1916vocabularytrainer.herokuapp.com" //
+    fun providesBaseUrlAuth(): String =
+        "http://10.0.2.2:8080/"//"https://vmakd1916vocabularytrainer.herokuapp.com" //
 
 
     @Provides
     @Singleton
     @Named("Vocabulary")
-    fun provideVocabularyRetrofit(@Named("VocabularyUrl")BASE_URL: String, client: OkHttpClient): Retrofit = Retrofit.Builder()
+    fun provideVocabularyRetrofit(
+        @Named("VocabularyUrl") BASE_URL: String,
+        client: OkHttpClient
+    ): Retrofit = Retrofit.Builder()
         .addConverterFactory(GsonConverterFactory.create())
         .baseUrl(BASE_URL)
         .client(client)
@@ -58,14 +63,20 @@ object DataModule {
 
     @Provides
     @Singleton
-    fun provideAuthApi(@Named("Vocabulary")retrofit: Retrofit): AuthApi {
+    fun provideAuthApi(@Named("Vocabulary") retrofit: Retrofit): AuthApi {
         return retrofit.create(AuthApi::class.java)
     }
 
     @Provides
     @Singleton
-    fun provideHomeApi(@Named("Vocabulary")retrofit: Retrofit): HomeApi {
+    fun provideHomeApi(@Named("Vocabulary") retrofit: Retrofit): HomeApi {
         return retrofit.create(HomeApi::class.java)
+    }
+
+    @Provides
+    @Singleton
+    fun provideWordApi(@Named("Vocabulary") retrofit: Retrofit): WordApi {
+        return retrofit.create(WordApi::class.java)
     }
 
 
@@ -93,10 +104,11 @@ object DataModule {
     @Singleton
     fun provideHomeRepository(
         homeApi: HomeApi,
+        wordApi: WordApi,
         dao: VocabularyDao,
         authSharedPreferences: AuthPreferenceImpl
     ): HomeRepository {
-        return HomeRepositoryImpl(homeApi,dao,authSharedPreferences)
+        return HomeRepositoryImpl(homeApi, wordApi, dao, authSharedPreferences)
     }
 
 }

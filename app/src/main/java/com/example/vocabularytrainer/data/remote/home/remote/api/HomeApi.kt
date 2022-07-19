@@ -20,7 +20,4 @@ interface HomeApi {
     @POST("postGroup")
     suspend fun postGroup(@Body group: GroupRequest): Response<SimpleResponse>
 
-    //Word request
-    @GET("/mobile_api/words/get/")
-    suspend fun getWordByGroup(@Query("group") groupId: String): Response<List<WordResponse>>
 }

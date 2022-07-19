@@ -5,7 +5,7 @@ import com.example.vocabularytrainer.domain.preferences.HomePreferences
 import com.example.vocabularytrainer.util.Constants
 
 class HomePreferenceImpl(private val prefs: SharedPreferences): HomePreferences {
-    override fun getAllGroupId(): String {
+    override fun getMainGroupId(): String {
         return prefs.getString(Constants.KEY_ALL_GROUP_ID, "")!!
     }
 

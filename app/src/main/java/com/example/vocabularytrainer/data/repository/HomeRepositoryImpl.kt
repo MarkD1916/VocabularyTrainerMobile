@@ -14,6 +14,7 @@ import com.example.vocabularytrainer.data.mapper.home.toGroupRequest
 import com.example.vocabularytrainer.data.mapper.home.toWordEntity
 import com.example.vocabularytrainer.data.preferences.AuthPreferenceImpl
 import com.example.vocabularytrainer.data.preferences.HomePreferenceImpl
+import com.example.vocabularytrainer.data.remote.detail_group.remote.WordApi
 import com.example.vocabularytrainer.data.remote.home.remote.api.HomeApi
 import com.example.vocabularytrainer.data.remote.home.remote.request.GroupRequest
 import com.example.vocabularytrainer.data.remote.home.remote.response.GroupResponse
@@ -30,6 +31,7 @@ import javax.inject.Inject
 
 class HomeRepositoryImpl @Inject constructor(
     private val homeApi: HomeApi,
+    private val wordApi: WordApi,
     private val dao: VocabularyDao,
     private val authSharedPreferences: AuthPreferenceImpl
 ) : HomeRepository, SyncController {
@@ -102,16 +104,18 @@ class HomeRepositoryImpl @Inject constructor(
     }
 
     override suspend fun syncWordsByGroup(groupId: String) {
+        Log.d("TESTS", "syncWordsByGroup: $groupId")
         if (Variables.isNetworkConnected) {
             val unsyncedWords = dao.getAllUnsyncedWords()
 
 //        unsyncedWords.forEach { word -> postGroup(group.toGroupRequest(authSharedPreferences.getUserId())) }
 
-            curWordResponse = homeApi.getWordByGroup(groupId)
+            curWordResponse = wordApi.getWordByGroup(groupId)
             curWordResponse?.body()?.let { words ->
                 dao.deleteAllWords()
 
                 insertWords(words.onEach { word ->
+                    Log.d("TESTS", "syncWordsByGroup: $word")
                     word.toWordEntity()
                 })
             }

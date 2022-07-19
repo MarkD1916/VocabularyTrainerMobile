@@ -1,7 +1,6 @@
 package com.example.vocabularytrainer.presentation.home
 
 import android.os.Build
-import android.util.Log
 import androidx.annotation.RequiresApi
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -13,7 +12,6 @@ import com.example.vocabularytrainer.data.mapper.home.toGroupSuccess
 import com.example.vocabularytrainer.data.preferences.AuthPreferenceImpl
 import com.example.vocabularytrainer.data.preferences.HomePreferenceImpl
 import com.example.vocabularytrainer.domain.auth.use_case.AuthUseCases
-import com.example.vocabularytrainer.domain.home.model.Group
 import com.example.vocabularytrainer.domain.home.use_case.HomeUseCases
 import com.example.vocabularytrainer.navigation.Route
 import com.example.vocabularytrainer.presentation.auth.AuthEvent
@@ -48,9 +46,8 @@ class HomeViewModel @Inject constructor(
         get() = _isRefreshing.asStateFlow()
 
 
-
     init {
-        state.mainGroupId = homePreference.getAllGroupId()
+        state.mainGroupId = homePreference.getMainGroupId()
     }
 
     fun onEvent(event: AuthEvent) {
@@ -80,17 +77,17 @@ class HomeViewModel @Inject constructor(
                         }
                     }
 
-                   launch {
+                    launch {
                         homeUseCases.getAllGroup.execute()
                             .map { it ->
                                 val data = it.data
                                 data?.map {
-                                    homeUseCases.syncWords.execute(it.id)
                                     it.toGroupSuccess()
                                 }
                             }
                             .flowOn(Dispatchers.IO)
-                            .collect { groupList ->
+                            .collectLatest { groupList ->
+                                homeUseCases.syncWords.execute(homePreference.getMainGroupId())
                                 jobLoad.cancel()
                                 state = state.copy(
                                     group = groupList ?: listOf(),

@@ -34,7 +34,6 @@ fun DetailGroupScreen(
     val context = LocalContext.current
     LaunchedEffect(key1 = context) {
         DetailGroupEvent.GetAllWordsByGroup.loadingType = LoadingType.FullScreenLoading()
-        viewModel.onDetailGroupEvent(DetailGroupEvent.GetAllWordsByGroup)
     }
 
 
@@ -52,44 +51,48 @@ fun DetailGroupScreen(
                 )
             }
         }
-    }
-    LazyColumn(modifier = Modifier
-        .fillMaxSize()
-        .padding(end = 40.dp)
-        .background(Color.White)) {
 
-            items(state.words, key = { it.id }) { item ->
-                WordItem(
-                    modifier = Modifier
-                        .animateItemPlacement()
-                        .fillMaxWidth()
-                        .padding(vertical = 10.dp),
-                    word = item.word,
-                    translate = item.translate,
-                    transcription = item.transcription,
-                    visible = true,
-                    onDelete = {
+        else -> {
+            LazyColumn(modifier = Modifier
+                .fillMaxSize()
+                .padding(end = 40.dp)
+                .background(Color.White)) {
 
-                    },
-                    isSync = item.isSync,
-                    isExpanded = item.isExpanded,
-                    content = {
-                        Column(
-                            modifier = Modifier
-                                .fillMaxWidth()
-                        ) {
-                            Row {
-                                Text(text = "TEST")
+                items(state.words, key = { it.id }) { item ->
+                    WordItem(
+                        modifier = Modifier
+                            .animateItemPlacement()
+                            .fillMaxWidth()
+                            .padding(vertical = 10.dp),
+                        word = item.word,
+                        translate = item.translate,
+                        transcription = item.transcription,
+                        visible = true,
+                        onDelete = {
+
+                        },
+                        isSync = item.isSync,
+                        isExpanded = item.isExpanded,
+                        content = {
+                            Column(
+                                modifier = Modifier
+                                    .fillMaxWidth()
+                            ) {
+                                Row {
+                                    Text(text = "TEST")
+                                }
                             }
+                        },
+                        onToggleClick = {
+                            viewModel.onDetailGroupEvent(DetailGroupEvent.OnToggleClick(item.id))
                         }
-                    },
-                    onToggleClick = {
-                        viewModel.onDetailGroupEvent(DetailGroupEvent.OnToggleClick(item.id))
-                    }
-                )
+                    )
 
+                }
+
+            }
+        }
     }
 
-    }
 
 }

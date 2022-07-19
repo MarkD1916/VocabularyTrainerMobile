@@ -1,7 +1,7 @@
 package com.example.vocabularytrainer.domain.preferences
 
 interface HomePreferences {
-    fun getAllGroupId(): String
+    fun getMainGroupId(): String
 
     fun setAllGroupId(id: String)
 }

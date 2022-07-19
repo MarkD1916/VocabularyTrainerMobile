@@ -6,15 +6,11 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.setValue
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
-import com.example.vocabularytrainer.data.local.home.entity.WordEntity
 import com.example.vocabularytrainer.data.mapper.home.toWord
 import com.example.vocabularytrainer.data.preferences.HomePreferenceImpl
-import com.example.vocabularytrainer.domain.detail_group.model.Word
 import com.example.vocabularytrainer.domain.detail_group.use_case.GroupDetailUseCase
-import com.example.vocabularytrainer.util.Constants.MAIN_GROUP_NAME
 import dagger.hilt.android.lifecycle.HiltViewModel
-import kotlinx.coroutines.Dispatchers
-import kotlinx.coroutines.Job
+import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 import javax.inject.Inject
 
@@ -29,14 +25,14 @@ class DetailGroupViewModel @Inject constructor(
     var getWordsByGroup: Job? = null
     var getAllWords: Job? = null
 
-    val allId = homeSharedPreferences.getAllGroupId()
+    val allId = homeSharedPreferences.getMainGroupId()
 
     companion object {
         var groupId by mutableStateOf("")
     }
 
     init {
-
+        onDetailGroupEvent(DetailGroupEvent.GetAllWordsByGroup)
     }
 
 
@@ -63,29 +59,33 @@ class DetailGroupViewModel @Inject constructor(
                 )
 
                 if (groupId == allId) {
-                    getAllWords?.cancel()
-                    val getAllWordsFlow = groupDetailUseCase.getAllWords.execute()
-                    val getGroupsWithWordsFlow = groupDetailUseCase.getWordsByGroup.execute(groupId)
-                    getAllWords = getGroupsWithWordsFlow.zip(getAllWordsFlow) { f1, f2 ->
-                        val mutableWordsList = mutableListOf<Word>()
-                        f1.data?.forEach { groupWithWords ->
-                            groupWithWords.words.forEach { wordEntityFromWordWithGroup ->
-                                if(wordEntityFromWordWithGroup.group_name != MAIN_GROUP_NAME) {
-                                    val word = wordEntityFromWordWithGroup.toWord()
-                                    mutableWordsList.add(word)
-                                }
+                    getWordsByGroup?.cancel()
+                    getWordsByGroup = groupDetailUseCase.getAllWords.execute()
+                        .onEach {
+
+                            val wordList = it.map {
+                                it.toWord()
                             }
+                            state = state.copy(
+                                words = wordList,
+                                screenState = null
+                            )
+
                         }
-                        f2.forEach { allWords ->
-                            val word = allWords.toWord()
-                            mutableWordsList.add(word)
-                        }
-                        state = state.copy(
-                            words = mutableWordsList.distinct(),
-                            screenState = null
-                        )
-                    }.flowOn(Dispatchers.Default)
+                        .flowOn(Dispatchers.IO)
                         .launchIn(viewModelScope)
+
+
+//                    viewModelScope.launch  {
+//                            groupDetailUseCase.getAllWords.execute()
+//                                .onEach {
+//                                    it.forEach { groupWithWords ->
+//                                        Log.d("LOLP", "onDetailGroupEvent2:  ${groupWithWords}")
+//                                    }
+//                                }
+//                                .flowOn(Dispatchers.IO)
+//                                .collect()
+//                        }
 
                 } else {
                     getWordsByGroup?.cancel()
@@ -103,12 +103,14 @@ class DetailGroupViewModel @Inject constructor(
                         }
                         .flowOn(Dispatchers.IO)
                         .launchIn(viewModelScope)
+
                 }
             }
             is DetailGroupEvent.GetAllWordsByMainGroup -> {
 
             }
         }
+
     }
 
     override fun onCleared() {

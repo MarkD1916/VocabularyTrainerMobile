@@ -11,7 +11,6 @@ fun WordResponse.toWordEntity(): WordEntity {
         word = word,
         translate = translate,
         transcription = transcription,
-        group_name = group_name,
         isSync = true,
         id = id
     )
@@ -22,7 +21,6 @@ fun WordEntity.toWord(): Word {
         word = word,
         translate = translate,
         transcription = transcription,
-        group_name = group_name,
         isSync = isSync,
         id = id,
         wordState = Resource.Success(null)

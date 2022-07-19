@@ -118,7 +118,7 @@ class MainActivity : ComponentActivity() {
                                 icon = {
                                     Icon(Icons.Default.Home, "")
                                 },
-                                label = { Text(text = "Save") },
+                                label = {  },
                                 selected = true,
                                 onClick = {
                                 },
@@ -131,7 +131,7 @@ class MainActivity : ComponentActivity() {
                                 },
 
 
-                                label = { Text(text = "Upload") },
+                                label = {  },
                                 selected = false,//selectedItem.value == "upload",
                                 onClick = {
 
