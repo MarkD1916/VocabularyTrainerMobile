@@ -8,7 +8,6 @@ import androidx.lifecycle.viewModelScope
 import com.example.vocabularytrainer.data.preferences.AuthPreferenceImpl
 import com.example.vocabularytrainer.data.preferences.HomePreferenceImpl
 import com.example.vocabularytrainer.domain.auth.use_case.AuthUseCases
-import com.example.vocabularytrainer.domain.preferences.HomePreferences
 import com.example.vocabularytrainer.navigation.Route
 import com.example.vocabularytrainer.presentation.auth.AuthEvent
 import com.example.vocabularytrainer.presentation.auth.registration.AuthResponseResult

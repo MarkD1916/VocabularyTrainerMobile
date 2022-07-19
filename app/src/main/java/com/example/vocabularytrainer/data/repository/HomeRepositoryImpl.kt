@@ -131,7 +131,6 @@ class HomeRepositoryImpl @Inject constructor(
         val response = try {
             homeApi.postGroup(groupRequest)
         } catch (e: Exception) {
-            Log.d("TestPost", "postGroup: ${e.message}")
             null
         }
         if (response != null && response.isSuccessful) {
