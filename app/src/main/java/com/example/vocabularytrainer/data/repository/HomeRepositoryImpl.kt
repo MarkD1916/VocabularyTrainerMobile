@@ -108,7 +108,6 @@ class HomeRepositoryImpl @Inject constructor(
         if (Variables.isNetworkConnected) {
             val unsyncedWords = dao.getAllUnsyncedWords()
 
-//        unsyncedWords.forEach { word -> postGroup(group.toGroupRequest(authSharedPreferences.getUserId())) }
 
             curWordResponse = wordApi.getWordByGroup(groupId)
             curWordResponse?.body()?.let { words ->
