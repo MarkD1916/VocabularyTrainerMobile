@@ -33,6 +33,7 @@ class AuthRepositoryImplTest {
     private lateinit var authApi: AuthApi
 
     private lateinit var email: String
+    private lateinit var incorrect_email: String
     private lateinit var password: String
     private lateinit var incorrectEmail: String
     private lateinit var incorrectPassword: String
@@ -166,11 +167,72 @@ class AuthRepositoryImplTest {
                 .setBody(validRegisterResponse)
         )
 
-        val result = repository.register("anon667@gmail.com", "123456789")
+        val result = repository.register("anon669@gmail.com", "123456789")
         Truth.assertThat(result).isEqualTo(
             RegistrationEvent.Success(
                 SimpleResponse(true, "Successfully created account")
             )
+        )
+
+    }
+
+    @Test
+    fun `Register user, invalid response`() = runBlocking {
+        mockWebServer.enqueue(
+            MockResponse()
+                .setResponseCode(500)
+                .setBody(invalidRegisterResponse)
+        )
+
+        val result = repository.register("anon669@gmail.com", "123456789")
+        Truth.assertThat(result).isEqualTo(
+            RegistrationEvent.Error(
+                "Server Error"
+            )
+        )
+    }
+
+    @Test
+    fun `Register user, invalid response user already exists`() = runBlocking {
+        mockWebServer.enqueue(
+            MockResponse()
+                .setResponseCode(409)
+                .setBody(invalidUserAlreadyExistsResponse)
+        )
+
+        val result = repository.login("anon669@gmail.com", "123456789")
+        Truth.assertThat(result).isEqualTo(
+            LoginEvent.Error("A user with this email already exists")
+        )
+
+    }
+
+    @Test
+    fun `Register user, invalid response not valid email`() = runBlocking {
+        mockWebServer.enqueue(
+            MockResponse()
+                .setResponseCode(409)
+                .setBody(invalidNotValidEmailResponse)
+        )
+
+        val result = repository.login("anon669@gmail.co", "123456789")
+        Truth.assertThat(result).isEqualTo(
+            LoginEvent.Error("That's not a valid email")
+        )
+
+    }
+
+    @Test
+    fun `Register user, invalid response short password`() = runBlocking {
+        mockWebServer.enqueue(
+            MockResponse()
+                .setResponseCode(409)
+                .setBody(invalidShortPasswordResponse)
+        )
+
+        val result = repository.login("anon669@gmail.com", "123")
+        Truth.assertThat(result).isEqualTo(
+            LoginEvent.Error("Password is too short")
         )
 
     }

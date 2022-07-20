@@ -1,8 +1,10 @@
 package com.example.vocabularytrainer.data.remote
 
 val validRegisterResponse = """
-    "successful": true,
-    "message": "Successfully created account"
+    {
+        "successful": true,
+        "message": "Successfully created account"
+    }
 """.trimIndent()
 
 val invalidRegisterResponse = """
