@@ -2,12 +2,14 @@ package com.example.vocabularytrainer.data.repository
 
 import android.util.Log
 import com.androiddevs.ktornoteapp.data.remote.interceptors.TokenInterceptor
+import com.example.response.SimpleResponse
 import com.example.vocabularytrainer.data.preferences.AuthPreferenceImpl
 import com.example.vocabularytrainer.data.remote.*
 import com.example.vocabularytrainer.data.remote.auth.api.AuthApi
 import com.example.vocabularytrainer.data.remote.auth.response.LoginResponse
 import com.example.vocabularytrainer.data.remote.auth.response.UserResponse
 import com.example.vocabularytrainer.presentation.auth.login.LoginEvent
+import com.example.vocabularytrainer.presentation.auth.registration.RegistrationEvent
 import com.google.common.truth.Truth
 import io.mockk.every
 import io.mockk.mockk
@@ -152,6 +154,23 @@ class AuthRepositoryImplTest {
         val result = repository.login("anon669@gmail.com", "123")
         Truth.assertThat(result).isEqualTo(
             LoginEvent.Error("Incorrect username or password")
+        )
+    }
+
+
+    @Test
+    fun `Register user, valid response`() = runBlocking {
+        mockWebServer.enqueue(
+            MockResponse()
+                .setResponseCode(200)
+                .setBody(validRegisterResponse)
+        )
+
+        val result = repository.register("anon667@gmail.com", "123456789")
+        Truth.assertThat(result).isEqualTo(
+            RegistrationEvent.Success(
+                SimpleResponse(true, "Successfully created account")
+            )
         )
 
     }

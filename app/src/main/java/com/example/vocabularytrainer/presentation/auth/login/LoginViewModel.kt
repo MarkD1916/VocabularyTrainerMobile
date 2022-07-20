@@ -68,6 +68,7 @@ class LoginViewModel @Inject constructor(
             is LoginEvent.SuccessLogin -> {
                 authPreference.setStoredToken(event.result?.token ?: "")
                 homePreferences.setAllGroupId(event.result?.mainGroupId ?:"")
+                state = state.copy(loginResponseResult = AuthResponseResult.Success)
             }
 
             is LoginEvent.Error -> {

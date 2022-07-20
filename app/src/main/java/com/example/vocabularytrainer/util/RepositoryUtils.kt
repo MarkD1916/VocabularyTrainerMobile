@@ -30,34 +30,6 @@ inline fun <T> safeCall(action: () -> Resource<T>): Resource<T> {
     }
 }
 
-//ToDo нужно как-то унифицировать эти функции
-fun getRegisterResponseFromServer(response: Response<SimpleResponse>): AuthEvent {
-
-    return if (response.isSuccessful) {
-        RegistrationEvent.Success(response.body())
-    } else {
-        if (response.code() == 400) {
-            RegistrationEvent.Error("A user with that username already exists.")
-        } else {
-            RegistrationEvent.Error(response.message())
-        }
-    }
-}
-
-fun getLoginResponseFromServer(response: Response<LoginResponse>): AuthEvent {
-    val gson = Gson()
-    val type = object : TypeToken<SimpleResponse>() {}.type
-    if (response.isSuccessful) {
-        return LoginEvent.SuccessLogin(response.body())
-    }
-    return if (response.code() == 409) {
-        val errorResponse: SimpleResponse? = gson.fromJson(response.errorBody()!!.charStream(), type)
-        LoginEvent.Error(errorResponse?.message ?: "")
-    }
-    else {
-        LoginEvent.Error(response.message())
-    }
-}
 
 fun getLogoutResponseFromServer(response: Response<LoginResponse>): AuthEvent {
 

@@ -1,7 +1,6 @@
 package com.example.vocabularytrainer.data.repository
 
 import com.example.response.SimpleResponse
-import com.example.vocabularytrainer.data.preferences.HomePreferenceImpl
 import com.example.vocabularytrainer.data.remote.auth.api.AuthApi
 import com.example.vocabularytrainer.data.remote.auth.request.LoginRequest
 import com.example.vocabularytrainer.data.remote.auth.request.RegisterRequest
@@ -9,9 +8,7 @@ import com.example.vocabularytrainer.domain.repository.AuthRepository
 import com.example.vocabularytrainer.presentation.auth.AuthEvent
 import com.example.vocabularytrainer.presentation.auth.login.LoginEvent
 import com.example.vocabularytrainer.presentation.auth.registration.RegistrationEvent
-import com.example.vocabularytrainer.util.getLoginResponseFromServer
 import com.example.vocabularytrainer.util.getLogoutResponseFromServer
-import com.example.vocabularytrainer.util.getRegisterResponseFromServer
 import com.google.gson.Gson
 import com.google.gson.reflect.TypeToken
 import javax.inject.Inject
@@ -29,7 +26,16 @@ class AuthRepositoryImpl @Inject constructor(
     ): AuthEvent {
         return try {
             val response = authApi.registerUser(RegisterRequest(email, password))
-            getRegisterResponseFromServer(response)
+            if (response.isSuccessful) {
+                return RegistrationEvent.Success(response.body())
+            }
+            return if (response.code() == 409) {
+                val errorResponse: SimpleResponse? = gson.fromJson(response.errorBody()!!.charStream(), type)
+                LoginEvent.Error(errorResponse?.message ?: "")
+            } else {
+                RegistrationEvent.Error(response.message())
+            }
+
         } catch (e: Exception) {
             RegistrationEvent.Error(e.message!!)
         }
