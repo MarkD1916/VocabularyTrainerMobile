@@ -1,17 +1,11 @@
 package com.example.vocabularytrainer.util
 
 import com.androiddevs.ktornoteapp.data.remote.interceptors.Variables
-import com.example.response.SimpleResponse
 import com.example.vocabularytrainer.data.remote.auth.response.LoginResponse
-import com.example.vocabularytrainer.data.remote.auth.response.RegisterResponse
 import com.example.vocabularytrainer.presentation.auth.AuthEvent
 import com.example.vocabularytrainer.presentation.auth.login.LoginEvent
-import com.example.vocabularytrainer.presentation.auth.registration.RegistrationEvent
 import com.example.vocabularytrainer.presentation.home.Resource
-import com.google.gson.Gson
-import com.google.gson.reflect.TypeToken
 import retrofit2.Response
-import java.io.IOException
 import java.util.concurrent.TimeoutException
 
 inline fun <T> safeCall(action: () -> Resource<T>): Resource<T> {

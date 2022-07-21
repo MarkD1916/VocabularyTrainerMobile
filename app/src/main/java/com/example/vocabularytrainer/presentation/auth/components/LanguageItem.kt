@@ -13,9 +13,6 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.example.vocabularytrainer.presentation.auth.Country
-import com.example.vocabularytrainer.presentation.auth.registration.AuthResponseResult
-import com.example.vocabularytrainer.presentation.auth.registration.RegistrationEvent
-import com.example.vocabularytrainer.presentation.components.LoadAnimation
 
 @Composable
 fun CountryItem(country: Country, modifier: Modifier, updateImage: (String)-> Unit) {

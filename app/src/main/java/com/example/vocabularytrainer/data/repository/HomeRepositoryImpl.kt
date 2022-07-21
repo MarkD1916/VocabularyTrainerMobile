@@ -13,7 +13,6 @@ import com.example.vocabularytrainer.data.mapper.home.toGroupEntity
 import com.example.vocabularytrainer.data.mapper.home.toGroupRequest
 import com.example.vocabularytrainer.data.mapper.home.toWordEntity
 import com.example.vocabularytrainer.data.preferences.AuthPreferenceImpl
-import com.example.vocabularytrainer.data.preferences.HomePreferenceImpl
 import com.example.vocabularytrainer.data.remote.detail_group.remote.WordApi
 import com.example.vocabularytrainer.data.remote.home.remote.api.HomeApi
 import com.example.vocabularytrainer.data.remote.home.remote.request.GroupRequest
@@ -23,7 +22,6 @@ import com.example.vocabularytrainer.domain.home.model.Group
 import com.example.vocabularytrainer.domain.repository.HomeRepository
 import com.example.vocabularytrainer.domain.repository.SyncController
 import com.example.vocabularytrainer.presentation.home.Resource
-import com.example.vocabularytrainer.util.Constants.MAIN_GROUP_NAME
 import com.example.vocabularytrainer.util.networkBoundResource
 import kotlinx.coroutines.flow.Flow
 import retrofit2.Response

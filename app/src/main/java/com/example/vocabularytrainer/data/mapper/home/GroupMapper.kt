@@ -7,9 +7,6 @@ import com.example.vocabularytrainer.data.remote.home.remote.request.GroupReques
 import com.example.vocabularytrainer.data.remote.home.remote.response.GroupResponse
 import com.example.vocabularytrainer.domain.home.model.Group
 import com.example.vocabularytrainer.presentation.home.Resource
-import java.time.LocalDateTime
-import java.time.ZoneOffset
-import java.util.*
 
 @RequiresApi(Build.VERSION_CODES.O)
 fun GroupEntity.toGroup(): Group {

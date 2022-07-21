@@ -89,7 +89,6 @@ class LoginViewModel @Inject constructor(
             }
 
             is LoginEvent.SetUserId -> {
-
                 viewModelScope.launch {
                     authPreference.setUserId(event.result?.id.toString())
                     _uiEvent.send(

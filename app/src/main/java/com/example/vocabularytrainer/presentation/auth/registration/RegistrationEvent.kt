@@ -1,7 +1,6 @@
 package com.example.vocabularytrainer.presentation.auth.registration
 
 import com.example.response.SimpleResponse
-import com.example.vocabularytrainer.data.remote.auth.response.RegisterResponse
 import com.example.vocabularytrainer.presentation.auth.AuthEvent
 
 

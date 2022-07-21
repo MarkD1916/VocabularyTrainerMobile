@@ -1,8 +1,6 @@
 package com.example.vocabularytrainer.domain.repository
 
 import com.example.vocabularytrainer.presentation.auth.AuthEvent
-import com.example.vocabularytrainer.presentation.auth.login.LoginEvent
-import com.example.vocabularytrainer.presentation.auth.registration.RegistrationEvent
 
 
 interface AuthRepository {

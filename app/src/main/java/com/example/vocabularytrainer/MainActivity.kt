@@ -3,30 +3,22 @@ package com.example.vocabularytrainer
 import android.annotation.SuppressLint
 import android.os.Build
 import android.os.Bundle
-import android.view.MotionEvent
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.activity.viewModels
 import androidx.annotation.RequiresApi
 import androidx.compose.animation.*
-import androidx.compose.animation.core.animateFloatAsState
-import androidx.compose.animation.core.tween
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.CircleShape
-import androidx.compose.foundation.shape.CornerSize
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.draw.scale
-import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.input.pointer.pointerInteropFilter
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.unit.dp
-import androidx.lifecycle.viewmodel.compose.viewModel
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
@@ -46,8 +38,6 @@ import com.example.vocabularytrainer.presentation.components.MultiFabState
 import com.example.vocabularytrainer.presentation.detail_group.DetailGroupScreen
 import com.example.vocabularytrainer.presentation.detail_group.DetailGroupViewModel
 import com.example.vocabularytrainer.presentation.home.HomeScreen
-import com.example.vocabularytrainer.presentation.home.HomeViewModel
-import com.example.vocabularytrainer.presentation.home.LoadingType
 import com.example.vocabularytrainer.presentation.home.components.AppBar
 import com.example.vocabularytrainer.presentation.home.components.DrawerBody
 import com.example.vocabularytrainer.presentation.home.components.DrawerHeader
@@ -58,8 +48,6 @@ import com.example.vocabularytrainer.ui.theme.VocabularyTrainerTheme
 import com.vmakd1916gmail.com.core.util.UiEvent
 
 import dagger.hilt.android.AndroidEntryPoint
-import kotlinx.coroutines.flow.collectIndexed
-import kotlinx.coroutines.flow.collectLatest
 import kotlinx.coroutines.launch
 import javax.inject.Inject
 

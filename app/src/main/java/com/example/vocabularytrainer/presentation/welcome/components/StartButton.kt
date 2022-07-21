@@ -1,13 +1,11 @@
 package com.example.vocabularytrainer.presentation.welcome.components
 
-import android.util.Log
 import android.view.MotionEvent
 import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.core.tween
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.Card
@@ -23,16 +21,10 @@ import androidx.compose.ui.input.pointer.pointerInteropFilter
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
-import com.example.vocabularytrainer.R
-import com.example.vocabularytrainer.navigation.Route
 import com.example.vocabularytrainer.presentation.welcome.WelcomeEvent
 import com.example.vocabularytrainer.presentation.welcome.WelcomeViewModel
 import com.vmakd1916gmail.com.core.util.UiEvent
 import kotlinx.coroutines.CoroutineScope
-import kotlinx.coroutines.Job
-import kotlinx.coroutines.delay
-import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalComposeUiApi::class)
 @Composable

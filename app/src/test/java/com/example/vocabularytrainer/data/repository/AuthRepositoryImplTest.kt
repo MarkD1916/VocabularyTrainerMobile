@@ -1,6 +1,5 @@
 package com.example.vocabularytrainer.data.repository
 
-import android.util.Log
 import com.androiddevs.ktornoteapp.data.remote.interceptors.TokenInterceptor
 import com.example.response.SimpleResponse
 import com.example.vocabularytrainer.data.preferences.AuthPreferenceImpl

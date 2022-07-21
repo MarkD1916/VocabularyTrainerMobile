@@ -20,7 +20,7 @@ class ValidateEmailAndroidTest {
     private lateinit var email_not_valid: String
 
     @Before
-    fun setUp2() {
+    fun setUp() {
         email_not_valid = "123"
         validateEmail = ValidateEmail()
         validationResultErrorNotValid = ValidationResult(

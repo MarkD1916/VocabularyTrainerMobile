@@ -2,8 +2,6 @@ package com.example.vocabularytrainer.presentation.welcome
 
 import android.annotation.SuppressLint
 import android.net.Uri
-import android.util.Log
-import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.shape.RoundedCornerShape
@@ -16,11 +14,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.platform.LocalUriHandler
-import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.FontFamily
-import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
-import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.vocabularytrainer.R
 import com.example.vocabularytrainer.navigation.Route
@@ -28,7 +22,6 @@ import com.example.vocabularytrainer.presentation.welcome.components.ImageWithSm
 import com.example.vocabularytrainer.presentation.welcome.components.StartButton
 import com.example.vocabularytrainer.util.Constants
 import com.vmakd1916gmail.com.core.util.UiEvent
-import kotlinx.coroutines.*
 import kotlinx.coroutines.flow.*
 
 

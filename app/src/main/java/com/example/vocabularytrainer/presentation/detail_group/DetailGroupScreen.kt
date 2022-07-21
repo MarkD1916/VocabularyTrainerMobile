@@ -17,7 +17,6 @@ import androidx.hilt.navigation.compose.hiltViewModel
 import com.example.vocabularytrainer.presentation.components.LoadAnimation
 import com.example.vocabularytrainer.presentation.components.LoadingAnimationType
 import com.example.vocabularytrainer.presentation.detail_group.components.WordItem
-import com.example.vocabularytrainer.presentation.home.HomeEvent
 import com.example.vocabularytrainer.presentation.home.LoadingType
 import com.vmakd1916gmail.com.core.util.UiEvent
 

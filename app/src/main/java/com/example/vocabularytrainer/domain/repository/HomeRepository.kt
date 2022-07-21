@@ -5,7 +5,6 @@ import com.example.vocabularytrainer.data.local.home.entity.WordEntity
 import com.example.vocabularytrainer.data.local.home.entity.relations.GroupWithWords
 import com.example.vocabularytrainer.data.remote.home.remote.request.GroupRequest
 import com.example.vocabularytrainer.data.remote.home.remote.response.GroupResponse
-import com.example.vocabularytrainer.data.remote.home.remote.response.SimpleResponse
 import com.example.vocabularytrainer.domain.home.model.Group
 import com.example.vocabularytrainer.presentation.home.Resource
 import kotlinx.coroutines.flow.Flow

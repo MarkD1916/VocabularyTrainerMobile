@@ -1,6 +1,5 @@
 package com.example.vocabularytrainer.presentation.detail_group
 
-import com.example.vocabularytrainer.data.local.home.entity.WordEntity
 import com.example.vocabularytrainer.domain.detail_group.model.Word
 import com.example.vocabularytrainer.presentation.home.Resource
 
