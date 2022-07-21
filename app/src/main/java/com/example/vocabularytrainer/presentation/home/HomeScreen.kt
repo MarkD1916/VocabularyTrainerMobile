@@ -80,10 +80,10 @@ fun HomeScreen(
     var visible by remember { mutableStateOf(false) }
     val isRefreshing by viewModel.isRefreshing.collectAsState()
 
-    if (mainActivityViewModel.isOpen) {
+    if (mainActivityViewModel.isAddGroupDialogOpen) {
         AlertDialog(
             onDismissRequest = {
-                mainActivityViewModel.isOpen = false
+                mainActivityViewModel.isAddGroupDialogOpen = false
             },
             title = {
                 Text("Create new group")
@@ -105,7 +105,7 @@ fun HomeScreen(
             confirmButton = {
                 Button(
                     onClick = {
-                        mainActivityViewModel.isOpen = false
+                        mainActivityViewModel.isAddGroupDialogOpen = false
                         viewModel.onHomeEvent(
                             HomeEvent.PostNewGroup(
                                 Group(
@@ -123,7 +123,7 @@ fun HomeScreen(
             dismissButton = {
                 Button(
                     onClick = {
-                        mainActivityViewModel.isOpen = false
+                        mainActivityViewModel.isAddGroupDialogOpen = false
                     }) {
                     Text("Cancel")
                 }

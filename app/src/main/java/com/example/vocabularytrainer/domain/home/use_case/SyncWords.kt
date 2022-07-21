@@ -5,7 +5,7 @@ import com.example.vocabularytrainer.domain.repository.HomeRepository
 class SyncWords(
     private val repository: HomeRepository
 ) {
-    suspend fun execute(groupId: String) {
-        return repository.syncWordsByGroup(groupId)
+    suspend fun execute() {
+        return repository.syncAllWord()
     }
 }

@@ -27,7 +27,6 @@ import javax.inject.Inject
 @HiltViewModel
 class HomeViewModel @Inject constructor(
     private val authPreference: AuthPreferenceImpl,
-    private val homePreference: HomePreferenceImpl,
     private val authUseCases: AuthUseCases,
     private val homeUseCases: HomeUseCases
 ) : ViewModel() {
@@ -45,10 +44,6 @@ class HomeViewModel @Inject constructor(
     val isRefreshing: StateFlow<Boolean>
         get() = _isRefreshing.asStateFlow()
 
-
-    init {
-        state.mainGroupId = homePreference.getMainGroupId()
-    }
 
     fun onEvent(event: AuthEvent) {
         when (event) {
@@ -87,7 +82,7 @@ class HomeViewModel @Inject constructor(
                             }
                             .flowOn(Dispatchers.IO)
                             .collectLatest { groupList ->
-                                homeUseCases.syncWords.execute(homePreference.getMainGroupId())
+                                homeUseCases.syncWords.execute()
                                 jobLoad.cancel()
                                 state = state.copy(
                                     group = groupList ?: listOf(),

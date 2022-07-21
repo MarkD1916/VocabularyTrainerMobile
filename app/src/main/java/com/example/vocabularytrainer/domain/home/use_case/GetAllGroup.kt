@@ -9,6 +9,6 @@ class GetAllGroup(
     private val repository: HomeRepository
 ) {
     fun execute(): Flow<Resource<List<GroupEntity>>> {
-        return repository.getAllGroupFromServer()
+        return repository.fetchAllGroupFromServer()
     }
 }

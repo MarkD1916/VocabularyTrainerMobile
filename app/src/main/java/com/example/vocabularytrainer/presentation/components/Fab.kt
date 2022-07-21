@@ -21,6 +21,7 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavBackStackEntry
 import com.example.vocabularytrainer.navigation.Route
 import com.example.vocabularytrainer.presentation.MainActivityViewModel
+import com.example.vocabularytrainer.presentation.detail_group.DetailGroupEvent
 
 enum class MultiFabState {
     COLLAPSED, EXPANDED
@@ -44,10 +45,10 @@ fun Fab(
         if (finished && !selected) {
             when (currentRoute?.destination?.route) {
                 Route.HOME -> {
-                    viewModel.isOpen = true
+                    viewModel.isAddGroupDialogOpen = true
                 }
-                Route.DETAIL_GROUP -> {
-
+                Route.DETAIL_GROUP + "/{groupId}" -> {
+                    viewModel.onGlobalDetailGroupEvent(DetailGroupEvent.OnNewWordClick)
                 }
             }
 

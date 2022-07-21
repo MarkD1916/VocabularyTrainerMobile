@@ -11,7 +11,7 @@ import kotlinx.coroutines.flow.Flow
 
 interface HomeRepository {
     // Work with GROUPS
-    fun getAllGroupFromServer(): Flow<Resource<List<GroupEntity>>>
+    fun fetchAllGroupFromServer(): Flow<Resource<List<GroupEntity>>>
 
     suspend fun postGroup(groupRequest: GroupRequest)
 
@@ -30,7 +30,7 @@ interface HomeRepository {
     //Work with WORDS
     fun getWordsByGroupFromServer(groupId: String): Flow<Resource<List<GroupWithWords>>>
 
-    suspend fun syncWordsByGroup(groupId: String)
+    suspend fun syncAllWord()
 
     fun getAllWords(): Flow<List<WordEntity>>
 

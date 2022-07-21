@@ -106,9 +106,10 @@ object DataModule {
         homeApi: HomeApi,
         wordApi: WordApi,
         dao: VocabularyDao,
+        homeSharedPreferences: HomePreferenceImpl,
         authSharedPreferences: AuthPreferenceImpl
     ): HomeRepository {
-        return HomeRepositoryImpl(homeApi, wordApi, dao, authSharedPreferences)
+        return HomeRepositoryImpl(homeApi, wordApi, dao, authSharedPreferences,homeSharedPreferences)
     }
 
 }

@@ -1,7 +1,6 @@
 package com.example.vocabularytrainer.data.repository
 
 import android.os.Build
-import android.util.Log
 import androidx.annotation.RequiresApi
 import com.androiddevs.ktornoteapp.data.remote.interceptors.Variables
 import com.example.vocabularytrainer.data.local.home.dao.VocabularyDao
@@ -13,6 +12,7 @@ import com.example.vocabularytrainer.data.mapper.home.toGroupEntity
 import com.example.vocabularytrainer.data.mapper.home.toGroupRequest
 import com.example.vocabularytrainer.data.mapper.home.toWordEntity
 import com.example.vocabularytrainer.data.preferences.AuthPreferenceImpl
+import com.example.vocabularytrainer.data.preferences.HomePreferenceImpl
 import com.example.vocabularytrainer.data.remote.detail_group.remote.WordApi
 import com.example.vocabularytrainer.data.remote.home.remote.api.HomeApi
 import com.example.vocabularytrainer.data.remote.home.remote.request.GroupRequest
@@ -20,7 +20,6 @@ import com.example.vocabularytrainer.data.remote.home.remote.response.GroupRespo
 import com.example.vocabularytrainer.data.remote.detail_group.remote.response.WordResponse
 import com.example.vocabularytrainer.domain.home.model.Group
 import com.example.vocabularytrainer.domain.repository.HomeRepository
-import com.example.vocabularytrainer.domain.repository.SyncController
 import com.example.vocabularytrainer.presentation.home.Resource
 import com.example.vocabularytrainer.util.networkBoundResource
 import kotlinx.coroutines.flow.Flow
@@ -31,18 +30,15 @@ class HomeRepositoryImpl @Inject constructor(
     private val homeApi: HomeApi,
     private val wordApi: WordApi,
     private val dao: VocabularyDao,
-    private val authSharedPreferences: AuthPreferenceImpl
-) : HomeRepository, SyncController {
+    private val authSharedPreferences: AuthPreferenceImpl,
+    private val homeSharedPreference: HomePreferenceImpl
+) : HomeRepository {
     private var curGroupResponse: Response<List<GroupResponse>>? = null
     private var curWordResponse: Response<List<WordResponse>>? = null
 
-    @RequiresApi(Build.VERSION_CODES.O)
-    override suspend fun syncGroupsAndWords() {
-        syncGroups()
-    }
 
     @RequiresApi(Build.VERSION_CODES.O)
-    override fun getAllGroupFromServer(): Flow<Resource<List<GroupEntity>>> {
+    override fun fetchAllGroupFromServer(): Flow<Resource<List<GroupEntity>>> {
         val result = networkBoundResource(
             query = {
                 dao.selectAllGroups()
@@ -101,18 +97,16 @@ class HomeRepositoryImpl @Inject constructor(
         return dao.getAllWords()
     }
 
-    override suspend fun syncWordsByGroup(groupId: String) {
-        Log.d("TESTS", "syncWordsByGroup: $groupId")
+    override suspend fun syncAllWord() {
         if (Variables.isNetworkConnected) {
             val unsyncedWords = dao.getAllUnsyncedWords()
 
 
-            curWordResponse = wordApi.getWordByGroup(groupId)
+            curWordResponse = wordApi.getWordByGroup(homeSharedPreference.getMainGroupId())
             curWordResponse?.body()?.let { words ->
                 dao.deleteAllWords()
 
                 insertWords(words.onEach { word ->
-                    Log.d("TESTS", "syncWordsByGroup: $word")
                     word.toWordEntity()
                 })
             }
@@ -167,7 +161,7 @@ class HomeRepositoryImpl @Inject constructor(
                 dao.getGroupWithWords(groupId)
             },
             fetch = {
-                syncWordsByGroup(groupId)
+                syncAllWord()
                 curWordResponse
             },
             saveFetchResult = { response ->

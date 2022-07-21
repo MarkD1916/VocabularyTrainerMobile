@@ -139,7 +139,12 @@ class MainActivity : ComponentActivity() {
                                         viewModel
                                     )
                                 }
-
+                                Route.DETAIL_GROUP + "/{groupId}" -> {
+                                    Fab(
+                                        currentRoute,
+                                        viewModel
+                                    )
+                                }
                                 else -> {
                                     MultiFab(
                                         currentRoute,
@@ -154,7 +159,7 @@ class MainActivity : ComponentActivity() {
                                             horizontalAlignment = Alignment.CenterHorizontally
                                         ) {
                                             OutlinedButton(
-                                                onClick = { /*TODO*/ },
+                                                onClick = {  },
                                                 modifier = Modifier.size(50.dp),  //avoid the oval shape
                                                 shape = CircleShape,
                                                 border = BorderStroke(
@@ -249,7 +254,7 @@ class MainActivity : ComponentActivity() {
                                         scope.launch {
                                             scaffoldState.drawerState.close()
                                         }
-                                        viewModel.onEvent(LoginEvent.LogOut)
+                                        viewModel.onGlobalAuthEvent(LoginEvent.LogOut)
                                     }
 
                                 }
@@ -303,6 +308,13 @@ class MainActivity : ComponentActivity() {
                                 ) {
 
                                 }
+                            }
+
+                            composable(
+                                route = Route.ADD_NEW_WORD
+                            )
+                            {
+                                //ToDo сделать скрин для добавления нового слова
                             }
 
                             composable(

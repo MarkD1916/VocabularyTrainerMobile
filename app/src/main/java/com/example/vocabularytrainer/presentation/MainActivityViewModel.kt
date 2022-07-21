@@ -12,6 +12,7 @@ import com.example.vocabularytrainer.domain.auth.use_case.AuthUseCases
 import com.example.vocabularytrainer.navigation.Route
 import com.example.vocabularytrainer.presentation.auth.AuthEvent
 import com.example.vocabularytrainer.presentation.auth.login.LoginEvent
+import com.example.vocabularytrainer.presentation.detail_group.DetailGroupEvent
 import com.vmakd1916gmail.com.core.util.UiEvent
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.*
@@ -31,10 +32,10 @@ class MainActivityViewModel @Inject constructor(
 
     val id by mutableStateOf(authPreference.getUserId())
 
-    var isOpen by mutableStateOf(false)
+    var isAddGroupDialogOpen by mutableStateOf(false)
     var changeState by mutableStateOf(false)
 
-    fun onEvent(event: AuthEvent) {
+    fun onGlobalAuthEvent(event: AuthEvent) {
         when (event) {
             is LoginEvent.LogOut -> {
                 logOutUser()
@@ -42,9 +43,23 @@ class MainActivityViewModel @Inject constructor(
         }
     }
 
+    fun onGlobalDetailGroupEvent(event: DetailGroupEvent) {
+        when (event) {
+            is DetailGroupEvent.OnNewWordClick -> {
+                viewModelScope.launch(Dispatchers.Main) {
+                    _uiEvent.send(
+                        UiEvent.Navigate(
+                            route = Route.ADD_NEW_WORD
+                        )
+                    )
+                }
+            }
+        }
+    }
+
 
     private fun logOutUser() {
-        viewModelScope.launch(Dispatchers.IO) {
+        viewModelScope.launch(Dispatchers.Main) {
             authPreference.clearStoredData()
             _uiEvent.send(
                 UiEvent.Navigate(
