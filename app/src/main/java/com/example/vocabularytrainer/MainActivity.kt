@@ -29,6 +29,7 @@ import com.example.vocabularytrainer.data.preferences.AuthPreferenceImpl
 import com.example.vocabularytrainer.extantions.navigateEvent
 import com.example.vocabularytrainer.navigation.Route
 import com.example.vocabularytrainer.presentation.MainActivityViewModel
+import com.example.vocabularytrainer.presentation.add_word.AddWordScreen
 import com.example.vocabularytrainer.presentation.auth.AuthScreen
 import com.example.vocabularytrainer.presentation.auth.RegisterScreen
 import com.example.vocabularytrainer.presentation.auth.login.LoginEvent
@@ -65,9 +66,6 @@ class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
-
-
-
         setContent {
             VocabularyTrainerTheme {
                 val navController = rememberNavController()
@@ -85,7 +83,7 @@ class MainActivity : ComponentActivity() {
                             is UiEvent.Navigate -> {
                                 navController.navigateEvent(
                                     UiEvent.Navigate(
-                                        Route.WELCOME
+                                        event.route
                                     )
                                 )
                             }
@@ -106,7 +104,7 @@ class MainActivity : ComponentActivity() {
                                 icon = {
                                     Icon(Icons.Default.Home, "")
                                 },
-                                label = {  },
+                                label = { },
                                 selected = true,
                                 onClick = {
                                 },
@@ -119,7 +117,7 @@ class MainActivity : ComponentActivity() {
                                 },
 
 
-                                label = {  },
+                                label = { },
                                 selected = false,//selectedItem.value == "upload",
                                 onClick = {
 
@@ -158,42 +156,68 @@ class MainActivity : ComponentActivity() {
                                             modifier = Modifier.padding(end = 10.dp),
                                             horizontalAlignment = Alignment.CenterHorizontally
                                         ) {
-                                            OutlinedButton(
-                                                onClick = {  },
-                                                modifier = Modifier.size(50.dp),  //avoid the oval shape
-                                                shape = CircleShape,
-                                                border = BorderStroke(
-                                                    1.dp,
-                                                    MaterialTheme.colors.primary
-                                                ),
-                                                contentPadding = PaddingValues(0.dp),  //avoid the little icon
-                                                colors = ButtonDefaults.outlinedButtonColors(
-                                                    contentColor = MaterialTheme.colors.primary
-                                                )
-                                            ) {
-                                                Icon(
-                                                    Icons.Default.Add,
-                                                    contentDescription = "content description"
-                                                )
+                                            Row(modifier = Modifier.align(Alignment.End)) {
+                                                Text(text = "Image",
+                                                    modifier = Modifier
+                                                        .align(Alignment.CenterVertically))
+
+                                                Spacer(modifier = Modifier.width(25.dp))
+
+                                                OutlinedButton(
+                                                    onClick = { },
+                                                    modifier = Modifier
+                                                        .size(50.dp)
+                                                        .align(Alignment.CenterVertically),  //avoid the oval shape
+                                                    shape = CircleShape,
+                                                    border = BorderStroke(
+                                                        1.dp,
+                                                        MaterialTheme.colors.primary
+                                                    ),
+                                                    contentPadding = PaddingValues(0.dp),  //avoid the little icon
+                                                    colors = ButtonDefaults.outlinedButtonColors(
+                                                        contentColor = MaterialTheme.colors.primary
+                                                    )
+                                                ) {
+                                                    Icon(
+                                                        Icons.Default.Add,
+                                                        contentDescription = "content description"
+                                                    )
+                                                }
                                             }
                                             Spacer(modifier = Modifier.height(15.dp))
-                                            OutlinedButton(
-                                                onClick = { /*TODO*/ },
-                                                modifier = Modifier.size(50.dp),  //avoid the oval shape
-                                                shape = CircleShape,
-                                                border = BorderStroke(
-                                                    1.dp,
-                                                    MaterialTheme.colors.primary
-                                                ),
-                                                contentPadding = PaddingValues(0.dp),  //avoid the little icon
-                                                colors = ButtonDefaults.outlinedButtonColors(
-                                                    contentColor = MaterialTheme.colors.primary
+                                            Row(modifier = Modifier.align(Alignment.End)) {
+                                                Text(
+                                                    text = "Example",
+                                                    modifier = Modifier
+                                                        .align(Alignment.CenterVertically),
                                                 )
-                                            ) {
-                                                Icon(
-                                                    Icons.Default.Add,
-                                                    contentDescription = "content description"
-                                                )
+                                                Spacer(modifier = Modifier.width(25.dp))
+                                                OutlinedButton(
+                                                    onClick = {
+                                                        viewModel.screenState = false
+
+                                                        viewModel.fabButtonState = MultiFabState.COLLAPSED
+
+                                                        viewModel.exampleNumber = viewModel.exampleNumber + 1
+                                                              },
+                                                    modifier = Modifier
+                                                        .size(50.dp)
+                                                        .align(Alignment.CenterVertically),  //avoid the oval shape
+                                                    shape = CircleShape,
+                                                    border = BorderStroke(
+                                                        1.dp,
+                                                        MaterialTheme.colors.primary
+                                                    ),
+                                                    contentPadding = PaddingValues(0.dp),  //avoid the little icon
+                                                    colors = ButtonDefaults.outlinedButtonColors(
+                                                        contentColor = MaterialTheme.colors.primary
+                                                    )
+                                                ) {
+                                                    Icon(
+                                                        Icons.Default.Add,
+                                                        contentDescription = "content description"
+                                                    )
+                                                }
                                             }
                                             Spacer(modifier = Modifier.height(15.dp))
 
@@ -314,7 +338,8 @@ class MainActivity : ComponentActivity() {
                                 route = Route.ADD_NEW_WORD
                             )
                             {
-                                //ToDo сделать скрин для добавления нового слова
+                                AddWordScreen(isBlockScreen = viewModel.screenState,
+                                viewModel.exampleNumber)
                             }
 
                             composable(

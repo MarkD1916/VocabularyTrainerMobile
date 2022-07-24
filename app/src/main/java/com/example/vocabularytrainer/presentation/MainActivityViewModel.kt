@@ -12,6 +12,7 @@ import com.example.vocabularytrainer.domain.auth.use_case.AuthUseCases
 import com.example.vocabularytrainer.navigation.Route
 import com.example.vocabularytrainer.presentation.auth.AuthEvent
 import com.example.vocabularytrainer.presentation.auth.login.LoginEvent
+import com.example.vocabularytrainer.presentation.components.MultiFabState
 import com.example.vocabularytrainer.presentation.detail_group.DetailGroupEvent
 import com.vmakd1916gmail.com.core.util.UiEvent
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -33,7 +34,12 @@ class MainActivityViewModel @Inject constructor(
     val id by mutableStateOf(authPreference.getUserId())
 
     var isAddGroupDialogOpen by mutableStateOf(false)
-    var changeState by mutableStateOf(false)
+
+    var fabButtonState by mutableStateOf(MultiFabState.COLLAPSED)
+
+    var screenState by mutableStateOf(false)
+    var exampleNumber by mutableStateOf(1)
+
 
     fun onGlobalAuthEvent(event: AuthEvent) {
         when (event) {

@@ -63,7 +63,8 @@ fun Fab(
 
 
     FloatingActionButton(
-        modifier = Modifier.padding(end = 10.dp)
+        modifier = Modifier
+            .padding(end = 10.dp)
             .scale(scale.value)
             .pointerInteropFilter {
                 selected = when (it.action) {
@@ -101,7 +102,7 @@ fun MultiFab(
     stateChanged: (fabState: MultiFabState) -> Unit,
     content: @Composable () -> Unit,
 ) {
-    val transition = updateTransition(targetState = toState, label = "")
+    val transition = updateTransition(targetState = viewModel.fabButtonState, label = "")
     val rotation: Float by transition.animateFloat(label = "") { state ->
         if (state == MultiFabState.EXPANDED) 45f else 0f
     }
@@ -113,14 +114,16 @@ fun MultiFab(
 
         FloatingActionButton(
             modifier = Modifier
-                .padding(end = 10.dp),
+                .padding(end = 10.dp)
+                .align(Alignment.End),
             onClick = {
-            stateChanged(
+                viewModel.screenState = !viewModel.screenState
+
                 if (transition.currentState == MultiFabState.EXPANDED) {
-                    MultiFabState.COLLAPSED
-                } else MultiFabState.EXPANDED
-            )
-        }) {
+                    viewModel.fabButtonState = MultiFabState.COLLAPSED
+                } else viewModel.fabButtonState = MultiFabState.EXPANDED
+
+            }) {
 
             Icon(
                 modifier = Modifier

@@ -13,6 +13,7 @@ import com.example.vocabularytrainer.data.preferences.AuthPreferenceImpl
 import com.example.vocabularytrainer.data.preferences.HomePreferenceImpl
 import com.example.vocabularytrainer.domain.auth.use_case.AuthUseCases
 import com.example.vocabularytrainer.domain.home.use_case.HomeUseCases
+import com.example.vocabularytrainer.domain.preferences.HomePreferences
 import com.example.vocabularytrainer.navigation.Route
 import com.example.vocabularytrainer.presentation.auth.AuthEvent
 import com.example.vocabularytrainer.presentation.auth.login.LoginEvent
@@ -27,6 +28,7 @@ import javax.inject.Inject
 @HiltViewModel
 class HomeViewModel @Inject constructor(
     private val authPreference: AuthPreferenceImpl,
+    private val homePreference: HomePreferenceImpl,
     private val authUseCases: AuthUseCases,
     private val homeUseCases: HomeUseCases
 ) : ViewModel() {
@@ -44,6 +46,10 @@ class HomeViewModel @Inject constructor(
     val isRefreshing: StateFlow<Boolean>
         get() = _isRefreshing.asStateFlow()
 
+
+    init {
+        state.mainGroupId = homePreference.getMainGroupId()
+    }
 
     fun onEvent(event: AuthEvent) {
         when (event) {
@@ -65,7 +71,7 @@ class HomeViewModel @Inject constructor(
 
                 getAllGroup?.cancel()
                 getAllGroup = viewModelScope.async {
-                    val jobLoad = async(Dispatchers.Main) {
+                    val jobLoad = async(Dispatchers.IO) {
                         delay(500L)
                         if (event.loadingType is LoadingType.FullScreenLoading) {
                             onHomeEvent(HomeEvent.ShowFullScreenLoading)
