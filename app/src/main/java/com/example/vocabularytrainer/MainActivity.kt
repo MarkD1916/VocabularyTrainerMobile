@@ -179,7 +179,7 @@ class MainActivity : ComponentActivity() {
                                                     )
                                                 ) {
                                                     Icon(
-                                                        Icons.Default.Add,
+                                                        Icons.Default.Build,
                                                         contentDescription = "content description"
                                                     )
                                                 }

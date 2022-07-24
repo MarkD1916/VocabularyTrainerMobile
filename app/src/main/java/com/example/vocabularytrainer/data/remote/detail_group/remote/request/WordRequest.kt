@@ -8,6 +8,6 @@ data class WordRequest(
     val translate: String,
     val transcription: String = "",
     val noteDescription: String = "",
-    val imageUrl: String = "",
+    val imageUrl: List<String> = listOf(),
     val exampleForWord: List<String> = listOf()
 )

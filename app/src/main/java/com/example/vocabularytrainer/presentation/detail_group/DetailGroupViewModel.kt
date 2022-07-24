@@ -62,7 +62,6 @@ class DetailGroupViewModel @Inject constructor(
                                 screenState = null
                             )
                         }
-                        .flowOn(Dispatchers.IO)
                         .launchIn(viewModelScope)
 
                 } else {
@@ -79,7 +78,6 @@ class DetailGroupViewModel @Inject constructor(
                                 )
                             }
                         }
-                        .flowOn(Dispatchers.IO)
                         .launchIn(viewModelScope)
                 }
             }

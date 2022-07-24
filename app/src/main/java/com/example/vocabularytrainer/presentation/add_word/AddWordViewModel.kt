@@ -1,4 +1,10 @@
 package com.example.vocabularytrainer.presentation.add_word
 
-class AddWordViewModel {
+import androidx.lifecycle.ViewModel
+import dagger.hilt.android.lifecycle.HiltViewModel
+import javax.inject.Inject
+
+@HiltViewModel
+class AddWordViewModel @Inject constructor(): ViewModel() {
+
 }
